@@ -6,7 +6,7 @@ import { MAX_RETRY_COUNT } from "@/app/config/api";
 export class GeminiService {
   static async generateContent(
     model: string,
-    contents: string | any[],
+    contents: string | any[], // eslint-disable-line @typescript-eslint/no-explicit-any
     config?: GenerateContentConfig,
     retries: number = MAX_RETRY_COUNT
   ) {
@@ -29,9 +29,9 @@ export class GeminiService {
 
   static async generateJSON<T>(
     model: string,
-    contents: string | any[],
+    contents: string | any[], // eslint-disable-line @typescript-eslint/no-explicit-any
     systemInstruction: string,
-    schema: any,
+    schema: any, // eslint-disable-line @typescript-eslint/no-explicit-any
     retries: number = MAX_RETRY_COUNT
   ): Promise<T> {
     const response = await this.generateContent(
