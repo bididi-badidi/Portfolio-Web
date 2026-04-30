@@ -1,0 +1,58 @@
+import { getErrorMessage } from "@/app/utils/handleReport";
+import { gemini_client as ai } from "@/lib/gemini";
+import { GenerateContentConfig } from "@google/genai";
+import { MAX_RETRY_COUNT } from "@/app/config/api";
+
+export class GeminiService {
+  static async generateContent(
+    model: string,
+    contents: string | any[],
+    config?: GenerateContentConfig,
+    retries: number = MAX_RETRY_COUNT
+  ) {
+    let lastError: unknown;
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents,
+          config,
+        });
+        return response;
+      } catch (err) {
+        lastError = err;
+        console.error(`Gemini attempt ${attempt + 1} failed: ${getErrorMessage(err)}`);
+      }
+    }
+    throw lastError || new Error("Failed to generate content after retries");
+  }
+
+  static async generateJSON<T>(
+    model: string,
+    contents: string | any[],
+    systemInstruction: string,
+    schema: any,
+    retries: number = MAX_RETRY_COUNT
+  ): Promise<T> {
+    const response = await this.generateContent(
+      model,
+      contents,
+      {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: schema,
+      },
+      retries
+    );
+
+    const text = response.text;
+    if (!text) throw new Error("Empty response from Gemini");
+
+    try {
+      return JSON.parse(text) as T;
+    } catch (err) {
+      console.error("Failed to parse Gemini JSON response:", text, getErrorMessage(err));
+      throw new Error("Invalid JSON response from Gemini");
+    }
+  }
+}
