@@ -70,7 +70,7 @@ export const FloatingNav = ({
         )}
       >
         {showHome && (
-          <button className="border-x text-sm font-medium relative text-neutral-200 hover:text-neutral-400 border-white/[0.2] px-4 py-2 rounded-full cursor-pointer">
+          <button className="border-x text-sm font-medium relative text-bright hover:text-foreground border-white/[0.2] px-4 py-2 rounded-full cursor-pointer">
             <Link href="/">Home</Link>
           </button>
         )}
@@ -79,14 +79,14 @@ export const FloatingNav = ({
             key={`link=${idx}`}
             href={navItem.link}
             className={cn(
-              "relative text-neutral-200 hover:text-neutral-400 items-center flex space-x-1 font-bold cursor-pointer"
+              "relative text-bright hover:text-foreground items-center flex space-x-1 font-bold cursor-pointer"
             )}
           >
             <span className="hidden sm:block text-sm">{navItem.name}</span>
           </a>
         ))}
         <button
-          className="border-y text-sm font-medium relative text-neutral-200 hover:text-neutral-400 border-white/[0.2] px-4 py-2 rounded-full cursor-pointer"
+          className="border-y text-sm font-medium relative text-bright hover:text-foreground border-white/[0.2] px-4 py-2 rounded-full cursor-pointer"
           onClick={() => {
             setVisible(false);
             setTimeout(() => setHidden(true), 1000);

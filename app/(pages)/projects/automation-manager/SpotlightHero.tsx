@@ -18,13 +18,13 @@ export function SpotlightHero({ id }: { id: string }) {
         <h1 className="bg-opacity-50 bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-center text-4xl font-bold text-transparent md:text-7xl">
           Automation Manager
         </h1>
-        <p className="mx-auto mt-4 mb-8 max-w-lg text-center text-base font-normal text-neutral-300">
+        <p className="mx-auto mt-4 mb-8 max-w-lg text-center text-base font-normal text-bright">
           Explore my portfolio interactively! This AI assistant can answer your
           questions about my skills and projects, or even help you get in touch
           and navigate the website.
         </p>
         <a
-          className="block mx-auto max-w-lg text-center text-base font-bold underline text-neutral-300"
+          className="block mx-auto max-w-lg text-center text-base font-bold underline text-bright"
           href="#why"
         >
           Explore

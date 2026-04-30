@@ -140,7 +140,7 @@ export const ModalFooter = () => {
           initial="hidden"
           animate={uiState.isChatOpen ? "visible" : "hidden"}
           exit="hidden"
-          className={cn("relative flex gap-4 justify-end p-4 backdrop-blur-md bg-slate-50/20")}
+          className={cn("relative flex gap-4 justify-end p-4 backdrop-blur-md bg-bright/5")}
         >
           <AnimatePresence>
             {!isFocus && (

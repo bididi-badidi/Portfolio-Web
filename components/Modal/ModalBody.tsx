@@ -68,7 +68,7 @@ export const ModalBody = ({
           <motion.div
             ref={modalRef}
             className={cn(
-              "h-[70%] max-w-[90%] lg:max-w-[70%] pt-3 bg-slate-800/55 backdrop-blur-md overflow-hidden border border-slate-50/20 rounded-2xl relative z-50 flex flex-col flex-1",
+              "h-[70%] max-w-[90%] lg:max-w-[70%] pt-3 bg-elevated/55 backdrop-blur-md overflow-hidden border border-slate-50/20 rounded-2xl relative z-50 flex flex-col flex-1",
               className
             )}
             variants={allowAnimation ? modalVariants : undefined}

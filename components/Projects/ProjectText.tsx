@@ -9,7 +9,7 @@ export function ProjectText({
   className?: string;
 }) {
   return (
-    <p className={cn("text-neutral-200 text-sm lg:text-lg mb-4", className)}>
+    <p className={cn("text-bright text-sm lg:text-lg mb-4", className)}>
       {children}
     </p>
   );

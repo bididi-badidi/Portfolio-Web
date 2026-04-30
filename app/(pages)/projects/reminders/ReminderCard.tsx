@@ -18,7 +18,7 @@ export function ReminderCard({
       }`}
     >
       <div className="border-6 border-transparent">
-        <div className=" py-4 px-6 h-[200px] bg-black/30 backdrop-blur-md border border-white/10  rounded-lg shadow-md text-neutral-200 overflow-hidden flex flex-col justify-between">
+        <div className=" py-4 px-6 h-[200px] bg-black/30 backdrop-blur-md border border-white/10  rounded-lg shadow-md text-bright overflow-hidden flex flex-col justify-between">
           <h3 className="text-lg lg:text-xl font-semibold text-slate-300">
             {title}
           </h3>

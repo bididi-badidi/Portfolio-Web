@@ -66,11 +66,11 @@ export function ModalContent() {
                   className={`py-[0.5rem] px-8 rounded-[4rem] text-start justify-center mt-6 max-w-5/6 ${
                     chat.role == "bot"
                       ? "bg-indigo-200/60  self-start rounded-[10px] rounded-tl-[2px]"
-                      : "bg-slate-700/40 self-end rounded-[10px] rounded-tr-[2px]"
+                      : "bg-subtle/40 self-end rounded-[10px] rounded-tr-[2px]"
                   }`}
                 >
                   <span
-                    className={`${chat.role == "bot" ? "text-neutral-800" : "text-neutral-300"} text-sm text-start`}
+                    className={`${chat.role == "bot" ? "text-neutral-800" : "text-bright"} text-sm text-start`}
                   >
                     {chat.message}
                   </span>

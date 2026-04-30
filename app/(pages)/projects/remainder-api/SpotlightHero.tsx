@@ -18,7 +18,7 @@ export function SpotlightRemainders({ id }: { id: string }) {
         <h1 className="bg-opacity-50 bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-center text-4xl font-bold text-transparent md:text-7xl">
           RemAInders
         </h1>
-        <p className="mx-auto mt-4 max-w-lg text-center text-base font-normal text-neutral-300">
+        <p className="mx-auto mt-4 max-w-lg text-center text-base font-normal text-bright">
           Flexibility and extensibility are key to integrating new features into
           digital ecosystem. For example, automatically reminding your
           colleagues to attend meeting happening this afternoon via an AI.

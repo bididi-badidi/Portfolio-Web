@@ -26,7 +26,7 @@ export interface InfiniteCardInterface {
 export const InfiniteCard = (item: InfiniteCardInterface) => {
   return (
     <li
-      className="w-[96px] h-[96px] max-w-full relative rounded-2xl border-y border-slate-700 px-8 py-6 lg:h-[196px] lg:w-[196px]"
+      className="w-[96px] h-[96px] max-w-full relative rounded-2xl border-y border-subtle px-8 py-6 lg:h-[196px] lg:w-[196px]"
       style={{
         background:
           "linear-gradient(180deg, var(--slate-800), var(--slate-900)",

@@ -72,7 +72,7 @@ export function EmailCopy() {
                 },
               }}
               exit={{ opacity: 0, y: 20, scale: 0.6 }}
-              className="shadow-xl rounded-xl  z-50 w-40 bg-slate-800/55 backdrop-blur-md py-4 px-2 text-slate-100 text-center text-sm outline-none"
+              className="shadow-xl rounded-xl  z-50 w-40 bg-elevated/55 backdrop-blur-md py-4 px-2 text-bright text-center text-sm outline-none"
               style={{
                 x: translateX,
               }}

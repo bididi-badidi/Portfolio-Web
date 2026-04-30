@@ -17,6 +17,14 @@
 
   /* --toast-error-bg: #ef4444; */
   --toast-error-text: #ef4444;
+
+  /* Semantic color tokens */
+  --color-surface: #0f172a;      /* slate-900: cards, panels */
+  --color-elevated: #1e293b;     /* slate-800: inputs, hover states */
+  --color-subtle: #334155;       /* slate-700: dividers, subtle borders */
+  --color-bright: #e2e8f0;       /* slate-200: primary text on dark bg */
+  --color-accent: #06b6d4;       /* cyan-500: primary interactive accent */
+  --color-accent-light: #22d3ee; /* cyan-400: hover/lighter accent */
 }
 
 html {

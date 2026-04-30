@@ -22,7 +22,7 @@ export const WhyItMatters = ({ id }: { id: string }) => {
         effortless and engaging, offering a more personalized
         experience navigating through my work."
       />
-      <ProjectText className="max-w-[70ch] text-center mb-24  text-slate-200">
+      <ProjectText className="max-w-[70ch] text-center mb-24  text-bright">
         This project showcases practical application of working with Large
         Language Models (LLMs) to solve complex problems by implementing robust
         function calling.

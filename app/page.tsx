@@ -20,7 +20,7 @@ export default function Home() {
     <>
       <FloatingNav navItems={navItems} showHome={false} />
       <SectionHero id="hero" />
-      <div className="h-[10rem] bg-gradient-to-b from-slate-950 to-transparent" />
+      <div className="h-[10rem] bg-gradient-to-b from-background to-transparent" />
       <SectionAbout id="about" />
       <TechGrid id="techstack" />
       <DottedBackground>
