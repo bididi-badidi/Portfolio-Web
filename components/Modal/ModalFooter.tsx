@@ -3,7 +3,8 @@ import { cn } from "@/app/utils/cn";
 import { useState } from "react";
 import { ChatInstance } from "@/app/interfaces/Chatbot";
 import { motion, AnimatePresence } from "motion/react";
-import { fetchChatbotReply, Reply } from "@/app/lib/chatbot/fetchReply";
+import { fetchChatbotReply } from "@/app/lib/chatbot/fetchReply";
+import { ChatReply } from "@/app/lib/chatbot/types";
 import { executeFunctionCall } from "@/app/lib/chatbot/functionHandlers";
 import { v4 as uuidv4 } from "uuid";
 import { useModal } from "@/app/context/ModalContext";
@@ -105,7 +106,7 @@ export const ModalFooter = () => {
     const reply = (await fetchChatbotReply({
       chatHistory: updatedChatHistory.slice(-MAX_CHAT_HISTORY_INSTANCE),
       enableFunctionCalling: enableFuncall,
-    })) as Reply;
+    })) as ChatReply;
     setIsThinking(false);
     setChatHistory((prev) =>
       prev
