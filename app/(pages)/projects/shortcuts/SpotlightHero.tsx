@@ -18,13 +18,13 @@ export function SpotlightHero({ id }: { id: string }) {
         <h1 className="bg-opacity-50 bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-center text-4xl font-bold text-transparent md:text-7xl">
           Event Capture
         </h1>
-        <p className="mx-auto mt-4 mb-8 max-w-lg text-center text-base font-normal text-neutral-300">
+        <p className="mx-auto mt-4 mb-8 max-w-lg text-center text-base font-normal text-bright">
           Speak or type, and let the app handle the rest. This tool
           automatically processes your voice and text commands, effortlessly
           adding new events to your calendar for instant, hands-free scheduling.
         </p>
         <a
-          className="block mx-auto max-w-lg text-center text-base font-bold underline text-neutral-300"
+          className="block mx-auto max-w-lg text-center text-base font-bold underline text-bright"
           href="#why"
         >
           See More

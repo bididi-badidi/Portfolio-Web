@@ -41,11 +41,11 @@ export const Footer = () => {
   ];
   return (
     <div className="relative min-h-[45dvh] bg-black-20 py-[10dvh] px-[10dvw] flex flex-col justify-between">
-      <div className="absolute top-12 h-[0.5px] w-[60%] left-[50%] translate-x-[-50%] bg-slate-200/20" />
+      <div className="absolute top-12 h-[0.5px] w-[60%] left-[50%] translate-x-[-50%] bg-bright/20" />
       <ul className="flex flex-col lg:flex-row justify-center text-center mb-8 gap-4 lg:gap-12">
         {footerLinks.map((item) => (
           <li key={item.name}>
-            <Link className="font-bold text-xl cursor-pointer hover:text-neutral-200/80" href={item.link}>
+            <Link className="font-bold text-xl cursor-pointer hover:text-bright/80" href={item.link}>
               {item.name}
             </Link>
           </li>
@@ -56,7 +56,7 @@ export const Footer = () => {
           <li key={item.icon}>
             <a className="cursor-pointer " href={item.link}>
               <Image
-                className="bg-neutral-200 rounded-[50%]"
+                className="bg-bright rounded-[50%]"
                 src={item.icon}
                 width={32}
                 height={32}

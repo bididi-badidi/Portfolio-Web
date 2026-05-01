@@ -71,7 +71,7 @@ export const AnimatedToggleButton = ({
           animate={isOn ? "on" : "off"}
         />
       </motion.button>
-      <p className="text-xs text-slate-300">{text}</p>
+      <p className="text-xs text-bright">{text}</p>
     </div>
   );
 };

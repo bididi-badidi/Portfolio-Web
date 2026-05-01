@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export function SectionTransition() {
   return (
-    <div className="h-[10rem] bg-gradient-to-b from-slate-950 to-transparent">
+    <div className="h-[10rem] bg-gradient-to-b from-background to-transparent">
       <motion.h2
         initial={{ opacity: 0.5, y: 100 }}
         whileInView={{ opacity: 1, y: 50 }}
