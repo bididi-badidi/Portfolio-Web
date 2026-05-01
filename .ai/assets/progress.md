@@ -5,8 +5,8 @@
 No current tasks
 
 ## Upcoming
-
-No upcoming tasks
+- Merge `fix/chatbot` into `dev`
+- Project Content completion (TODOs in project pages)
 
 ## Project Documents
 
@@ -16,3 +16,4 @@ No upcoming tasks
 - [Task Archive](.ai/assets/task_archive.md)
 
 ## Phases
+- [x] Phase: Chatbot Bug Fixes & Testing - [Plan](.ai/assets/branches/fix-chatbot/plan.md)
