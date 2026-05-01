@@ -2,7 +2,6 @@
 
 # vs code
 /.vscode
-.github
 
 # dependencies
 /node_modules
