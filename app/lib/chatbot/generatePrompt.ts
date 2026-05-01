@@ -1,9 +1,6 @@
-"use server";
-
-// import { ResultInstance } from "./fetchSearchResults";
 import { FunctionCall } from "@google/genai";
 
-export async function generatePrompt(
+export function generatePrompt(
   conversationHistoryString: string,
   searchResults: string,
   functionCall: FunctionCall | undefined,

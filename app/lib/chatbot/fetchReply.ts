@@ -4,7 +4,7 @@ import { envClient } from "@/app/env/client";
 import { getErrorMessage } from "@/app/utils/handleReport";
 import { fetchFunctionCalls } from "./fetchFunctionCalls";
 import { funcSysMsgDict } from "./functionCalls";
-import { fetchStructQueryPrompt } from "./fetchSearchResults";
+import { fetchStructQueryPrompt, fetchSearchResults } from "./fetchSearchResults";
 import {
   REPLY_ERROR_FALLBACK_MSG,
   GEMINI_GENERATION_CONFIG,
@@ -26,13 +26,17 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
       fetchStructQueryPrompt(conversationHistoryString, request.chatHistory[request.chatHistory.length - 1].message),
     ]);
 
+    if (functionCallResponse.error) {
+      console.warn("Function call detection failed, proceeding without function calls");
+    }
+
     if (DEBUG_MODE) {
       console.log(`--- Function Call: ${JSON.stringify(functionCallResponse)}`);
       console.log(`--- Struct query: ${JSON.stringify(searchQuery)}`);
     }
 
     let functionExecApproved = false;
-    if (request.enableFunctionCalling && functionCallResponse.functionCall) {
+    if (request.enableFunctionCalling && !functionCallResponse.error && functionCallResponse.functionCall) {
       const functionType = Object.values(FunctionCallType).find(
         (func) => func.name === functionCallResponse.functionCall?.name,
       );
@@ -52,11 +56,33 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
       ? funcSysMsgDict.get(functionCallResponse?.functionCall?.name)
       : "";
 
-    const knowledgeData = getKnowledgeData();
+    let knowledgeData: unknown = {};
+    try {
+      knowledgeData = await getKnowledgeData();
+    } catch (err) {
+      console.error(`getKnowledgeData error: ${getErrorMessage(err)}`);
+    }
 
-    const prompt = await generatePrompt(
+    let searchResultsData: unknown[] = [];
+    if (searchQuery.needSearch) {
+      try {
+        searchResultsData = await fetchSearchResults(
+          searchQuery.synthesisQuery,
+          searchQuery.searchQueryLimit,
+        );
+      } catch (err) {
+        console.error(`fetchSearchResults error: ${getErrorMessage(err)}`);
+      }
+    }
+
+    const knowledgeContext = JSON.stringify({
+      knowledge: knowledgeData,
+      searchResults: searchResultsData,
+    });
+
+    const prompt = generatePrompt(
       conversationHistoryString,
-      JSON.stringify(knowledgeData),
+      knowledgeContext,
       functionExecApproved ? functionCallResponse.functionCall : undefined,
     );
 
