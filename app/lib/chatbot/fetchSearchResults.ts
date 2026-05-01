@@ -27,7 +27,7 @@ export async function fetchStructQueryPrompt(
   fallbackQuery: string,
 ): Promise<QueryStructure> {
   try {
-    return await GeminiService.generateJSON<QueryStructure>(
+    const raw = await GeminiService.generateJSON<QueryStructure & { searchQueryLimit: string | number }>(
       envClient.NEXT_PUBLIC_GEMINI_MODEL_QUERY,
       `instruction: ${SEARCH_QUERY_SYN_PROMPT}\n[Conversation]\n${conversationHistoryString}`,
       "You are a helpful assistant that helps with query synthesis.", // Generic system instruction as the main one is in the prompt
@@ -51,6 +51,10 @@ export async function fetchStructQueryPrompt(
         },
       }
     );
+    return {
+      ...raw,
+      searchQueryLimit: Number(raw.searchQueryLimit) || 3,
+    };
   } catch (err) {
     const errMsg = getErrorMessage(err);
     console.error(`fetchStructQueryPrompt error: ${errMsg}`);

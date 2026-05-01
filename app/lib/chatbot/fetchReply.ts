@@ -19,11 +19,26 @@ import { generatePrompt } from "./generatePrompt";
 
 export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatReply> {
   try {
+    if (!Array.isArray(request.chatHistory) || request.chatHistory.length === 0) {
+      return {
+        message: REPLY_ERROR_FALLBACK_MSG,
+        error: true,
+      };
+    }
+
+    const latestMessage = request.chatHistory[request.chatHistory.length - 1]?.message;
+    if (typeof latestMessage !== "string" || latestMessage.trim().length === 0) {
+      return {
+        message: REPLY_ERROR_FALLBACK_MSG,
+        error: true,
+      };
+    }
+
     const conversationHistoryString = JSON.stringify(request.chatHistory);
 
     const [functionCallResponse, searchQuery] = await Promise.all([
       fetchFunctionCalls(conversationHistoryString),
-      fetchStructQueryPrompt(conversationHistoryString, request.chatHistory[request.chatHistory.length - 1].message),
+      fetchStructQueryPrompt(conversationHistoryString, latestMessage),
     ]);
 
     if (functionCallResponse.error) {
@@ -40,15 +55,20 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
       const functionType = Object.values(FunctionCallType).find(
         (func) => func.name === functionCallResponse.functionCall?.name,
       );
-      const funcExecApproveObj = await fetchExcDecisionStruct(
-        conversationHistoryString,
-        functionCallResponse.functionCall,
-        functionType?.description ?? "",
-      );
-      functionExecApproved = funcExecApproveObj.approve;
-      
-      if (DEBUG_MODE) {
-        console.log(`--- Func Approver: ${JSON.stringify(funcExecApproveObj)}`);
+      try {
+        const funcExecApproveObj = await fetchExcDecisionStruct(
+          conversationHistoryString,
+          functionCallResponse.functionCall,
+          functionType?.description ?? "",
+        );
+        functionExecApproved = funcExecApproveObj.approve;
+
+        if (DEBUG_MODE) {
+          console.log(`--- Func Approver: ${JSON.stringify(funcExecApproveObj)}`);
+        }
+      } catch (err) {
+        console.error(`fetchExcDecisionStruct error: ${getErrorMessage(err)}`);
+        functionExecApproved = false;
       }
     }
 
@@ -93,7 +113,9 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
     );
 
     const replyText = response.text;
-    if (!replyText) throw new Error("Unable to fetch response");
+    if (!replyText || (typeof replyText === "string" && replyText.trim().length === 0)) {
+      throw new Error("Unable to fetch response");
+    }
 
     return {
       message: replyText,
