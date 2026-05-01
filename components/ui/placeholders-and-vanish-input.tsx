@@ -104,8 +104,8 @@ export function PlaceholdersAndVanishInput({
       animate={isFocus ? "focused" : "unfocused"}
       exit="unfocused"
       className={cn(
-        "justify-self-end backdrop-blur-md bg-elevated/70 h-12 rounded-full overflow-hidden shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-100",
-        value && "bg-elevated/60"
+        "justify-self-end backdrop-blur-2xl bg-white/5 h-12 rounded-full overflow-hidden border border-white/10 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-100",
+        value && "bg-white/10"
       )}
       onSubmit={handleSubmit}
     >
