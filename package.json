@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "worktree": "bash scripts/worktree-bootstrap.sh",
     "test:chatbot-golden": "bun test app/lib/chatbot/__tests__/goldenEval.test.ts",
     "test:chatbot-golden-live": "CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test ./app/lib/chatbot/__tests__/goldenLive.test.ts",
     "test:chatbot-golden-live:file": "CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test ./app/lib/chatbot/__tests__/goldenLive.test.ts",
