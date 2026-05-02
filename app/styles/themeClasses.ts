@@ -1,0 +1,45 @@
+export const themeClasses = {
+  text: {
+    primary: "text-bright",
+    secondary: "text-foreground",
+    muted: "text-muted",
+    faint: "text-faint",
+    inverse: "text-inverse",
+    onAccent: "text-white",
+  },
+  gradient: {
+    heading:
+      "bg-gradient-to-br from-heading-from to-heading-to bg-clip-text text-transparent",
+    heroHeading:
+      "bg-gradient-to-b from-hero-heading-from to-hero-heading-to bg-clip-text text-transparent",
+    primaryAction:
+      "bg-gradient-to-r from-accent-secondary to-accent hover:from-accent hover:to-accent-secondary-hover",
+  },
+  surface: {
+    page: "bg-background",
+    panel: "bg-surface border border-subtle",
+    panelSubtle: "bg-surface/50 border border-subtle",
+    elevated: "bg-elevated border border-subtle",
+    glass: "bg-glass border border-glass-border backdrop-blur-xl",
+    glassHover:
+      "bg-glass border border-glass-border hover:bg-glass-hover hover:border-glass-border-strong backdrop-blur-xl",
+    overlay: "bg-overlay",
+    scrim: "bg-scrim",
+  },
+  control: {
+    focusRing: "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+    iconButton:
+      "text-foreground hover:text-bright transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+    navItem: "text-bright hover:text-foreground transition-colors",
+  },
+  chat: {
+    bubbleBase:
+      "py-3 px-6 rounded-3xl text-start justify-center mt-6 max-w-[85%] backdrop-blur-xl border border-glass-border shadow-lg",
+    botBubble:
+      "bg-[var(--color-chat-bot-bg)] text-[var(--color-chat-bot-text)] self-start rounded-tl-none shadow-indigo-500/10",
+    userBubble:
+      "bg-[var(--color-chat-user-bg)] text-[var(--color-chat-user-text)] self-end rounded-tr-none shadow-black/20",
+    errorBubble:
+      "bg-error-bg text-error-text self-start rounded-tl-none shadow-error/10 border-error-border",
+  },
+} as const;
