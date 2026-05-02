@@ -1,8 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from "bun:test";
-import {
-  mockGeminiGenerateContent,
-  mockGetMasterResume,
-} from "../../../../bun-test-setup";
+import { mockGeminiGenerateContent, mockGetMasterResume } from "../../../../bun-test-setup";
 
 /**
  * Tests for chatbot sub-components using the real implementations.
@@ -19,18 +17,14 @@ describe("Chatbot Chain Components", () => {
     mockGeminiGenerateContent.mockReset();
     mockGetMasterResume.mockReset();
 
-    mockGetMasterResume.mockImplementation(() =>
-      Promise.resolve({ header: {}, education: {} })
-    );
+    mockGetMasterResume.mockImplementation(() => Promise.resolve({ header: {}, education: {} }));
   });
 
   // ── GeminiService ──
 
   describe("GeminiService (via shared mock)", () => {
     it("should handle successful content generation", async () => {
-      mockGeminiGenerateContent.mockImplementation(() =>
-        Promise.resolve({ text: "Success" })
-      );
+      mockGeminiGenerateContent.mockImplementation(() => Promise.resolve({ text: "Success" }));
       const res = await GeminiService.generateContent("model", "hi");
       expect(res.text).toBe("Success");
     });
@@ -59,32 +53,22 @@ describe("Chatbot Chain Components", () => {
         "Leadership Experiences": [],
         skills: { Technical: "JS", "Soft Skills": "Comm", Interests: "Gaming" },
       };
-      mockGeminiGenerateContent.mockImplementation(() =>
-        Promise.resolve({ text: JSON.stringify(mockResult) })
-      );
+      mockGeminiGenerateContent.mockImplementation(() => Promise.resolve({ text: JSON.stringify(mockResult) }));
       const res = await fetchResumeData("job", "master");
       expect(res.summary).toBe("Tailored summary");
       expect(res.skills.Technical).toBe("JS");
     });
 
     it("should throw when master resume fetch fails", async () => {
-      mockGetMasterResume.mockImplementation(() =>
-        Promise.reject(new Error("s3 unavailable"))
-      );
+      mockGetMasterResume.mockImplementation(() => Promise.reject(new Error("s3 unavailable")));
 
-      await expect(fetchResumeData("job", "master")).rejects.toThrow(
-        "s3 unavailable"
-      );
+      await expect(fetchResumeData("job", "master")).rejects.toThrow("s3 unavailable");
     });
 
     it("should throw when Gemini returns invalid JSON", async () => {
-      mockGeminiGenerateContent.mockImplementation(() =>
-        Promise.resolve({ text: "not-json" })
-      );
+      mockGeminiGenerateContent.mockImplementation(() => Promise.resolve({ text: "not-json" }));
 
-      await expect(fetchResumeData("job", "master")).rejects.toThrow(
-        "Invalid JSON response from Gemini"
-      );
+      await expect(fetchResumeData("job", "master")).rejects.toThrow("Invalid JSON response from Gemini");
     });
   });
 });

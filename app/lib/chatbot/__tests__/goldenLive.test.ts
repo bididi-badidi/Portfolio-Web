@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { readdirSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -10,6 +11,11 @@ import { FunctionCallType } from "@/app/enums/functionCall";
 import { envClient } from "@/app/env/client";
 import { envServer } from "@/app/env/server";
 import { Type } from "@google/genai";
+
+interface LiveGoldenThresholdConfig {
+  overallPassRate: number;
+  files?: Record<string, number>;
+}
 
 interface LiveGoldenCase {
   id: string;
@@ -43,14 +49,20 @@ interface EvaluatorResult {
   notes?: string;
 }
 
+interface LoadedLiveGoldenCase extends LiveGoldenCase {
+  sourceFile: string;
+}
+
 const CASES_DIR = join(process.cwd(), "testdata", "chatbot-golden-live");
 const REPORT_DIR = join(process.cwd(), "testdata", "chatbot-golden-live", "reports");
 const REPORT_PATH = join(REPORT_DIR, "latest.json");
+const THRESHOLDS_PATH = join(CASES_DIR, "thresholds.json");
 const EVAL_DIR = join(CASES_DIR, "evaluator");
 const EVAL_SYSTEM_PATH = join(EVAL_DIR, "system.md");
 const EVAL_FUNCTIONS_PATH = join(EVAL_DIR, "functions.json");
 const EVAL_PROFILES_PATH = join(EVAL_DIR, "profiles.json");
 const DEFAULT_TIMEOUT_MS = 45000;
+const describeLive = process.env.CHATBOT_LIVE_EVAL === "1" ? describe : describe.skip;
 
 async function runPreflight() {
   const missing: string[] = [];
@@ -82,15 +94,15 @@ async function runPreflight() {
 
 const caseFilter = process.env.CASE;
 const files = readdirSync(CASES_DIR)
-  .filter((f) => f.endsWith(".json") && (!caseFilter || f.includes(caseFilter)))
+  .filter((f) => f.endsWith(".json") && f !== "thresholds.json" && (!caseFilter || f.includes(caseFilter)))
   .sort();
-const allCases: LiveGoldenCase[] = [];
+const allCases: LoadedLiveGoldenCase[] = [];
 for (const file of files) {
   const raw = JSON.parse(readFileSync(join(CASES_DIR, file), "utf-8")) as LiveGoldenCase | LiveGoldenCaseGroup;
   if (Array.isArray((raw as LiveGoldenCaseGroup).cases)) {
-    allCases.push(...(raw as LiveGoldenCaseGroup).cases);
+    allCases.push(...(raw as LiveGoldenCaseGroup).cases.map((testCase) => ({ ...testCase, sourceFile: file })));
   } else {
-    allCases.push(raw as LiveGoldenCase);
+    allCases.push({ ...(raw as LiveGoldenCase), sourceFile: file });
   }
 }
 const evaluatorSystemInstruction = readFileSync(EVAL_SYSTEM_PATH, "utf-8");
@@ -100,6 +112,80 @@ const evaluatorProfiles = JSON.parse(readFileSync(EVAL_PROFILES_PATH, "utf-8")) 
   { name: string; instruction: string }
 >;
 
+function normalizeThreshold(value: number, label: string) {
+  if (!Number.isFinite(value)) {
+    throw new Error(`Invalid live golden threshold for ${label}: expected a number.`);
+  }
+
+  const normalized = value > 1 ? value / 100 : value;
+  if (normalized < 0 || normalized > 1) {
+    throw new Error(`Invalid live golden threshold for ${label}: expected 0-1 or 0-100.`);
+  }
+
+  return normalized;
+}
+
+function parseFileThresholds(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return {};
+
+  if (trimmed.startsWith("{")) {
+    const parsed = JSON.parse(trimmed) as Record<string, number>;
+    return Object.fromEntries(
+      Object.entries(parsed).map(([file, threshold]) => [file, normalizeThreshold(threshold, file)]),
+    );
+  }
+
+  return Object.fromEntries(
+    trimmed.split(",").map((entry) => {
+      const [file, threshold] = entry.split("=").map((part) => part.trim());
+      if (!file || !threshold) {
+        throw new Error(`Invalid GOLDEN_LIVE_FILE_THRESHOLDS entry: ${entry}`);
+      }
+      return [file, normalizeThreshold(Number(threshold), file)];
+    }),
+  );
+}
+
+function loadThresholdConfig(): LiveGoldenThresholdConfig {
+  const defaults: LiveGoldenThresholdConfig = {
+    overallPassRate: 1,
+    files: {},
+  };
+
+  let fromFile: LiveGoldenThresholdConfig = defaults;
+  try {
+    fromFile = {
+      ...defaults,
+      ...(JSON.parse(readFileSync(THRESHOLDS_PATH, "utf-8")) as LiveGoldenThresholdConfig),
+    };
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw err;
+    }
+  }
+
+  const overallPassRate =
+    process.env.GOLDEN_LIVE_PASS_RATE_THRESHOLD === undefined
+      ? fromFile.overallPassRate
+      : normalizeThreshold(Number(process.env.GOLDEN_LIVE_PASS_RATE_THRESHOLD), "overall");
+
+  const fileOverrides =
+    process.env.GOLDEN_LIVE_FILE_THRESHOLDS === undefined
+      ? {}
+      : parseFileThresholds(process.env.GOLDEN_LIVE_FILE_THRESHOLDS);
+
+  return {
+    overallPassRate: normalizeThreshold(overallPassRate, "overall"),
+    files: {
+      ...(fromFile.files ?? {}),
+      ...fileOverrides,
+    },
+  };
+}
+
+const thresholdConfig = loadThresholdConfig();
+
 interface LiveGoldenSummary {
   reportId: string;
   reportPath?: string;
@@ -108,6 +194,18 @@ interface LiveGoldenSummary {
   total: number;
   passCount: number;
   failCount: number;
+  passRate: number;
+  thresholds: LiveGoldenThresholdConfig;
+  fileSummaries: Array<{
+    file: string;
+    total: number;
+    passCount: number;
+    failCount: number;
+    passRate: number;
+    threshold: number | null;
+    passedThreshold: boolean;
+  }>;
+  thresholdFailures: string[];
   models: {
     functionCallDetection: string;
     functionCallApprover: string;
@@ -115,6 +213,7 @@ interface LiveGoldenSummary {
   };
   results: Array<{
     id: string;
+    sourceFile: string;
     description: string;
     evalProfile: string;
     useEvaluator: boolean;
@@ -141,6 +240,10 @@ const summary: LiveGoldenSummary = {
   total: allCases.length,
   passCount: 0,
   failCount: 0,
+  passRate: 0,
+  thresholds: thresholdConfig,
+  fileSummaries: [],
+  thresholdFailures: [],
   models: {
     functionCallDetection: envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL,
     functionCallApprover: envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER,
@@ -172,10 +275,64 @@ interface ReplyResponse {
   functionCall?: { name: string; args?: Record<string, unknown> };
 }
 
-describe("chatbot golden live eval", () => {
+function updateSummaryThresholds() {
+  summary.passRate = summary.total === 0 ? 0 : summary.passCount / summary.total;
+
+  const fileSummaries = files.map((file) => {
+    const fileResults = summary.results.filter((result) => result.sourceFile === file);
+    const total = fileResults.length;
+    const passCount = fileResults.filter((result) => result.passed).length;
+    const failCount = total - passCount;
+    const passRate = total === 0 ? 0 : passCount / total;
+    const threshold = summary.thresholds.files?.[file] ?? null;
+
+    return {
+      file,
+      total,
+      passCount,
+      failCount,
+      passRate,
+      threshold,
+      passedThreshold: threshold === null || passRate >= threshold,
+    };
+  });
+
+  const thresholdFailures: string[] = [];
+  if (summary.passRate < summary.thresholds.overallPassRate) {
+    thresholdFailures.push(
+      `overall pass rate ${formatPassRate(summary.passRate)} is below ${formatPassRate(
+        summary.thresholds.overallPassRate,
+      )}`,
+    );
+  }
+
+  for (const fileSummary of fileSummaries) {
+    if (!fileSummary.passedThreshold && fileSummary.threshold !== null) {
+      thresholdFailures.push(
+        `${fileSummary.file} pass rate ${formatPassRate(fileSummary.passRate)} is below ${formatPassRate(
+          fileSummary.threshold,
+        )}`,
+      );
+    }
+  }
+
+  summary.fileSummaries = fileSummaries;
+  summary.thresholdFailures = thresholdFailures;
+}
+
+function formatPassRate(passRate: number) {
+  return `${(passRate * 100).toFixed(1)}%`;
+}
+
+describeLive("chatbot golden live eval", () => {
   beforeAll(async () => {
     await runPreflight();
     console.log(`live golden discovery: ${files.length} file(s), ${allCases.length} case(s)`);
+    console.log(
+      `live golden thresholds: overall=${formatPassRate(thresholdConfig.overallPassRate)}, files=${JSON.stringify(
+        thresholdConfig.files ?? {},
+      )}`,
+    );
     expect(allCases.length).toBeGreaterThan(0);
   });
 
@@ -334,6 +491,7 @@ describe("chatbot golden live eval", () => {
 
         const resultEntry: LiveGoldenSummary["results"][0] = {
           id: testCase.id,
+          sourceFile: testCase.sourceFile,
           description: testCase.description,
           evalProfile: profileName,
           useEvaluator: evaluatorEnabled,
@@ -390,13 +548,19 @@ describe("chatbot golden live eval", () => {
         }
 
         summary.results.push(resultEntry);
-        expect(failures.length).toBe(0);
       },
       testCase.timeoutMs ?? DEFAULT_TIMEOUT_MS,
     );
   }
 
+  it("meets configured pass-rate thresholds", () => {
+    updateSummaryThresholds();
+    expect(summary.results.length).toBe(summary.total);
+    expect(summary.thresholdFailures).toEqual([]);
+  });
+
   afterAll(() => {
+    updateSummaryThresholds();
     mkdirSync(REPORT_DIR, { recursive: true });
     const uniqueReportPath = join(REPORT_DIR, `${summary.timestamp.replace(/[:.]/g, "-")}__${summary.reportId}.json`);
     summary.reportPath = uniqueReportPath;
@@ -404,6 +568,11 @@ describe("chatbot golden live eval", () => {
     writeFileSync(REPORT_PATH, JSON.stringify(summary, null, 2));
     console.log(`live golden report: ${REPORT_PATH}`);
     console.log(`live golden unique report: ${uniqueReportPath}`);
-    console.log(`live golden summary: ${summary.passCount}/${summary.total} passed`);
+    console.log(
+      `live golden summary: ${summary.passCount}/${summary.total} passed (${formatPassRate(summary.passRate)})`,
+    );
+    if (summary.thresholdFailures.length > 0) {
+      console.log(`live golden threshold failures: ${summary.thresholdFailures.join("; ")}`);
+    }
   });
 });
