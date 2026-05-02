@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { readdirSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -101,7 +100,41 @@ const evaluatorProfiles = JSON.parse(readFileSync(EVAL_PROFILES_PATH, "utf-8")) 
   { name: string; instruction: string }
 >;
 
-const summary: any = {
+interface LiveGoldenSummary {
+  reportId: string;
+  reportPath?: string;
+  timestamp: string;
+  filesFound: number;
+  total: number;
+  passCount: number;
+  failCount: number;
+  models: {
+    functionCallDetection: string;
+    functionCallApprover: string;
+    finalReply: string;
+  };
+  results: Array<{
+    id: string;
+    description: string;
+    evalProfile: string;
+    useEvaluator: boolean;
+    passed: boolean;
+    failures: string[];
+    apiResults: Record<string, unknown>;
+    trace: Record<string, unknown>;
+    evaluatorSettings?: Record<string, unknown>;
+    evaluatorInput?: Record<string, unknown>;
+    evaluatorResult?: EvaluatorResult | null;
+  }>;
+  evaluator: {
+    systemInstructionPath: string;
+    functionCatalogPath: string;
+    profilesPath: string;
+    defaultModel: string;
+  };
+}
+
+const summary: LiveGoldenSummary = {
   reportId: randomUUID(),
   timestamp: new Date().toISOString(),
   filesFound: files.length,
@@ -113,7 +146,7 @@ const summary: any = {
     functionCallApprover: envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER,
     finalReply: envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT,
   },
-  results: [] as any[],
+  results: [],
   evaluator: {
     systemInstructionPath: EVAL_SYSTEM_PATH,
     functionCatalogPath: EVAL_FUNCTIONS_PATH,
@@ -121,6 +154,23 @@ const summary: any = {
     defaultModel: process.env.EVALUATOR_MODEL || envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT,
   },
 };
+
+interface DetectionResponse {
+  functionCall?: { name: string; args?: Record<string, unknown> };
+  functionMessage?: string;
+  error?: boolean;
+}
+
+interface ApprovalResponse {
+  approve: boolean;
+  reason: string;
+}
+
+interface ReplyResponse {
+  message: string;
+  error: boolean;
+  functionCall?: { name: string; args?: Record<string, unknown> };
+}
 
 describe("chatbot golden live eval", () => {
   beforeAll(async () => {
@@ -136,13 +186,13 @@ describe("chatbot golden live eval", () => {
         const conversationHistoryString = JSON.stringify(testCase.request.chatHistory);
 
         let detectionError: string | null = null;
-        let detectionRaw: any = null;
+        let detectionRaw: unknown = null;
         try {
           detectionRaw = await fetchFunctionCalls(conversationHistoryString);
         } catch (err) {
           detectionError = err instanceof Error ? err.message : String(err);
         }
-        const detection = detectionRaw ?? {
+        const detection = (detectionRaw as DetectionResponse) ?? {
           functionCall: undefined,
           functionMessage: detectionError ?? "Detector returned undefined response",
           error: true,
@@ -151,7 +201,7 @@ describe("chatbot golden live eval", () => {
 
         let approveDecision: boolean | null = null;
         let approveReason: string | null = null;
-        let approvalRaw: any = null;
+        let approvalRaw: unknown = null;
         let approvalError: string | null = null;
         if (detection.functionCall) {
           const functionType = Object.values(FunctionCallType).find(
@@ -163,21 +213,21 @@ describe("chatbot golden live eval", () => {
               detection.functionCall,
               functionType?.description ?? "",
             );
-            approveDecision = approvalRaw.approve;
-            approveReason = approvalRaw.reason;
+            approveDecision = (approvalRaw as ApprovalResponse).approve;
+            approveReason = (approvalRaw as ApprovalResponse).reason;
           } catch (err) {
             approvalError = err instanceof Error ? err.message : String(err);
           }
         }
 
-        let replyRaw: any = null;
+        let replyRaw: unknown = null;
         let replyError: string | null = null;
         try {
           replyRaw = await fetchChatbotReply(testCase.request);
         } catch (err) {
           replyError = err instanceof Error ? err.message : String(err);
         }
-        const reply = replyRaw ?? {
+        const reply = (replyRaw as ReplyResponse) ?? {
           message: "",
           error: true,
         };
@@ -282,7 +332,7 @@ describe("chatbot golden live eval", () => {
           }
         }
 
-        const resultEntry: any = {
+        const resultEntry: LiveGoldenSummary["results"][0] = {
           id: testCase.id,
           description: testCase.description,
           evalProfile: profileName,

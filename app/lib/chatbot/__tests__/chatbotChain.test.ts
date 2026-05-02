@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from "bun:test";
 import {
   mockGeminiGenerateContent,
   mockGetMasterResume,
 } from "../../../../bun-test-setup";
-import { REPLY_ERROR_FALLBACK_MSG } from "../config";
 
 /**
  * Tests for chatbot sub-components using the real implementations.
