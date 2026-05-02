@@ -14,9 +14,25 @@ import {
   fetchWithRetryResponse,
 } from "../utils/fetchWithRetry";
 
-// const BASE_URL = env.NEXT_PUBLIC_LOCAL_REMINDER_API_URL;
-const BASE_URL = envClient.NEXT_PUBLIC_AZURE_REMINDER_API_URL;
-const REMINDER_URL = `${BASE_URL}/reminder`;
+function getReminderUrl() {
+  const baseUrl = envClient.NEXT_PUBLIC_AZURE_REMINDER_API_URL;
+
+  if (!baseUrl) {
+    throw new Error("NEXT_PUBLIC_AZURE_REMINDER_API_URL is required to call the reminder API.");
+  }
+
+  return `${baseUrl}/reminder`;
+}
+
+function getReminderToken() {
+  const token = envServer.REMINDER_API_TOKEN;
+
+  if (!token) {
+    throw new Error("REMINDER_API_TOKEN is required to call the reminder API.");
+  }
+
+  return token;
+}
 
 interface GetRemindersResponse {
   error: boolean;
@@ -38,9 +54,10 @@ export interface QueryObject {
 }
 
 async function deleteReminder(id: number) {
-  const token = envServer.REMINDER_API_TOKEN;
+  const token = getReminderToken();
+  const reminderUrl = getReminderUrl();
   try {
-    const response = await fetch(`${REMINDER_URL}/delete/${id}`, {
+    const response = await fetch(`${reminderUrl}/delete/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -71,10 +88,11 @@ async function deleteReminder(id: number) {
 }
 
 async function addReminders(reminder: Reminder): Promise<AddReminderResponse> {
-  const token = envServer.REMINDER_API_TOKEN;
+  const token = getReminderToken();
+  const reminderUrl = getReminderUrl();
 
   try {
-    const response = (await fetchWithRetry(`${REMINDER_URL}/add`, {
+    const response = (await fetchWithRetry(`${reminderUrl}/add`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -111,7 +129,8 @@ async function addReminders(reminder: Reminder): Promise<AddReminderResponse> {
 async function fetchReminders(
   queryObject: QueryObject
 ): Promise<GetRemindersResponse> {
-  const token = envServer.REMINDER_API_TOKEN;
+  const token = getReminderToken();
+  const reminderUrl = getReminderUrl();
 
   const queryString = Object.entries(queryObject)
     .map(([key, val]) => `${key}=${String(val)}`)
@@ -119,7 +138,7 @@ async function fetchReminders(
 
   try {
     const response = (await fetchWithRetry(
-      `${REMINDER_URL}/all?${queryString}`,
+      `${reminderUrl}/all?${queryString}`,
       {
         method: "GET",
         headers: {

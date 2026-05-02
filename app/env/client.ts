@@ -6,16 +6,16 @@ export const envClient = createEnv({
   client: {
     NEXT_PUBLIC_DEV_MODE: z.string(),
 
-    NEXT_PUBLIC_EMAILJS_SERVICE_ID: z.string(),
-    NEXT_PUBLIC_EMAILJS_TEMPLATE_ID: z.string(),
-    NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: z.string(),
-    NEXT_PUBLIC_AZURE_REMINDER_API_URL: z.string(),
-    NEXT_PUBLIC_LOCAL_REMINDER_API_URL: z.string(),
+    NEXT_PUBLIC_EMAILJS_SERVICE_ID: z.string().optional(),
+    NEXT_PUBLIC_EMAILJS_TEMPLATE_ID: z.string().optional(),
+    NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: z.string().optional(),
+    NEXT_PUBLIC_AZURE_REMINDER_API_URL: z.string().optional(),
+    NEXT_PUBLIC_LOCAL_REMINDER_API_URL: z.string().optional(),
     // Chatbot
     NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: z.string(),
     NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: z.string(),
     NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: z.string(),
-    NEXT_PUBLIC_GEMINI_MODEL_RESUME: z.string(),
+    NEXT_PUBLIC_GEMINI_MODEL_RESUME: z.string().optional(),
   },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_DEV_MODE: process.env.NEXT_PUBLIC_DEV_MODE,
