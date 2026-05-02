@@ -99,7 +99,7 @@ export const ModalFooter = () => {
 
     setIsThinking(true);
     const botId = generateRandomId();
-    setTimeout(
+    const timeoutId = setTimeout(
       () =>
         setChatHistory((chatHistory: ChatInstance[]) => [
           ...chatHistory,
@@ -127,6 +127,7 @@ export const ModalFooter = () => {
       };
     }
 
+    clearTimeout(timeoutId);
     setIsThinking(false);
     setChatHistory((prev) =>
       prev

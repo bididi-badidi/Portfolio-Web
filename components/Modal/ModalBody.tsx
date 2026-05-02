@@ -6,6 +6,8 @@ import { cn } from "@/app/utils/cn";
 import { Overlay } from "./ModalOverlay";
 import { useUIState } from "@/app/context/UIStateContext";
 import { ModalClose } from "./ModalClose";
+import { FluidGlass } from "../ui/FluidGlass";
+import { AnimatedBlobs } from "../ui/AnimatedBlobs";
 
 const modalBgVariants = {
   initial: { opacity: 0 },
@@ -64,11 +66,12 @@ export const ModalBody = ({
           className="w-screen fixed inset-0 flex items-center justify-center z-50"
         >
           <Overlay />
+          <AnimatedBlobs />
 
           <motion.div
             ref={modalRef}
             className={cn(
-              "h-[70%] max-w-[95%] lg:max-w-[75%] pt-3 bg-slate-900/40 backdrop-blur-3xl overflow-hidden border border-white/10 rounded-[2.5rem] relative z-50 flex flex-col flex-1 shadow-2xl shadow-black/50",
+              "h-[70%] w-[95%] lg:w-[75%] relative z-50 flex flex-col",
               className
             )}
             variants={allowAnimation ? modalVariants : undefined}
@@ -76,8 +79,15 @@ export const ModalBody = ({
             animate="animate"
             exit="exit"
           >
-            <ModalClose />
-            {children}
+            <FluidGlass 
+              intensity={0.4} 
+              className="flex-1 flex flex-col pt-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] shadow-black/50"
+              containerClassName="h-full w-full"
+              borderRadius="2.5rem"
+            >
+              <ModalClose />
+              {children}
+            </FluidGlass>
           </motion.div>
         </motion.div>
       )}

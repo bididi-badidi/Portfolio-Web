@@ -1,5 +1,9 @@
-import { FunctionCall } from "@google/genai";
 import { ChatInstance } from "@/app/interfaces/Chatbot";
+
+export interface FunctionCall {
+  name: string;
+  args: Record<string, unknown>;
+}
 
 export interface ChatReply {
   message: string;

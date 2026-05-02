@@ -25,7 +25,12 @@ export async function fetchFunctionCalls(conversation: string): Promise<Function
       }
     );
 
-    const funcCall = response.functionCalls ? response.functionCalls[0] : undefined;
+    const funcCallRaw = response.functionCalls ? response.functionCalls[0] : undefined;
+    const funcCall = funcCallRaw?.name ? {
+      name: funcCallRaw.name,
+      args: (funcCallRaw.args as Record<string, unknown>) || {},
+    } : undefined;
+
     return {
       functionCall: funcCall,
       functionMessage: response.text || "",

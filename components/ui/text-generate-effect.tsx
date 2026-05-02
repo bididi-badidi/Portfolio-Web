@@ -40,7 +40,7 @@ export const TextGenerateEffect = ({
         delay * 200
       );
     }
-  }, [scope.current]);
+  }, [isInView, animate, filter, duration, delay]);
 
   const renderWords = () => {
     return (
