@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [dev, main]
+    branches: [ dev, main ]
   push:
-    branches: [dev]
+    branches: [ dev ]
   workflow_dispatch:
 
 concurrency:
@@ -13,6 +13,27 @@ concurrency:
 
 permissions:
   contents: read
+
+env:
+  # Required by app/env/server.ts and app/env/client.ts
+  # These are dummy values to pass validation in CI for lint/test jobs.
+  # Live jobs (like golden-live) will override these with real secrets/vars.
+  NEXT_PUBLIC_DEV_MODE: "false"
+  REMINDER_API_TOKEN: "dummy-token"
+  NEXT_PUBLIC_EMAILJS_SERVICE_ID: "dummy-service"
+  NEXT_PUBLIC_EMAILJS_TEMPLATE_ID: "dummy-template"
+  NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: "dummy-key"
+  NEXT_PUBLIC_AZURE_REMINDER_API_URL: "https://dummy-url.com"
+  NEXT_PUBLIC_LOCAL_REMINDER_API_URL: "http://localhost:3000"
+  NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: "gemini-1.5-flash"
+  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: "gemini-1.5-flash"
+  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: "gemini-1.5-flash"
+  NEXT_PUBLIC_GEMINI_MODEL_RESUME: "gemini-1.5-flash"
+  EVALUATOR_MODEL: "gemini-1.5-flash"
+  AWS_REGION: "us-east-1"
+  AWS_ACCESS_KEY_ID: "dummy-key-id"
+  AWS_SECRET_ACCESS_KEY: "dummy-secret"
+  AWS_BUCKET_NAME: "dummy-bucket"
 
 jobs:
   lint:
@@ -47,23 +68,27 @@ jobs:
   golden-live:
     name: Live golden chatbot eval
     needs: test
-    if: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') || github.event_name == 'workflow_dispatch' }}
+    if: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') ||
+      github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       CHATBOT_LIVE_EVAL: "1"
       GOLDEN_LIVE_PASS_RATE_THRESHOLD: "0.8"
-      GOLDEN_LIVE_FILE_THRESHOLDS: '{"security.json":1}'
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      NEXT_PUBLIC_DEV_MODE: "false"
-      NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT }}
-      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL }}
-      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER }}
-      EVALUATOR_MODEL: ${{ vars.EVALUATOR_MODEL }}
-      AWS_REGION: ${{ vars.AWS_REGION }}
-      AWS_BUCKET_NAME: ${{ vars.AWS_BUCKET_NAME }}
+      GOLDEN_LIVE_FILE_THRESHOLDS: "{\"security.json\":1}"
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'dummy-key' }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID || 'dummy-key-id' }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY || 'dummy-secret' }}
+      # Use real models/vars if available, otherwise workflow-level dummies apply
+      NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT || 'gemini-2.5-flash' }}
+      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL || 'gemini-2.5-flash' }}
+      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: ${{
+        vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER || 'gemini-2.5-flash'
+        }}
+      NEXT_PUBLIC_GEMINI_MODEL_RESUME: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_RESUME || 'gemini-2.5-flash' }}
+      EVALUATOR_MODEL: ${{ vars.EVALUATOR_MODEL || 'gemini-2.5-flash' }}
+      AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+      AWS_BUCKET_NAME: ${{ vars.AWS_BUCKET_NAME || 'dummy-bucket' }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
