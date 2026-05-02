@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { readdirSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
