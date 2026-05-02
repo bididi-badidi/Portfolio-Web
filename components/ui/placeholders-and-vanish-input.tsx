@@ -76,6 +76,7 @@ export function PlaceholdersAndVanishInput({
         stiffness: 300,
         damping: 30,
         mass: 1,
+        delay: 0.5,
       },
     },
     unfocused: {
