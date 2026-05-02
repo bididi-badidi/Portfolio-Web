@@ -3,8 +3,6 @@ import { describe, it, expect, beforeEach } from "bun:test";
 import {
   mockGeminiGenerateContent,
   mockFetchFunctionCalls,
-  mockFetchStructQueryPrompt,
-  mockFetchSearchResults,
   mockFetchExcDecisionStruct,
   mockGetKnowledgeData,
 } from "../../../../bun-test-setup";
@@ -14,8 +12,6 @@ import { REPLY_ERROR_FALLBACK_MSG } from "../config";
 describe("fetchChatbotReply", () => {
   beforeEach(() => {
     mockFetchFunctionCalls.mockReset();
-    mockFetchStructQueryPrompt.mockReset();
-    mockFetchSearchResults.mockReset();
     mockFetchExcDecisionStruct.mockReset();
     mockGetKnowledgeData.mockReset();
     mockGeminiGenerateContent.mockReset();
@@ -23,10 +19,6 @@ describe("fetchChatbotReply", () => {
     mockFetchFunctionCalls.mockImplementation(() =>
       Promise.resolve({ functionCall: undefined, functionMessage: "", error: false })
     );
-    mockFetchStructQueryPrompt.mockImplementation(() =>
-      Promise.resolve({ needSearch: false, synthesisQuery: "fallback", searchQueryLimit: 3 })
-    );
-    mockFetchSearchResults.mockImplementation(() => Promise.resolve([]));
     mockGetKnowledgeData.mockImplementation(() => Promise.resolve({ info: "knowledge" }));
     mockGeminiGenerateContent.mockImplementation(() =>
       Promise.resolve({ text: "Bot response" })
@@ -99,53 +91,6 @@ describe("fetchChatbotReply", () => {
     expect(mockFetchExcDecisionStruct).not.toHaveBeenCalled();
     expect(result.functionCall).toBeUndefined();
     expect(result.error).toBe(false);
-  });
-
-  it("should perform search when requested", async () => {
-    mockFetchStructQueryPrompt.mockImplementation(() =>
-      Promise.resolve({ needSearch: true, synthesisQuery: "search query", searchQueryLimit: 5 })
-    );
-    mockFetchSearchResults.mockImplementation(() =>
-      Promise.resolve([{ id: "1", text: "search result" }])
-    );
-
-    const request = {
-      chatHistory: [{ role: "user", message: "What is X?" }],
-      enableFunctionCalling: false,
-    };
-
-    const result = await fetchChatbotReply(request as any);
-    expect(mockFetchSearchResults).toHaveBeenCalledWith("search query", 5);
-    expect(result.message).toBe("Bot response");
-    expect(result.error).toBe(false);
-  });
-
-  it("should NOT call fetchSearchResults when needSearch is false", async () => {
-    const request = {
-      chatHistory: [{ role: "user", message: "Hello" }],
-      enableFunctionCalling: false,
-    };
-
-    await fetchChatbotReply(request as any);
-    expect(mockFetchSearchResults).not.toHaveBeenCalled();
-  });
-
-  it("should continue when fetchSearchResults fails", async () => {
-    mockFetchStructQueryPrompt.mockImplementation(() =>
-      Promise.resolve({ needSearch: true, synthesisQuery: "search", searchQueryLimit: 3 })
-    );
-    mockFetchSearchResults.mockImplementation(() =>
-      Promise.reject(new Error("Search API down"))
-    );
-
-    const request = {
-      chatHistory: [{ role: "user", message: "What is X?" }],
-      enableFunctionCalling: false,
-    };
-
-    const result = await fetchChatbotReply(request as any);
-    expect(result.error).toBe(false);
-    expect(result.message).toBe("Bot response");
   });
 
   it("should continue when getKnowledgeData fails", async () => {

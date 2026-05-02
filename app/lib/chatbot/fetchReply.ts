@@ -4,7 +4,6 @@ import { envClient } from "@/app/env/client";
 import { getErrorMessage } from "@/app/utils/handleReport";
 import { fetchFunctionCalls } from "./fetchFunctionCalls";
 import { funcSysMsgDict } from "./functionCalls";
-import { fetchStructQueryPrompt, fetchSearchResults } from "./fetchSearchResults";
 import {
   REPLY_ERROR_FALLBACK_MSG,
   GEMINI_GENERATION_CONFIG,
@@ -36,10 +35,12 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
 
     const conversationHistoryString = JSON.stringify(request.chatHistory);
 
-    const [functionCallResponse, searchQuery] = await Promise.all([
-      fetchFunctionCalls(conversationHistoryString),
-      fetchStructQueryPrompt(conversationHistoryString, latestMessage),
-    ]);
+    const functionCallResponseRaw = await fetchFunctionCalls(conversationHistoryString);
+    const functionCallResponse = functionCallResponseRaw ?? {
+      functionCall: undefined,
+      functionMessage: "Function call detection returned undefined response.",
+      error: true,
+    };
 
     if (functionCallResponse.error) {
       console.warn("Function call detection failed, proceeding without function calls");
@@ -47,7 +48,6 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
 
     if (DEBUG_MODE) {
       console.log(`--- Function Call: ${JSON.stringify(functionCallResponse)}`);
-      console.log(`--- Struct query: ${JSON.stringify(searchQuery)}`);
     }
 
     let functionExecApproved = false;
@@ -83,21 +83,8 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
       console.error(`getKnowledgeData error: ${getErrorMessage(err)}`);
     }
 
-    let searchResultsData: unknown[] = [];
-    if (searchQuery.needSearch) {
-      try {
-        searchResultsData = await fetchSearchResults(
-          searchQuery.synthesisQuery,
-          searchQuery.searchQueryLimit,
-        );
-      } catch (err) {
-        console.error(`fetchSearchResults error: ${getErrorMessage(err)}`);
-      }
-    }
-
     const knowledgeContext = JSON.stringify({
       knowledge: knowledgeData,
-      searchResults: searchResultsData,
     });
 
     const prompt = generatePrompt(

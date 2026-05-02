@@ -1,0 +1,39 @@
+{
+  "group": "AddNewReminder",
+  "cases": [
+    {
+      "id": "AR-301",
+      "description": "create work reminder with required fields",
+      "evalProfile": "reminder",
+      "request": {
+        "chatHistory": [
+          { "role": "user", "message": "Please add a work reminder for submitting report on 2026-05-10." }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "AddNewReminder",
+        "approved": true,
+        "returnedFunctionCallName": "AddNewReminder",
+        "error": false
+      }
+    },
+    {
+      "id": "AR-302",
+      "description": "create personal reminder with date, time, and description",
+      "evalProfile": "reminder",
+      "request": {
+        "chatHistory": [
+          { "role": "user", "message": "Add a personal reminder to call mom on 2026-05-12 at 20:30:00, description: weekly catch-up." }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "AddNewReminder",
+        "approved": true,
+        "returnedFunctionCallName": "AddNewReminder",
+        "error": false
+      }
+    }
+  ]
+}

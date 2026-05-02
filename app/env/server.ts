@@ -5,7 +5,6 @@ export const envServer = createEnv({
   emptyStringAsUndefined: true,
   server: {
     GEMINI_API_KEY: z.string(),
-    TXTAI_BASE_URL: z.string(),
     REMINDER_API_TOKEN: z.string(),
     AWS_REGION: z.string(),
     AWS_ACCESS_KEY_ID: z.string(),
@@ -14,7 +13,6 @@ export const envServer = createEnv({
   },
   experimental__runtimeEnv: {
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
-    TXTAI_BASE_URL: process.env.TXTAI_BASE_URL,
     AWS_REGION: process.env.AWS_REGION,
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
