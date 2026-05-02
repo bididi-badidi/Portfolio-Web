@@ -1,3 +1,5 @@
+"use server";
+
 import { type FunctionDeclaration, Type } from "@google/genai";
 import { FunctionCallType } from "@/app/enums/functionCall";
 // import { ProjectDemoType } from "@/app/enums/projectDemo";
