@@ -1,4 +1,4 @@
-import { FunctionDeclaration, Type } from "@google/genai";
+import { type FunctionDeclaration, Type } from "@google/genai";
 import { FunctionCallType } from "@/app/enums/functionCall";
 // import { ProjectDemoType } from "@/app/enums/projectDemo";
 
@@ -132,26 +132,9 @@ const sendEmailDeclaration: FunctionDeclaration = {
   },
 };
 
-// const showProjectDemo: FunctionDeclaration = {
-//   name: FunctionCallType.ShowProjectDemo.name,
-//   parameters: {
-//     type: Type.OBJECT,
-//     description: FunctionCallType.ShowProjectDemo.description,
-//     properties: {
-//       name: {
-//         type: Type.STRING,
-//         description: "The name of project to show user.",
-//         enum: Object.values(ProjectDemoType),
-//       },
-//     },
-//     required: ["name"],
-//   },
-// };
-
 export const functionCallList = [
   sendEmailDeclaration,
   navigateProjectsDeclaration,
   navigateSectionDeclaration,
   addNewReminderDeclaration,
-  // showProjectDemo,
 ];

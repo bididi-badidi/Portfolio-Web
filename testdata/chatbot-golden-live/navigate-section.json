@@ -1,0 +1,43 @@
+{
+  "group": "NavigateSection",
+  "cases": [
+    {
+      "id": "NS-201",
+      "description": "user confirms navigation to contact section",
+      "evalProfile": "navigation",
+      "request": {
+        "chatHistory": [
+          { "role": "user", "message": "How can I contact Zi Shen?" },
+          { "role": "bot", "message": "You can reach out from the contact section. Want me to navigate you there?" },
+          { "role": "user", "message": "Yes please." }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "NavigateSection",
+        "approved": true,
+        "returnedFunctionCallName": "NavigateSection",
+        "error": false
+      }
+    },
+    {
+      "id": "NS-202",
+      "description": "user confirms navigation to techstack section",
+      "evalProfile": "navigation",
+      "request": {
+        "chatHistory": [
+          { "role": "user", "message": "What tech do you use?" },
+          { "role": "bot", "message": "I can show you the techstack section directly. Would you like me to scroll there?" },
+          { "role": "user", "message": "Yes, show me the tech stack section." }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "NavigateSection",
+        "approved": true,
+        "returnedFunctionCallName": "NavigateSection",
+        "error": false
+      }
+    }
+  ]
+}

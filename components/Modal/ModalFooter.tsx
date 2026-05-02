@@ -11,7 +11,12 @@ import { useModal } from "@/app/context/ModalContext";
 import { ChatbotInput } from "./ChatbotInput";
 import { useAppActions } from "@/app/context/AppActionsContext";
 import { useUIState } from "@/app/context/UIStateContext";
-import { CHATBOT_WAITING_PLACEHOLDER, MAX_CHAT_HISTORY_INSTANCE } from "@/app/lib/chatbot/config";
+import { 
+  CHATBOT_WAITING_PLACEHOLDER, 
+  MAX_CHAT_HISTORY_INSTANCE,
+  CHAT_TIMEOUT_MS,
+  REPLY_ERROR_FALLBACK_MSG
+} from "@/app/lib/chatbot/config";
 import { AnimatedToggleButton } from "../Buttons/AnimatedToggleButton";
 
 const AnimationToggleButton = () => {
@@ -103,10 +108,25 @@ export const ModalFooter = () => {
       500,
     );
 
-    const reply = (await fetchChatbotReply({
-      chatHistory: updatedChatHistory.slice(-MAX_CHAT_HISTORY_INSTANCE),
-      enableFunctionCalling: enableFuncall,
-    })) as ChatReply;
+    let reply: ChatReply;
+    try {
+      reply = (await Promise.race([
+        fetchChatbotReply({
+          chatHistory: updatedChatHistory.slice(-MAX_CHAT_HISTORY_INSTANCE),
+          enableFunctionCalling: enableFuncall,
+        }),
+        new Promise<ChatReply>((_, reject) =>
+          setTimeout(() => reject(new Error("Chatbot response timeout")), CHAT_TIMEOUT_MS)
+        ),
+      ])) as ChatReply;
+    } catch (err) {
+      console.error("Chatbot submission error:", err);
+      reply = {
+        message: REPLY_ERROR_FALLBACK_MSG,
+        error: true,
+      };
+    }
+
     setIsThinking(false);
     setChatHistory((prev) =>
       prev
@@ -116,10 +136,12 @@ export const ModalFooter = () => {
             id: generateRandomId(),
             message: reply.message,
             role: "bot",
+            isError: reply.error,
           } as ChatInstance,
         ]),
     );
-    if (reply.functionCall != null) {
+
+    if (!reply.error && reply.functionCall != null) {
       setChatHistory((prev) =>
         prev.concat([
           {
@@ -129,8 +151,8 @@ export const ModalFooter = () => {
           } as ChatInstance,
         ]),
       );
+      setTimeout(() => executeFunctionCall(reply.functionCall, appActions, uiState), 500);
     }
-    setTimeout(() => executeFunctionCall(reply.functionCall, appActions, uiState), 500);
   };
 
   return (

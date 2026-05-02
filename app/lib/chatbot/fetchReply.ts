@@ -4,7 +4,6 @@ import { envClient } from "@/app/env/client";
 import { getErrorMessage } from "@/app/utils/handleReport";
 import { fetchFunctionCalls } from "./fetchFunctionCalls";
 import { funcSysMsgDict } from "./functionCalls";
-import { fetchStructQueryPrompt } from "./fetchSearchResults";
 import {
   REPLY_ERROR_FALLBACK_MSG,
   GEMINI_GENERATION_CONFIG,
@@ -19,32 +18,57 @@ import { generatePrompt } from "./generatePrompt";
 
 export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatReply> {
   try {
+    if (!Array.isArray(request.chatHistory) || request.chatHistory.length === 0) {
+      return {
+        message: REPLY_ERROR_FALLBACK_MSG,
+        error: true,
+      };
+    }
+
+    const latestMessage = request.chatHistory[request.chatHistory.length - 1]?.message;
+    if (typeof latestMessage !== "string" || latestMessage.trim().length === 0) {
+      return {
+        message: REPLY_ERROR_FALLBACK_MSG,
+        error: true,
+      };
+    }
+
     const conversationHistoryString = JSON.stringify(request.chatHistory);
 
-    const [functionCallResponse, searchQuery] = await Promise.all([
-      fetchFunctionCalls(conversationHistoryString),
-      fetchStructQueryPrompt(conversationHistoryString, request.chatHistory[request.chatHistory.length - 1].message),
-    ]);
+    const functionCallResponseRaw = await fetchFunctionCalls(conversationHistoryString);
+    const functionCallResponse = functionCallResponseRaw ?? {
+      functionCall: undefined,
+      functionMessage: "Function call detection returned undefined response.",
+      error: true,
+    };
+
+    if (functionCallResponse.error) {
+      console.warn("Function call detection failed, proceeding without function calls");
+    }
 
     if (DEBUG_MODE) {
       console.log(`--- Function Call: ${JSON.stringify(functionCallResponse)}`);
-      console.log(`--- Struct query: ${JSON.stringify(searchQuery)}`);
     }
 
     let functionExecApproved = false;
-    if (request.enableFunctionCalling && functionCallResponse.functionCall) {
+    if (request.enableFunctionCalling && !functionCallResponse.error && functionCallResponse.functionCall) {
       const functionType = Object.values(FunctionCallType).find(
         (func) => func.name === functionCallResponse.functionCall?.name,
       );
-      const funcExecApproveObj = await fetchExcDecisionStruct(
-        conversationHistoryString,
-        functionCallResponse.functionCall,
-        functionType?.description ?? "",
-      );
-      functionExecApproved = funcExecApproveObj.approve;
-      
-      if (DEBUG_MODE) {
-        console.log(`--- Func Approver: ${JSON.stringify(funcExecApproveObj)}`);
+      try {
+        const funcExecApproveObj = await fetchExcDecisionStruct(
+          conversationHistoryString,
+          functionCallResponse.functionCall,
+          functionType?.description ?? "",
+        );
+        functionExecApproved = funcExecApproveObj.approve;
+
+        if (DEBUG_MODE) {
+          console.log(`--- Func Approver: ${JSON.stringify(funcExecApproveObj)}`);
+        }
+      } catch (err) {
+        console.error(`fetchExcDecisionStruct error: ${getErrorMessage(err)}`);
+        functionExecApproved = false;
       }
     }
 
@@ -52,11 +76,20 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
       ? funcSysMsgDict.get(functionCallResponse?.functionCall?.name)
       : "";
 
-    const knowledgeData = getKnowledgeData();
+    let knowledgeData: unknown = {};
+    try {
+      knowledgeData = await getKnowledgeData();
+    } catch (err) {
+      console.error(`getKnowledgeData error: ${getErrorMessage(err)}`);
+    }
 
-    const prompt = await generatePrompt(
+    const knowledgeContext = JSON.stringify({
+      knowledge: knowledgeData,
+    });
+
+    const prompt = generatePrompt(
       conversationHistoryString,
-      JSON.stringify(knowledgeData),
+      knowledgeContext,
       functionExecApproved ? functionCallResponse.functionCall : undefined,
     );
 
@@ -67,7 +100,9 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
     );
 
     const replyText = response.text;
-    if (!replyText) throw new Error("Unable to fetch response");
+    if (!replyText || (typeof replyText === "string" && replyText.trim().length === 0)) {
+      throw new Error("Unable to fetch response");
+    }
 
     return {
       message: replyText,

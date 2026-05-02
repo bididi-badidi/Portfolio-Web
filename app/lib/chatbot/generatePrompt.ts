@@ -1,19 +1,17 @@
-"use server";
-
-// import { ResultInstance } from "./fetchSearchResults";
 import { FunctionCall } from "@google/genai";
+import { wrapWithTag } from "./promptUtils";
 
-export async function generatePrompt(
+export function generatePrompt(
   conversationHistoryString: string,
-  searchResults: string,
+  knowledgeContext: string,
   functionCall: FunctionCall | undefined,
 ) {
-  const prompt = `[Conversation History]
-${conversationHistoryString}
-[Function Call Details]
-${functionCall ? JSON.stringify(functionCall) : "No Function Call\n"}
-[Available Information]
-${searchResults}`;
+  const history = wrapWithTag("ConversationHistory", conversationHistoryString);
+  const funcCall = wrapWithTag(
+    "FunctionCallDetails",
+    functionCall ? JSON.stringify(functionCall) : "No Function Call",
+  );
+  const info = wrapWithTag("AvailableInformation", knowledgeContext);
 
-  return prompt;
+  return `${history}\n${funcCall}\n${info}`;
 }

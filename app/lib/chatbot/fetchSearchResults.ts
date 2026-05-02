@@ -1,6 +1,5 @@
 "use server";
 
-import { envServer } from "@/app/env/server";
 import { getErrorMessage } from "@/app/utils/handleReport";
 import { Type } from "@google/genai";
 import { fetchWithRetry } from "@/app/utils/fetchWithRetry";
@@ -27,8 +26,10 @@ export async function fetchStructQueryPrompt(
   fallbackQuery: string,
 ): Promise<QueryStructure> {
   try {
-    return await GeminiService.generateJSON<QueryStructure>(
-      envClient.NEXT_PUBLIC_GEMINI_MODEL_QUERY,
+    const queryModel = process.env.NEXT_PUBLIC_GEMINI_MODEL_QUERY
+      || envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT;
+    const raw = await GeminiService.generateJSON<QueryStructure & { searchQueryLimit: string | number }>(
+      queryModel,
       `instruction: ${SEARCH_QUERY_SYN_PROMPT}\n[Conversation]\n${conversationHistoryString}`,
       "You are a helpful assistant that helps with query synthesis.", // Generic system instruction as the main one is in the prompt
       {
@@ -51,6 +52,10 @@ export async function fetchStructQueryPrompt(
         },
       }
     );
+    return {
+      ...raw,
+      searchQueryLimit: Number(raw.searchQueryLimit) || 3,
+    };
   } catch (err) {
     const errMsg = getErrorMessage(err);
     console.error(`fetchStructQueryPrompt error: ${errMsg}`);
@@ -66,7 +71,12 @@ export async function fetchSearchResults(
   query: string,
   limit: number = 3,
 ): Promise<ResultInstance[]> {
-  const res = await fetchWithRetry(envServer.TXTAI_BASE_URL, {
+  const searchBaseUrl = process.env.TXTAI_BASE_URL;
+  if (!searchBaseUrl) {
+    return [];
+  }
+
+  const res = await fetchWithRetry(searchBaseUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

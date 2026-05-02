@@ -3,6 +3,8 @@ import { gemini_client as ai } from "@/lib/gemini";
 import { GenerateContentConfig } from "@google/genai";
 import { MAX_RETRY_COUNT } from "@/app/config/api";
 
+const GEMINI_TIMEOUT_MS = 15000;
+
 export class GeminiService {
   static async generateContent(
     model: string,
@@ -13,11 +15,16 @@ export class GeminiService {
     let lastError: unknown;
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
-        const response = await ai.models.generateContent({
-          model,
-          contents,
-          config,
-        });
+        const response = await Promise.race([
+          ai.models.generateContent({
+            model,
+            contents,
+            config,
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("Gemini API timeout")), GEMINI_TIMEOUT_MS)
+          ),
+        ]);
         return response;
       } catch (err) {
         lastError = err;

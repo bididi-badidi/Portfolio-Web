@@ -35,6 +35,7 @@ export const INITIAL_CHAT_HISTORY = [
 export const MAX_CHAT_HISTORY_INSTANCE = 20;
 
 export const CHATBOT_WAITING_PLACEHOLDER = "...";
+export const CHAT_TIMEOUT_MS = 30000;
 
 //* Query Searching
 export const QUERY_SEARCH_LIMIT = 3;
