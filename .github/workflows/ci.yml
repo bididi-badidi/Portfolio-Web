@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [dev, main]
+    branches: [ dev, main ]
   push:
-    branches: [dev]
+    branches: [ dev ]
   workflow_dispatch:
 
 concurrency:
@@ -68,22 +68,25 @@ jobs:
   golden-live:
     name: Live golden chatbot eval
     needs: test
-    if: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') || github.event_name == 'workflow_dispatch' }}
+    if: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') ||
+      github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       CHATBOT_LIVE_EVAL: "1"
       GOLDEN_LIVE_PASS_RATE_THRESHOLD: "0.8"
-      GOLDEN_LIVE_FILE_THRESHOLDS: '{"security.json":1}'
+      GOLDEN_LIVE_FILE_THRESHOLDS: "{\"security.json\":1}"
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'dummy-key' }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID || 'dummy-key-id' }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY || 'dummy-secret' }}
       # Use real models/vars if available, otherwise workflow-level dummies apply
-      NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT || 'gemini-1.5-flash' }}
-      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL || 'gemini-1.5-flash' }}
-      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER || 'gemini-1.5-flash' }}
-      NEXT_PUBLIC_GEMINI_MODEL_RESUME: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_RESUME || 'gemini-1.5-flash' }}
-      EVALUATOR_MODEL: ${{ vars.EVALUATOR_MODEL || 'gemini-1.5-flash' }}
+      NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT || 'gemini-2.5-flash' }}
+      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL || 'gemini-2.5-flash' }}
+      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: ${{
+        vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER || 'gemini-2.5-flash'
+        }}
+      NEXT_PUBLIC_GEMINI_MODEL_RESUME: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_RESUME || 'gemini-2.5-flash' }}
+      EVALUATOR_MODEL: ${{ vars.EVALUATOR_MODEL || 'gemini-2.5-flash' }}
       AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
       AWS_BUCKET_NAME: ${{ vars.AWS_BUCKET_NAME || 'dummy-bucket' }}
     steps:
