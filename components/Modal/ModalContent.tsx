@@ -63,12 +63,12 @@ export function ModalContent() {
                 <motion.li
                   key={chat.id}
                   variants={itemVariants}
-                  className={`py-3 px-6 rounded-[2rem] text-start justify-center mt-6 max-w-[85%] backdrop-blur-md border border-white/10 shadow-xl transition-all duration-300 ${
+                  className={`py-3 px-6 rounded-3xl text-start justify-center mt-6 max-w-[85%] backdrop-blur-xl border border-white/10 shadow-lg ${
                     chat.role == "bot"
                       ? chat.isError
-                        ? "bg-red-500/10 self-start rounded-tl-none border-red-500/20 shadow-red-500/5"
-                        : "bg-indigo-500/10 self-start rounded-tl-none border-indigo-500/20 shadow-indigo-500/5"
-                      : "bg-white/5 self-end rounded-tr-none border-white/10 shadow-black/10"
+                        ? "bg-red-500/20 self-start rounded-tl-none shadow-red-500/10 border-red-500/30"
+                        : "bg-indigo-500/20 self-start rounded-tl-none shadow-indigo-500/10"
+                      : "bg-white/5 self-end rounded-tr-none shadow-black/20"
                   }`}
                 >
                   <span

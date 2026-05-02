@@ -70,7 +70,6 @@ const buttonGroupVariants = {
       stiffness: 500,
       damping: 30,
       mass: 0.5,
-      delay: 1,
     },
   },
 };
@@ -100,7 +99,7 @@ export const ModalFooter = () => {
 
     setIsThinking(true);
     const botId = generateRandomId();
-    setTimeout(
+    const timeoutId = setTimeout(
       () =>
         setChatHistory((chatHistory: ChatInstance[]) => [
           ...chatHistory,
@@ -128,6 +127,7 @@ export const ModalFooter = () => {
       };
     }
 
+    clearTimeout(timeoutId);
     setIsThinking(false);
     setChatHistory((prev) =>
       prev

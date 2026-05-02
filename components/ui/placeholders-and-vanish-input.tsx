@@ -73,19 +73,18 @@ export function PlaceholdersAndVanishInput({
       width: "100%",
       transition: {
         type: "spring",
-        stiffness: 300,
-        damping: 30,
-        mass: 1,
-        delay: 0.5,
+        stiffness: 500,
+        damping: 100,
+        mass: 0.8,
       },
     },
     unfocused: {
       width: "50%",
       transition: {
         type: "spring",
-        stiffness: 300,
+        stiffness: 600,
         damping: 30,
-        mass: 1,
+        mass: 1.0,
       },
     },
   };
@@ -105,8 +104,8 @@ export function PlaceholdersAndVanishInput({
       animate={isFocus ? "focused" : "unfocused"}
       exit="unfocused"
       className={cn(
-        "justify-self-end backdrop-blur-3xl bg-white/5 h-12 rounded-full overflow-hidden border border-white/10 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition-all duration-300",
-        value && "bg-white/10 border-white/20 shadow-indigo-500/10"
+        "justify-self-end backdrop-blur-3xl bg-white/5 h-12 rounded-full overflow-hidden border border-white/10 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-100",
+        value && "bg-white/10 border-white/20 shadow-indigo-500/10",
       )}
       onSubmit={handleSubmit}
     >
@@ -121,7 +120,7 @@ export function PlaceholdersAndVanishInput({
         value={value}
         type="text"
         className={cn(
-          "w-full relative text-sm sm:text-base z-50 border-none text-bright bg-transparent h-full rounded-full focus:outline-none focus:ring-0 pl-6 md:pl-10 pr-20"
+          "w-full relative text-sm sm:text-base z-50 border-none text-bright bg-transparent h-full rounded-full focus:outline-none focus:ring-0 pl-6 md:pl-10 pr-20",
         )}
       />
 
