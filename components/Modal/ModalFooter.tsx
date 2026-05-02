@@ -70,6 +70,7 @@ const buttonGroupVariants = {
       stiffness: 500,
       damping: 30,
       mass: 0.5,
+      delay: 1,
     },
   },
 };
