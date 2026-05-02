@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import { themeClasses } from "@/app/styles/themeClasses";
+import { cn } from "@/app/utils/cn";
 
 export function ProjectHeading({
   children,
@@ -9,7 +11,7 @@ export function ProjectHeading({
 }) {
   return (
     <h3
-      className={`text-bright text-center text-xl md:text-3xl font-bold mb-8 ${className}`}
+      className={cn(themeClasses.text.primary, "text-center text-xl md:text-3xl font-bold mb-8", className)}
     >
       {children}
     </h3>

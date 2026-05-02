@@ -5,7 +5,7 @@ export const themeClasses = {
     muted: "text-muted",
     faint: "text-faint",
     inverse: "text-inverse",
-    onAccent: "text-white",
+    onAccent: "text-[var(--color-text-on-accent)]",
   },
   gradient: {
     heading:

@@ -18,7 +18,7 @@ export default function RemindersPage() {
 
   return (
     <DottedBackground>
-      <FloatingNav navItems={navItems} className="bg-black-80" />
+      <FloatingNav navItems={navItems} className="bg-surface/80" />
       <div className="w-full items-center justify-center flex flex-col lg:px-[10dvw]">
         <SpotlightHero id="hero" />
 

@@ -4,6 +4,8 @@ import React from "react";
 import { InfiniteMovingCards } from "@/components/ui/InfiniteCard";
 import { ScrollableSection } from "@/components/layout/ScrollableSection";
 import { motion } from "framer-motion";
+import { themeClasses } from "@/app/styles/themeClasses";
+import { cn } from "@/app/utils/cn";
 
 export function TechGrid({ id }: { id: string }) {
   return (
@@ -18,7 +20,7 @@ export function TechGrid({ id }: { id: string }) {
             duration: 0.5,
             ease: "easeInOut",
           }}
-          className="bg-gradient-to-br from-slate-300 to-slate-500 bg-clip-text text-center text-4xl font-bold tracking-tight text-transparent md:text-5xl"
+          className={cn(themeClasses.gradient.heading, "text-center text-4xl font-bold tracking-tight md:text-5xl")}
         >
           Explore My Tech Stack
         </motion.h2>

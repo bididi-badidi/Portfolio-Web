@@ -1,5 +1,7 @@
 "use client";
 
+import { themeClasses } from "@/app/styles/themeClasses";
+import { cn } from "@/app/utils/cn";
 import { motion } from "framer-motion";
 
 export function SectionTransition() {
@@ -13,7 +15,7 @@ export function SectionTransition() {
           duration: 0.5,
           ease: "easeInOut",
         }}
-        className="bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-5xl"
+        className={cn(themeClasses.gradient.heading, "py-4 text-center text-4xl font-medium tracking-tight md:text-5xl")}
       >
         Explore My Tech Stack
       </motion.h2>

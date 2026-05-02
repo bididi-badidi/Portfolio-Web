@@ -7,6 +7,7 @@ import {
   useScroll,
   useMotionValueEvent,
 } from "motion/react";
+import { themeClasses } from "@/app/styles/themeClasses";
 import { cn } from "@/app/utils/cn";
 
 export interface navItemInterface {
@@ -63,14 +64,14 @@ export const FloatingNav = ({
           duration: 0.2,
         }}
         className={cn(
-          "hidden sm:flex max-w-fit fixed top-10 inset-x-0 mx-auto border border-transparent dark:border-white/[0.2] rounded-full bg-black-80 backdrop-blur-lg shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-[10] px-2 py-2  items-center justify-center space-x-4 lg:space-x-8",
+          "hidden sm:flex max-w-fit fixed top-10 inset-x-0 mx-auto rounded-full bg-surface/80 border border-glass-border backdrop-blur-lg shadow-input z-[10] px-2 py-2 items-center justify-center space-x-4 lg:space-x-8",
           className,
           hidden ? "sm:hidden" : "",
           showHome ? "" : "pl-8"
         )}
       >
         {showHome && (
-          <button className="border-x text-sm font-medium relative text-bright hover:text-foreground border-white/[0.2] px-4 py-2 rounded-full cursor-pointer">
+          <button className={cn(themeClasses.control.navItem, "border-x text-sm font-medium relative border-glass-border-strong px-4 py-2 rounded-full cursor-pointer")}>
             <Link href="/">Home</Link>
           </button>
         )}
@@ -79,21 +80,22 @@ export const FloatingNav = ({
             key={`link=${idx}`}
             href={navItem.link}
             className={cn(
-              "relative text-bright hover:text-foreground items-center flex space-x-1 font-bold cursor-pointer"
+              themeClasses.control.navItem,
+              "relative items-center flex space-x-1 font-bold cursor-pointer"
             )}
           >
             <span className="hidden sm:block text-sm">{navItem.name}</span>
           </a>
         ))}
         <button
-          className="border-y text-sm font-medium relative text-bright hover:text-foreground border-white/[0.2] px-4 py-2 rounded-full cursor-pointer"
+          className={cn(themeClasses.control.navItem, "border-y text-sm font-medium relative border-glass-border-strong px-4 py-2 rounded-full cursor-pointer")}
           onClick={() => {
             setVisible(false);
             setTimeout(() => setHidden(true), 1000);
           }}
         >
           <span>Close</span>
-          <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-red-800 to-transparent h-px" />
+          <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-error to-transparent h-px" />
         </button>
       </motion.div>
     </AnimatePresence>
