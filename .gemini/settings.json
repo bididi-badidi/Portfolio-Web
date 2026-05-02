@@ -1,6 +1,6 @@
 {
   "mcp": {
-    "allowed": ["memory"],
+    "allowed": ["memory", "chrome-devtools"],
     "excluded": []
   },
   "mcpServers": {
@@ -10,6 +10,10 @@
       "env": {
         "MEMORY_FILE_PATH": ".gemini/assets/memory.jsonl"
       }
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
     }
   }
 }

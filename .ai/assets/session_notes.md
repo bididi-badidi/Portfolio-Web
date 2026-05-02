@@ -15,3 +15,11 @@
 ## Notable Decisions
 - **GeminiService Types**: Used `eslint-disable` for `any` in some places where the Gemini SDK types were too restrictive or complex to map quickly during refactoring.
 - **DottedBackground**: Kept the hardcoded SVG hex value as per the plan because CSS variables don't resolve inside data URIs.
+
+## Fix Chatbot Branch (Friday, May 1, 2026)
+- **Branch**: `fix/chatbot`
+- **Status**: Completed critical bug fixes and testing suite.
+- **Key Fix**: The chatbot was previously sending `{}` as knowledge data due to a missing `await`. This is now fixed.
+- **Robustness**: Added timeouts (15s per AI call, 30s total client wait) and explicit error states.
+- **Tests**: 100% test coverage for `app/lib/chatbot/` logic using `bun:test`.
+- **Preload**: Created `bun-test-setup.ts` to handle `server-only` and environment variable mocking for tests.

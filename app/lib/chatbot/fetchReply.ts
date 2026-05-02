@@ -1,112 +1,108 @@
 "use server";
+
 import { envClient } from "@/app/env/client";
-import { ChatInstance } from "@/app/interfaces/Chatbot";
-import { FunctionCall } from "@google/genai";
 import { getErrorMessage } from "@/app/utils/handleReport";
-import { generatePrompt } from "./generatePrompt";
 import { fetchFunctionCalls } from "./fetchFunctionCalls";
 import { funcSysMsgDict } from "./functionCalls";
 import {
-  // fetchSearchResults,
-  // ResultInstance,
-  fetchStructQueryPrompt,
-} from "./fetchSearchResults";
-import {
   REPLY_ERROR_FALLBACK_MSG,
   GEMINI_GENERATION_CONFIG,
-  INITIAL_CHAT_HISTORY,
-  // QUERY_SEARCH_LIMIT,
   DEBUG_MODE,
 } from "./config";
 import { fetchExcDecisionStruct } from "./fetchFunctionApproval";
 import { FunctionCallType } from "@/app/enums/functionCall";
 import { getKnowledgeData } from "@/lib/s3-file-loader";
-import { gemini_client as ai } from "@/lib/gemini";
+import { GeminiService } from "./geminiService";
+import { ChatReply, ChatbotRequest } from "./types";
+import { generatePrompt } from "./generatePrompt";
 
-export interface Reply {
-  message: string;
-  error: boolean;
-  functionCall?: FunctionCall;
-  funcSysMsg?: string;
-}
-
-interface Request {
-  chatHistory: ChatInstance[];
-  enableFunctionCalling: boolean;
-}
-
-function initiateChatSession() {
-  const MODEL_NAME = envClient.NEXT_PUBLIC_GEMINI_MODEL_MAIN;
-  const chatSession = ai.chats.create({
-    model: MODEL_NAME,
-    history: INITIAL_CHAT_HISTORY,
-    config: GEMINI_GENERATION_CONFIG,
-  });
-  return chatSession;
-}
-
-const chatSession = initiateChatSession();
-
-export async function fetchChatbotReply(request: Request): Promise<Reply> {
+export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatReply> {
   try {
+    if (!Array.isArray(request.chatHistory) || request.chatHistory.length === 0) {
+      return {
+        message: REPLY_ERROR_FALLBACK_MSG,
+        error: true,
+      };
+    }
+
+    const latestMessage = request.chatHistory[request.chatHistory.length - 1]?.message;
+    if (typeof latestMessage !== "string" || latestMessage.trim().length === 0) {
+      return {
+        message: REPLY_ERROR_FALLBACK_MSG,
+        error: true,
+      };
+    }
+
     const conversationHistoryString = JSON.stringify(request.chatHistory);
 
-    const [functionCallResponse, searchQuery]: [
-      Awaited<ReturnType<typeof fetchFunctionCalls>>,
-      Awaited<ReturnType<typeof fetchStructQueryPrompt>>,
-    ] = await Promise.all([
-      fetchFunctionCalls(conversationHistoryString),
-      fetchStructQueryPrompt(conversationHistoryString, request.chatHistory[request.chatHistory.length - 1].message),
-    ]);
+    const functionCallResponseRaw = await fetchFunctionCalls(conversationHistoryString);
+    const functionCallResponse = functionCallResponseRaw ?? {
+      functionCall: undefined,
+      functionMessage: "Function call detection returned undefined response.",
+      error: true,
+    };
+
+    if (functionCallResponse.error) {
+      console.warn("Function call detection failed, proceeding without function calls");
+    }
 
     if (DEBUG_MODE) {
       console.log(`--- Function Call: ${JSON.stringify(functionCallResponse)}`);
-      console.log(`--- Struct query: ${JSON.stringify(searchQuery)}`);
     }
 
     let functionExecApproved = false;
-    if (request.enableFunctionCalling && functionCallResponse.functionCall) {
+    if (request.enableFunctionCalling && !functionCallResponse.error && functionCallResponse.functionCall) {
       const functionType = Object.values(FunctionCallType).find(
         (func) => func.name === functionCallResponse.functionCall?.name,
       );
-      const funcExecApproveObj = await fetchExcDecisionStruct(
-        conversationHistoryString,
-        functionCallResponse.functionCall,
-        functionType?.description ?? "",
-      );
-      functionExecApproved = funcExecApproveObj.approve;
-      if (DEBUG_MODE) {
-        console.log(`--- Func Approver: ${JSON.stringify(funcExecApproveObj)}`);
+      try {
+        const funcExecApproveObj = await fetchExcDecisionStruct(
+          conversationHistoryString,
+          functionCallResponse.functionCall,
+          functionType?.description ?? "",
+        );
+        functionExecApproved = funcExecApproveObj.approve;
+
+        if (DEBUG_MODE) {
+          console.log(`--- Func Approver: ${JSON.stringify(funcExecApproveObj)}`);
+        }
+      } catch (err) {
+        console.error(`fetchExcDecisionStruct error: ${getErrorMessage(err)}`);
+        functionExecApproved = false;
       }
     }
-
-    // let searchResults: ResultInstance[] = [];
-    // if (searchQuery.needSearch && !functionExecApproved) {
-    //   searchResults = await fetchSearchResults(
-    //     searchQuery.synthesisQuery,
-    //     searchQuery.searchQueryLimit | QUERY_SEARCH_LIMIT
-    //   );
-    //   if (DEBUG_MODE)
-    //     console.log(
-    //       `--- Azure FunctionApp : Found ${searchResults.length} search results`
-    //     );
-    // }
 
     const funcSysMsg = functionCallResponse?.functionCall?.name
       ? funcSysMsgDict.get(functionCallResponse?.functionCall?.name)
       : "";
 
-    const knowledgeData = getKnowledgeData();
+    let knowledgeData: unknown = {};
+    try {
+      knowledgeData = await getKnowledgeData();
+    } catch (err) {
+      console.error(`getKnowledgeData error: ${getErrorMessage(err)}`);
+    }
 
-    const prompt = await generatePrompt(
+    const knowledgeContext = JSON.stringify({
+      knowledge: knowledgeData,
+    });
+
+    const prompt = generatePrompt(
       conversationHistoryString,
-      JSON.stringify(knowledgeData),
+      knowledgeContext,
       functionExecApproved ? functionCallResponse.functionCall : undefined,
     );
 
-    const response = await chatSession.sendMessage({ message: prompt });
+    const response = await GeminiService.generateContent(
+      envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT,
+      prompt,
+      GEMINI_GENERATION_CONFIG
+    );
+
     const replyText = response.text;
-    if (!replyText) throw new Error("Unable to fetch response");
+    if (!replyText || (typeof replyText === "string" && replyText.trim().length === 0)) {
+      throw new Error("Unable to fetch response");
+    }
 
     return {
       message: replyText,
@@ -116,7 +112,7 @@ export async function fetchChatbotReply(request: Request): Promise<Reply> {
     };
   } catch (err) {
     const errMsg = getErrorMessage(err);
-    console.error(errMsg);
+    console.error(`fetchChatbotReply error: ${errMsg}`);
     return {
       message: REPLY_ERROR_FALLBACK_MSG,
       error: true,

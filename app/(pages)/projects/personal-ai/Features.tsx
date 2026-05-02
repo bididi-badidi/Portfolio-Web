@@ -32,7 +32,7 @@ export const Features = ({ id }: { id: string }) => {
         </ProjectText>
       </ProjectDetail>
 
-      <ProjectText className="text-center text-slate-400 mb-[10dvh]">
+      <ProjectText className="text-center text-foreground mb-[10dvh]">
         My AI can now perform helpful actions directly within the portfolio
         website!
       </ProjectText>

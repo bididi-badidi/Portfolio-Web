@@ -104,8 +104,8 @@ export function PlaceholdersAndVanishInput({
       animate={isFocus ? "focused" : "unfocused"}
       exit="unfocused"
       className={cn(
-        "justify-self-end backdrop-blur-md bg-slate-800/70 h-12 rounded-full overflow-hidden shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-100",
-        value && "bg-slate-800/60"
+        "justify-self-end backdrop-blur-2xl bg-white/5 h-12 rounded-full overflow-hidden border border-white/10 shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-100",
+        value && "bg-white/10"
       )}
       onSubmit={handleSubmit}
     >
@@ -120,7 +120,7 @@ export function PlaceholdersAndVanishInput({
         value={value}
         type="text"
         className={cn(
-          "w-full relative text-sm sm:text-base z-50 border-none text-slate-100 bg-transparent h-full rounded-full focus:outline-none focus:ring-0 pl-6 md:pl-10 pr-20"
+          "w-full relative text-sm sm:text-base z-50 border-none text-bright bg-transparent h-full rounded-full focus:outline-none focus:ring-0 pl-6 md:pl-10 pr-20"
         )}
       />
 
@@ -128,7 +128,7 @@ export function PlaceholdersAndVanishInput({
         disabled={!value || isSubmitting}
         // disabled={true}
         type="submit"
-        className="absolute right-2 top-1/2 z-50 -translate-y-1/2 h-8 w-8 rounded-full bg-slate-800 disabled:bg-transparent  transition duration-200 flex items-center justify-center"
+        className="absolute right-2 top-1/2 z-50 -translate-y-1/2 h-8 w-8 rounded-full bg-elevated disabled:bg-transparent  transition duration-200 flex items-center justify-center"
       >
         <motion.svg
           xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +140,7 @@ export function PlaceholdersAndVanishInput({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-gray-300 h-4 w-4"
+          className="text-bright h-4 w-4"
         >
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <motion.path

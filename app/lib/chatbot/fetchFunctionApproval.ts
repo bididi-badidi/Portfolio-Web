@@ -1,21 +1,17 @@
 "use server";
 
-import { getErrorMessage } from "@/app/utils/handleReport";
 import { FunctionCall, Type } from "@google/genai";
 import { envClient } from "@/app/env/client";
 import { DECIDE_FUNCTION_CALL_SYS_INSTURCTION } from "./config";
-import { gemini_client as ai } from "@/lib/gemini";
-
-export interface FunctionExcDecisionStruct {
-  approve: boolean;
-  reason: string;
-}
+import { GeminiService } from "./geminiService";
+import { FunctionExcDecision } from "./types";
+import { getErrorMessage } from "@/app/utils/handleReport";
 
 export async function fetchExcDecisionStruct(
   conversation: string,
   functionCall: FunctionCall,
   specificDescription: string,
-): Promise<FunctionExcDecisionStruct> {
+): Promise<FunctionExcDecision> {
   const prompt = `[Conversation]
 ${conversation}
 [Proposed Function Call]
@@ -24,41 +20,25 @@ ${JSON.stringify(functionCall)}
 ${specificDescription}`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER,
-      contents: prompt,
-      config: {
-        systemInstruction: DECIDE_FUNCTION_CALL_SYS_INSTURCTION,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          required: ["approve", "reason"],
-          properties: {
-            approve: {
-              type: Type.BOOLEAN,
-            },
-            reason: {
-              type: Type.STRING,
-            },
-          },
+    return await GeminiService.generateJSON<FunctionExcDecision>(
+      envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER,
+      prompt,
+      DECIDE_FUNCTION_CALL_SYS_INSTURCTION,
+      {
+        type: Type.OBJECT,
+        required: ["approve", "reason"],
+        properties: {
+          approve: { type: Type.BOOLEAN },
+          reason: { type: Type.STRING },
         },
-      },
-    });
-
-    const jsonString = response.text;
-    if (!jsonString) throw new Error("Failed to parse json string");
-    const result = JSON.parse(jsonString) as FunctionExcDecisionStruct;
-    console.log(`${result.approve}: ${result.reason}`);
-    console.log("=======================");
-    return result;
+      }
+    );
   } catch (err) {
     const errMsg = getErrorMessage(err);
-    console.error(
-      `Error while fetching search query: ${errMsg}. Using user last message`,
-    );
+    console.error(`fetchExcDecisionStruct error: ${errMsg}`);
     return {
       approve: false,
-      reason: "Failed to fetch",
-    } as FunctionExcDecisionStruct;
+      reason: "Failed to fetch decision",
+    };
   }
 }

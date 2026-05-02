@@ -1,12 +1,12 @@
 "use server";
 
-import { envServer } from "@/app/env/server";
 import { getErrorMessage } from "@/app/utils/handleReport";
 import { Type } from "@google/genai";
 import { fetchWithRetry } from "@/app/utils/fetchWithRetry";
 import { envClient } from "@/app/env/client";
 import { SEARCH_QUERY_SYN_PROMPT } from "./config";
-import { gemini_client as ai } from "@/lib/gemini";
+import { GeminiService } from "./geminiService";
+import { QueryStructure } from "./types";
 
 export interface ResultInstance {
   id: string | null;
@@ -21,86 +21,49 @@ interface SearchResponse {
   result: ResultInstance[] | null;
 }
 
-export interface QueryStructure {
-  synthesisQuery: string;
-  needSearch: boolean;
-  searchQueryLimit: number;
-}
-
 export async function fetchStructQueryPrompt(
   conversationHistoryString: string,
   fallbackQuery: string,
 ): Promise<QueryStructure> {
   try {
-    const response = await ai.models.generateContent({
-      model: envClient.NEXT_PUBLIC_GEMINI_MODEL_QUERY,
-      contents: `instruction: ${SEARCH_QUERY_SYN_PROMPT}
-[Conversation]
-${conversationHistoryString}`,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          required: ["needSearch", "synthesisQuery"],
-          properties: {
-            synthesisQuery: {
-              type: Type.STRING,
-              description:
-                "The synthesized query based on the user current request.",
-            },
-            needSearch: {
-              type: Type.BOOLEAN,
-              description:
-                "Indicate whether searching for information is needed based on the user question.",
-            },
-            searchQueryLimit: {
-              type: Type.STRING,
-              enum: ["3", "5", "7"],
-              description:
-                "Indicate the number of search query limit for information retrieval. Higher search limit is required when the user is asking for more information, for instance 'tell me more about this project'. Minimum is 3",
-            },
+    const queryModel = process.env.NEXT_PUBLIC_GEMINI_MODEL_QUERY
+      || envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT;
+    const raw = await GeminiService.generateJSON<QueryStructure & { searchQueryLimit: string | number }>(
+      queryModel,
+      `instruction: ${SEARCH_QUERY_SYN_PROMPT}\n[Conversation]\n${conversationHistoryString}`,
+      "You are a helpful assistant that helps with query synthesis.", // Generic system instruction as the main one is in the prompt
+      {
+        type: Type.OBJECT,
+        required: ["needSearch", "synthesisQuery"],
+        properties: {
+          synthesisQuery: {
+            type: Type.STRING,
+            description: "The synthesized query based on the user current request.",
+          },
+          needSearch: {
+            type: Type.BOOLEAN,
+            description: "Indicate whether searching for information is needed based on the user question.",
+          },
+          searchQueryLimit: {
+            type: Type.STRING,
+            enum: ["3", "5", "7"],
+            description: "Indicate the number of search query limit for information retrieval.",
           },
         },
-      },
-    });
-
-    const jsonString = response.text;
-    if (!jsonString) throw new Error("Failed to parse json string");
-    const result = JSON.parse(jsonString) as QueryStructure;
-    return result;
+      }
+    );
+    return {
+      ...raw,
+      searchQueryLimit: Number(raw.searchQueryLimit) || 3,
+    };
   } catch (err) {
     const errMsg = getErrorMessage(err);
-    console.error(
-      `Error while fetching search query: ${errMsg}. Using user last message`,
-    );
+    console.error(`fetchStructQueryPrompt error: ${errMsg}`);
     return {
       synthesisQuery: fallbackQuery,
       needSearch: false,
-    } as QueryStructure;
-  }
-}
-
-export async function fetchSearchQueryPrompt(
-  conversationHistoryString: string,
-  fallbackQuery: string,
-) {
-  const instructions = SEARCH_QUERY_SYN_PROMPT;
-
-  try {
-    const response = await ai.models.generateContent({
-      model: envClient.NEXT_PUBLIC_GEMINI_MODEL_QUERY,
-      contents: `[conversation]
-${conversationHistoryString}`,
-      config: { systemInstruction: instructions },
-    });
-
-    return response.text ?? fallbackQuery;
-  } catch (err) {
-    const errMsg = getErrorMessage(err);
-    console.error(
-      `Error while fetching search query: ${errMsg}. Using user last message`,
-    );
-    return fallbackQuery;
+      searchQueryLimit: 3,
+    };
   }
 }
 
@@ -108,11 +71,15 @@ export async function fetchSearchResults(
   query: string,
   limit: number = 3,
 ): Promise<ResultInstance[]> {
-  // No need for a try...catch here, as fetchWithRetry handles it.
-  const res = await fetchWithRetry(envServer.TXTAI_BASE_URL, {
+  const searchBaseUrl = process.env.TXTAI_BASE_URL;
+  if (!searchBaseUrl) {
+    return [];
+  }
+
+  const res = await fetchWithRetry(searchBaseUrl, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json", // Added header for clarity
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       "query": query,
@@ -125,11 +92,9 @@ export async function fetchSearchResults(
     return [];
   }
 
-  // We can be confident res.response has our data
   const fetchData = res.response as unknown as SearchResponse;
   if (fetchData != null && fetchData.result != null) {
-    const searchResults = fetchData.result;
-    return [...searchResults];
+    return [...fetchData.result];
   }
 
   return [];

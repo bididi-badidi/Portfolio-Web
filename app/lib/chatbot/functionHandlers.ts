@@ -113,7 +113,7 @@ export const executeFunctionCall = async (
       await handler(functionArgs, appActions, uiState);
     } catch (err) {
       const errMsg = getErrorMessage(err);
-      reportError(errMsg);
+      reportErrorMessage(errMsg);
     }
   } else {
     reportErrorMessage("Unknown Function Called");

@@ -22,7 +22,7 @@ export function SectionContact({ id }: { id: string }) {
         </div>
         <div className="min-w-[min(90%,25rem)] md:min-w-[25rem]">
           <div className="items-center justify-center">
-            <h3 className="text-lg text-center mb-[1rem] text-zinc-400">Or simply fill out this form</h3>
+            <h3 className="text-lg text-center mb-[1rem] text-foreground">Or simply fill out this form</h3>
           </div>
           <Form />
         </div>

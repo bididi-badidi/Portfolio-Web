@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:chatbot-golden": "bun test app/lib/chatbot/__tests__/goldenEval.test.ts",
+    "test:chatbot-golden-live": "CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test ./app/lib/chatbot/__tests__/goldenLive.test.ts",
+    "test:chatbot-golden-live:file": "CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test ./app/lib/chatbot/__tests__/goldenLive.test.ts",
+    "test:chatbot-golden-live:ci": "CHATBOT_LIVE_EVAL=1 bun test ./app/lib/chatbot/__tests__/goldenLive.test.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.981.0",
@@ -36,6 +40,7 @@
     "react-player": "^2.16.0",
     "react-responsive": "^10.0.1",
     "react-syntax-highlighter": "^15.6.1",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.0.2",
     "uuid": "^11.1.0",
     "zod": "^3.24.2"

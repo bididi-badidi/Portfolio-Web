@@ -63,14 +63,22 @@ export function ModalContent() {
                 <motion.li
                   key={chat.id}
                   variants={itemVariants}
-                  className={`py-[0.5rem] px-8 rounded-[4rem] text-start justify-center mt-6 max-w-5/6 ${
+                  className={`py-3 px-6 rounded-3xl text-start justify-center mt-6 max-w-[85%] backdrop-blur-xl border border-white/10 shadow-lg ${
                     chat.role == "bot"
-                      ? "bg-indigo-200/60  self-start rounded-[10px] rounded-tl-[2px]"
-                      : "bg-slate-700/40 self-end rounded-[10px] rounded-tr-[2px]"
+                      ? chat.isError
+                        ? "bg-red-500/20 self-start rounded-tl-none shadow-red-500/10 border-red-500/30"
+                        : "bg-indigo-500/20 self-start rounded-tl-none shadow-indigo-500/10"
+                      : "bg-white/5 self-end rounded-tr-none shadow-black/20"
                   }`}
                 >
                   <span
-                    className={`${chat.role == "bot" ? "text-neutral-800" : "text-neutral-300"} text-sm text-start`}
+                    className={`${
+                      chat.role == "bot"
+                        ? chat.isError
+                          ? "text-red-200"
+                          : "text-indigo-50"
+                        : "text-slate-100"
+                    } text-sm text-start`}
                   >
                     {chat.message}
                   </span>

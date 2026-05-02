@@ -1,0 +1,43 @@
+{
+  "group": "NavigateProjects",
+  "cases": [
+    {
+      "id": "NP-101",
+      "description": "user confirms navigation to all projects",
+      "evalProfile": "navigation",
+      "request": {
+        "chatHistory": [
+          { "role": "user", "message": "Can I see your projects?" },
+          { "role": "bot", "message": "Sure, I can take you to the projects section now. Would you like me to navigate there?" },
+          { "role": "user", "message": "Yes, please take me there." }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "NavigateProjects",
+        "approved": true,
+        "returnedFunctionCallName": "NavigateProjects",
+        "error": false
+      }
+    },
+    {
+      "id": "NP-102",
+      "description": "user confirms navigation to stock-ai project",
+      "evalProfile": "navigation",
+      "request": {
+        "chatHistory": [
+          { "role": "user", "message": "What is your stock AI project?" },
+          { "role": "bot", "message": "It is a CLI-driven stock research project. I can navigate you to the stock-ai section if you want." },
+          { "role": "user", "message": "Yes, navigate me there now." }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "NavigateProjects",
+        "approved": true,
+        "returnedFunctionCallName": "NavigateProjects",
+        "error": false
+      }
+    }
+  ]
+}

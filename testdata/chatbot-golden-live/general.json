@@ -1,0 +1,313 @@
+{
+  "group": "General",
+  "cases": [
+    {
+      "id": "G001",
+      "description": "basic greeting should not trigger function call",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Hi, introduce yourself briefly."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": null,
+        "approved": null,
+        "returnedFunctionCallName": null,
+        "error": false,
+        "messageContains": ["Zi Shen"]
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G002",
+      "description": "capability question should stay informational",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "What can you help me with on this portfolio?"
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "returnedFunctionCallName": null,
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G003",
+      "description": "portfolio summary request should not force a function",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Give me a quick summary of your portfolio."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "returnedFunctionCallName": null,
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G004",
+      "description": "project comparison should be answered as text by default",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Compare stock-ai and reminder-api in 3 bullets."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "returnedFunctionCallName": null,
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G005",
+      "description": "ambiguous navigation request should not auto-call function",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Take me there."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "returnedFunctionCallName": null,
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G006",
+      "description": "confirmed section navigation should call NavigateSection",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Where can I find contact details?"
+          },
+          {
+            "role": "bot",
+            "message": "I can navigate you to the contact section. Want me to do that?"
+          },
+          {
+            "role": "user",
+            "message": "Yes please."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "NavigateSection",
+        "approved": true,
+        "returnedFunctionCallName": "NavigateSection",
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G007",
+      "description": "confirmed project navigation should call NavigateProjects",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Can I see the xcuisite project?"
+          },
+          {
+            "role": "bot",
+            "message": "Sure, I can navigate you to that project section now. Should I?"
+          },
+          {
+            "role": "user",
+            "message": "Yes, go ahead."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "NavigateProjects",
+        "approved": true,
+        "returnedFunctionCallName": "NavigateProjects",
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G008",
+      "description": "add reminder with full details should call AddNewReminder",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Add a Work reminder titled submit monthly report on 2026-05-20 at 09:00:00 with description send to manager."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "AddNewReminder",
+        "approved": true,
+        "returnedFunctionCallName": "AddNewReminder",
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G009",
+      "description": "add reminder missing required fields should avoid function call",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Set a reminder for me sometime next week."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "returnedFunctionCallName": null,
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G010",
+      "description": "multi-turn context carryover should still support AddNewReminder",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "I need a reminder."
+          },
+          {
+            "role": "bot",
+            "message": "Sure. Please provide title, due date, and reminder type."
+          },
+          {
+            "role": "user",
+            "message": "Title call dentist, due date 2026-05-21, type Personal."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "detectedFunctionName": "AddNewReminder",
+        "approved": true,
+        "returnedFunctionCallName": "AddNewReminder",
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G011",
+      "description": "off-topic request should not trigger function call",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Write me a recipe for spaghetti carbonara."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "returnedFunctionCallName": null,
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G012",
+      "description": "mixed info and action request without confirmation should not auto-navigate",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Tell me about stock-ai and take me there."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "returnedFunctionCallName": null,
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G013",
+      "description": "long noisy input should stay stable and avoid accidental function calls",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Hey there, I was browsing quickly and saw a lot of cool stuff maybe react maybe backend maybe reminder api maybe stock ai anyway I just wanted to say this portfolio is interesting and maybe you can explain where to start but I am not sure what I need yet."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "returnedFunctionCallName": null,
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G014",
+      "description": "function calling disabled should never return function call",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Please add a personal reminder titled gym on 2026-05-30."
+          }
+        ],
+        "enableFunctionCalling": false
+      },
+      "expected": {
+        "returnedFunctionCallName": null,
+        "error": false
+      },
+      "evalProfile": "general"
+    },
+    {
+      "id": "G015",
+      "description": "duplicate reminder request phrasing should not escalate to unrelated function",
+      "request": {
+        "chatHistory": [
+          {
+            "role": "user",
+            "message": "Add reminder: Work, title sprint planning, due date 2026-05-31."
+          },
+          {
+            "role": "user",
+            "message": "Same request again: add reminder for sprint planning on 2026-05-31."
+          }
+        ],
+        "enableFunctionCalling": true
+      },
+      "expected": {
+        "error": false
+      },
+      "evalProfile": "general"
+    }
+  ]
+}

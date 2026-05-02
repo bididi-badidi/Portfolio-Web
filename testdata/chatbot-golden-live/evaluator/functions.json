@@ -1,0 +1,49 @@
+{
+  "functions": [
+    {
+      "name": "NavigateProjects",
+      "purpose": "Navigate user to a specific project section.",
+      "required": ["project"],
+      "parameters": {
+        "project": {
+          "type": "string",
+          "enum": [
+            "projects",
+            "reminder-api",
+            "xcuisite",
+            "sccc",
+            "hologram",
+            "personal-assistant",
+            "automation-manager",
+            "stock-ai",
+            "event-capture"
+          ]
+        }
+      }
+    },
+    {
+      "name": "NavigateSection",
+      "purpose": "Navigate user to a top-level section.",
+      "required": ["section"],
+      "parameters": {
+        "section": {
+          "type": "string",
+          "enum": ["hero", "about", "techstack", "contact"]
+        }
+      }
+    },
+    {
+      "name": "AddNewReminder",
+      "purpose": "Create a reminder with required scheduling context.",
+      "required": ["title", "dueDate", "reminderType"],
+      "parameters": {
+        "title": { "type": "string" },
+        "dueDate": { "type": "string", "format": "YYYY-MM-DD" },
+        "reminderType": { "type": "string", "enum": ["Work", "Personal"] },
+        "time": { "type": "string", "format": "hh:mm:ss", "optional": true },
+        "description": { "type": "string", "optional": true }
+      }
+    }
+  ]
+}
+
