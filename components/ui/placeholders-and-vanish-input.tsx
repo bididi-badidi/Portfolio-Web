@@ -73,18 +73,18 @@ export function PlaceholdersAndVanishInput({
       width: "100%",
       transition: {
         type: "spring",
-        stiffness: 500,
-        damping: 100,
-        mass: 0.8,
+        stiffness: 300,
+        damping: 30,
+        mass: 1,
       },
     },
     unfocused: {
       width: "50%",
       transition: {
         type: "spring",
-        stiffness: 600,
+        stiffness: 300,
         damping: 30,
-        mass: 1.0,
+        mass: 1,
       },
     },
   };
