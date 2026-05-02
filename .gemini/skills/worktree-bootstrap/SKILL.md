@@ -25,6 +25,6 @@ Use the repository script instead of manually chaining commands.
 ## Rules
 
 - Keep `.env*` files uncommitted.
-- Prefer sibling worktree paths under `/Users/user/Projects`, matching the user's existing layout.
+- Prefer sibling worktree paths under `/Users/user/Projects/portfolio/`, matching the user's existing layout.
 - Use `--base` only when creating a new branch; existing branches are attached directly.
 - Do not delete existing worktrees unless the user explicitly asks.
