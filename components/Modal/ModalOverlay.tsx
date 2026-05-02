@@ -13,6 +13,7 @@ export const Overlay = ({ className }: { className?: string }) => {
       exit={{
         opacity: 0,
         backdropFilter: "blur(0px)",
+        transition: { delay: 1 },
       }}
       className={`fixed inset-0 h-full w-full bg-black/80 z-50 ${className}`}
     ></motion.div>
