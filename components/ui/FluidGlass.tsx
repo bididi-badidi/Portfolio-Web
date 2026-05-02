@@ -69,7 +69,7 @@ export const FluidGlass: React.FC<FluidGlassProps> = ({
               ([x, y]) => {
                 const posX = (Number(x) + 0.5) * 100;
                 const posY = (Number(y) + 0.5) * 100;
-                return `radial-gradient(circle at ${posX}% ${posY}%, rgba(255,255,255,0.04) 0%, transparent 50%)`;
+                return `radial-gradient(circle at ${posX}% ${posY}%, rgba(255,255,255,${0.08 * intensity}) 0%, transparent 50%)`;
               }
             )
           }}
