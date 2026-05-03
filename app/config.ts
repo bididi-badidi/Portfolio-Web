@@ -6,7 +6,7 @@ export const FOOTER_LAST_UPDATE = "06 Feb 2026";
 
 //* CONTACTS
 export const EMAIL_ADDRESS = "zshen2002@gmail.com";
-export const GITHUB_URL = "https://github.com/ZSHenChan";
+export const GITHUB_URL = "https://github.com/bididi-badidi";
 export const LINKEDIN_URL = "https://www.linkedin.com/in/zishenchan/";
 
 //* Resume Generation

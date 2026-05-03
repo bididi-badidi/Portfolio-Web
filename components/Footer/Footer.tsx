@@ -13,7 +13,7 @@ export const Footer = () => {
       name: "linked-in-icon",
     },
     {
-      link: "https://github.com/ZSHenChan",
+      link: "https://github.com/bididi-badidi",
       icon: "/icons/github.png",
       name: "github-icon",
     },

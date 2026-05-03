@@ -14,6 +14,7 @@ import Link from "next/link";
 import { cn } from "@/app/utils/cn";
 import { FadeUpInView } from "@/components/ui/FadeUpInView";
 import { themeClasses } from "@/app/styles/themeClasses";
+import { FluidGlass } from "@/components/ui/FluidGlass";
 
 type LinkPreviewProps = {
   children: React.ReactNode;
@@ -150,26 +151,29 @@ export const LinkPreview = ({
                   },
                 }}
                 exit={{ opacity: 0, y: 20, scale: 0.6 }}
-                className="shadow-xl rounded-xl"
+                className="rounded-[1.125rem]"
                 style={{
                   x: translateX,
                 }}
               >
-                <Link
-                  href={url}
-                  className="block p-1 bg-heading-from border border-transparent shadow rounded-xl hover:border-muted"
-                  style={{ fontSize: 0 }}
+                <FluidGlass
+                  borderRadius="1.125rem"
+                  containerClassName="block h-auto w-auto"
+                  className="p-0.5 shadow-[0_18px_60px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.18)] transition-colors hover:border-glass-border-strong"
+                  tintColor="rgb(255 255 255 / 0.08)"
                 >
-                  <Image
-                    src={isStatic ? imageSrc : src}
-                    width={width}
-                    height={height}
-                    quality={quality}
-                    priority={true}
-                    className="rounded-lg"
-                    alt="preview image"
-                  />
-                </Link>
+                  <Link href={url} className="block rounded-[0.875rem]" style={{ fontSize: 0 }}>
+                    <Image
+                      src={isStatic ? imageSrc : src}
+                      width={width}
+                      height={height}
+                      quality={quality}
+                      priority={true}
+                      className="rounded-[0.875rem]"
+                      alt="preview image"
+                    />
+                  </Link>
+                </FluidGlass>
               </motion.div>
             )}
           </AnimatePresence>
