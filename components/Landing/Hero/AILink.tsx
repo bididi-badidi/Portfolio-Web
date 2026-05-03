@@ -6,13 +6,14 @@ export function AILink({ className }: { className?: string }) {
   return (
     <motion.div
       initial={{
-        // color: "#fff",
         background: "linear-gradient(to bottom right, #cbd5e1, #64748b)",
-        // color: "transparent",
         backgroundClip: "text",
+        WebkitBackgroundClip: "text",
+        color: "transparent",
+        WebkitTextFillColor: "transparent",
       }}
       whileInView={{
-        background: "linear-gradient(to bottom right, #fbbf24, #f87171)", // yellow to red
+        background: "linear-gradient(to bottom right, #818cf8, #a855f7)",
       }}
       viewport={{ once: true }}
       transition={{

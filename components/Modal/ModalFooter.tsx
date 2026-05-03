@@ -1,5 +1,6 @@
 "use client";
 import { cn } from "@/app/utils/cn";
+import { themeClasses } from "@/app/styles/themeClasses";
 import { useState } from "react";
 import { ChatInstance } from "@/app/interfaces/Chatbot";
 import { motion, AnimatePresence } from "motion/react";
@@ -164,7 +165,7 @@ export const ModalFooter = () => {
           initial="hidden"
           animate={uiState.isChatOpen ? "visible" : "hidden"}
           exit="hidden"
-          className={cn("relative flex gap-4 justify-end p-4 backdrop-blur-2xl bg-white/5")}
+          className={cn(themeClasses.surface.glass, "relative flex gap-4 justify-end p-4 backdrop-blur-2xl border-x-0 border-b-0")}
         >
           <AnimatePresence>
             {!isFocus && (

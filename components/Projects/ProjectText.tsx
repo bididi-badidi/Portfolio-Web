@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { themeClasses } from "@/app/styles/themeClasses";
 import { cn } from "@/app/utils/cn";
 
 export function ProjectText({
@@ -9,7 +10,7 @@ export function ProjectText({
   className?: string;
 }) {
   return (
-    <p className={cn("text-bright text-sm lg:text-lg mb-4", className)}>
+    <p className={cn(themeClasses.text.primary, "text-sm lg:text-lg mb-4", className)}>
       {children}
     </p>
   );

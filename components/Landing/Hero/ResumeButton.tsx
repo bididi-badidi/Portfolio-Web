@@ -10,6 +10,8 @@ import { RESUME_OPTIONS } from "@/app/config";
 import toast from "react-hot-toast";
 import { downloadResumePdf, getMasterResume } from "@/lib/s3-file-loader";
 import purify from "dompurify";
+import { themeClasses } from "@/app/styles/themeClasses";
+import { AnimatedGlassWindow } from "@/components/ui/AnimatedGlassWindow";
 
 export function ResumeButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -121,23 +123,29 @@ export function ResumeButton() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="text-xl lg:text-2xl mt-8 underline cursor-pointer hover:text-bright transition-colors"
+        className={cn(themeClasses.button.secondary, "mt-8 rounded-full px-6 py-2 text-xl lg:text-2xl cursor-pointer")}
       >
         Resume
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-
-          <div className="relative w-full max-w-md bg-background border border-elevated rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <AnimatedGlassWindow
+        open={isOpen}
+        onOutsideClick={() => setIsOpen(false)}
+        backdrop={<div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />}
+        className="z-[100] p-4"
+        panelClassName="w-full max-w-md relative z-50 flex flex-col"
+        panelHeight="auto"
+        glassClassName="pt-0 border-elevated shadow-2xl"
+        tintColor="var(--color-bg-page)"
+        borderRadius="0.75rem"
+      >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-elevated bg-surface/50">
               <div className="flex items-center gap-2">
                 {showCustomInput && (
                   <button
                     onClick={() => setShowCustomInput(false)}
-                    className="mr-2 text-foreground hover:text-white transition-colors"
+                    className={cn(themeClasses.control.iconButton, "mr-2")}
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
@@ -146,7 +154,7 @@ export function ResumeButton() {
                   {showCustomInput ? "Paste Job Description" : "Select Resume Version"}
                 </h3>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-foreground hover:text-white transition-colors">
+              <button onClick={() => setIsOpen(false)} className={themeClasses.control.iconButton}>
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -171,8 +179,8 @@ export function ResumeButton() {
                           <Icon className="w-5 h-5" />
                         </div>
                         <div>
-                          <div className="font-medium text-bright group-hover:text-white">{option.label}</div>
-                          <div className="text-xs text-slate-500">{option.text}</div>
+                          <div className="font-medium text-bright group-hover:text-[var(--color-text-on-accent)]">{option.label}</div>
+                          <div className="text-xs text-muted">{option.text}</div>
                         </div>
                       </button>
                     );
@@ -187,7 +195,7 @@ export function ResumeButton() {
                       onChange={(e) => setJobDescription(e.target.value)}
                       onDoubleClick={handleDoubleClickPaste}
                       placeholder="Ctrl+V or DOUBLE click to paste the job description or role requirements here..."
-                      className="w-full h-60 p-3 bg-surface border border-elevated rounded-lg text-bright placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none text-sm"
+                      className="w-full h-60 p-3 bg-surface border border-elevated rounded-lg text-bright placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none text-sm"
                       disabled={loading === "Custom"}
                     />
                   </div>
@@ -197,7 +205,8 @@ export function ResumeButton() {
                     disabled={!jobDescription.trim() || loading === "Custom"}
                     className={cn(
                       "w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
-                      "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-accent hover:to-blue-500 text-white",
+                      themeClasses.gradient.primaryAction,
+                      themeClasses.text.onAccent,
                       "disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale",
                     )}
                   >
@@ -219,15 +228,13 @@ export function ResumeButton() {
 
             {/* Footer */}
             <div className="p-4 bg-surface/30 text-center border-t border-elevated">
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted">
                 {showCustomInput
                   ? "AI will analyze requirements to highlight best matching skills from my database"
                   : "Powered by Docx & Gemini 3 Pro"}
               </p>
             </div>
-          </div>
-        </div>
-      )}
+      </AnimatedGlassWindow>
     </>
   );
 }

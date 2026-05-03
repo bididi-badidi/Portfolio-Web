@@ -30,7 +30,7 @@ export function Lamp({ children }: { children: React.ReactNode }) {
               opacity: 0,
             }}
             className={cn(
-              "fixed inset-0 h-[100dvh] w-[100dvw] bg-black/95 z-40"
+              "fixed inset-0 h-[100dvh] w-[100dvw] bg-scrim z-40"
             )}
           />
         )}

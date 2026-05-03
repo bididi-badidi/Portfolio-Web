@@ -27,7 +27,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type,
         background: useMotionTemplate`
         radial-gradient(
           ${visible ? radius + "px" : "0px"} circle at ${mouseX}px ${mouseY}px,
-          #94a3b8,
+          var(--color-text-secondary),
           transparent 50%
         )
       `,
@@ -40,7 +40,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type,
       <input
         type={type}
         className={cn(
-          `placeholder:text-zinc-400/55 flex h-10 w-full rounded-md border-none px-3 py-2 text-sm transition duration-400 group-hover/input:shadow-none file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-[2px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 bg-zinc-800 text-white shadow-[0px_0px_1px_1px_#404040] focus-visible:ring-neutral-600`,
+          "placeholder:text-foreground/55 flex h-10 w-full rounded-md border-none px-3 py-2 text-sm transition duration-400 group-hover/input:shadow-none file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-[2px] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 bg-elevated text-bright shadow-[0px_0px_1px_1px_var(--color-border-subtle)] focus-visible:ring-accent/60",
           className,
         )}
         ref={ref}
