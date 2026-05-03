@@ -187,6 +187,16 @@ html {
   animation: text-fade-in 6s ease-in-out forwards;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .hero-text {
+    animation: none;
+  }
+
+  .hero-text {
+    opacity: 1;
+  }
+}
+
 @keyframes spotlight {
   0% {
     opacity: 0;
