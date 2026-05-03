@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/app/utils/cn";
 import { FadeUpInView } from "@/components/ui/FadeUpInView";
+import { themeClasses } from "@/app/styles/themeClasses";
 
 type LinkPreviewProps = {
   children: React.ReactNode;
@@ -105,7 +106,8 @@ export const LinkPreview = ({
             <HoverCardPrimitive.Trigger
               onMouseMove={handleMouseMove}
               className={cn(
-                "text-transparent bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-xl lg:text-2xl font-bold align-self-center flex justify-center mx-auto",
+                themeClasses.gradient.heading,
+                "py-4 text-xl lg:text-2xl font-bold align-self-center flex justify-center mx-auto",
                 className
               )}
               href={url}
@@ -117,7 +119,8 @@ export const LinkPreview = ({
           <HoverCardPrimitive.Trigger
             onMouseMove={handleMouseMove}
             className={cn(
-              "text-transparent bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-xl lg:text-2xl font-bold align-self-center flex justify-center mx-auto",
+              themeClasses.gradient.heading,
+              "py-4 text-xl lg:text-2xl font-bold align-self-center flex justify-center mx-auto",
               className
             )}
             href={url}
@@ -154,7 +157,7 @@ export const LinkPreview = ({
               >
                 <Link
                   href={url}
-                  className="block p-1 bg-slate-300 border border-transparent shadow rounded-xl hover:border-slate-500 dark:hover:border-neutral-800"
+                  className="block p-1 bg-heading-from border border-transparent shadow rounded-xl hover:border-muted"
                   style={{ fontSize: 0 }}
                 >
                   <Image

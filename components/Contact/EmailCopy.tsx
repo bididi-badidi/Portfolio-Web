@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { FadeUpInView } from "../ui/FadeUpInView";
 import { motion, AnimatePresence, useSpring, useMotionValue } from "motion/react";
 import { EMAIL_ADDRESS } from "@/app/config";
+import { themeClasses } from "@/app/styles/themeClasses";
+import { cn } from "@/app/utils/cn";
 
 export function EmailCopy() {
   const [isOpen, setOpen] = useState(false);
@@ -44,7 +46,7 @@ export function EmailCopy() {
       <FadeUpInView>
         <HoverCardPrimitive.Trigger asChild onMouseMove={handleMouseMove}>
           <div
-            className="font-bold text-transparent bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text cursor-pointer"
+            className={cn(themeClasses.gradient.heading, "font-bold py-4 cursor-pointer")}
             onClick={handleCopyEmail}
           >
             Email

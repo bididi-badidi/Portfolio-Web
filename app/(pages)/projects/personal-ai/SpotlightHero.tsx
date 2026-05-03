@@ -3,6 +3,8 @@
 import React from "react";
 import { Spotlight } from "@/components/ui/Spotlight";
 import { ScrollableSection } from "@/components/layout/ScrollableSection";
+import { themeClasses } from "@/app/styles/themeClasses";
+import { cn } from "@/app/utils/cn";
 
 export function SpotlightHero({ id }: { id: string }) {
   return (
@@ -15,7 +17,7 @@ export function SpotlightHero({ id }: { id: string }) {
         fill="white"
       />
       <div className="relative z-10 mx-auto w-full max-w-7xl p-4 pt-20 md:pt-0">
-        <h1 className="bg-opacity-50 bg-gradient-to-b from-slate-50 to-slate-400 bg-clip-text text-center text-4xl font-bold text-transparent md:text-7xl">
+        <h1 className={cn(themeClasses.gradient.heroHeading, "bg-opacity-50 text-center text-4xl font-bold md:text-7xl")}>
           Meet My Personal <br /> AI Assistant
         </h1>
         <p className="mx-auto mt-4 mb-8 max-w-lg text-center text-base font-normal text-bright">

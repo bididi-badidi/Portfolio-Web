@@ -1,4 +1,5 @@
 import { useUIState } from "@/app/context/UIStateContext";
+import { themeClasses } from "@/app/styles/themeClasses";
 import { cn } from "@/app/utils/cn";
 import { FluidGlass } from "@/components/ui/FluidGlass";
 import type { ReactNode } from "react";
@@ -21,7 +22,7 @@ export const ModalTrigger = ({
     <motion.button
       type="button"
       className={cn(
-        "rounded-full border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+        "rounded-full border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className
       )}
       whileHover={TRIGGER_HOVER}
@@ -34,7 +35,11 @@ export const ModalTrigger = ({
       <FluidGlass
         borderRadius="9999px"
         containerClassName="w-auto h-auto"
-        className="px-8 py-3 w-fit h-fit bg-background/30 backdrop-blur-xl border-white/20 text-bright cursor-pointer hover:bg-white/10 transition-colors flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]"
+        className={cn(
+          themeClasses.surface.glassHover,
+          themeClasses.text.primary,
+          "px-8 py-3 w-fit h-fit cursor-pointer transition-colors flex items-center justify-center shadow-[0_0_20px_var(--color-bg-glass)] hover:shadow-[0_0_25px_var(--color-bg-glass-hover)]"
+        )}
         intensity={0.6}
       >
         {children}

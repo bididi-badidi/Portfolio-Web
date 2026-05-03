@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { cn } from "@/app/utils/cn";
 
 export const Overlay = ({ className }: { className?: string }) => {
   return (
@@ -15,7 +16,7 @@ export const Overlay = ({ className }: { className?: string }) => {
         backdropFilter: "blur(0px)",
         transition: { delay: 1 },
       }}
-      className={`fixed inset-0 h-full w-full bg-black/80 z-50 ${className}`}
+      className={cn("fixed inset-0 h-full w-full bg-overlay z-50", className)}
     ></motion.div>
   );
 };

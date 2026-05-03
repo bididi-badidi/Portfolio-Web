@@ -18,7 +18,7 @@ export const FluidGlass: React.FC<FluidGlassProps> = ({
   className,
   containerClassName,
   intensity = 0.5,
-  tintColor = 'rgba(255, 255, 255, 0.05)',
+  tintColor = 'var(--color-bg-glass)',
   borderRadius = '2.5rem',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -54,9 +54,9 @@ export const FluidGlass: React.FC<FluidGlassProps> = ({
           backgroundColor: tintColor,
         }}
         className={cn(
-          "relative overflow-hidden border border-white/10 shadow-2xl w-full h-full",
+          "relative overflow-hidden border border-glass-border shadow-2xl w-full h-full",
           "backdrop-blur-3xl backdrop-saturate-150",
-          "before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/10 before:to-transparent before:opacity-30 before:pointer-events-none",
+          "before:absolute before:inset-0 before:bg-gradient-to-br before:from-glass-hover before:to-transparent before:opacity-30 before:pointer-events-none",
           className
         )}
       >

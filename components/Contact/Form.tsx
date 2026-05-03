@@ -3,6 +3,7 @@ import React, { useRef } from "react";
 import { Label } from "./Label";
 import { Input } from "./Input";
 import { cn } from "@/app/utils/cn";
+import { themeClasses } from "@/app/styles/themeClasses";
 import { sendFormEmail } from "@/app/api/sendEmail";
 import { EMAIL_ADDRESS } from "@/app/config";
 
@@ -16,7 +17,7 @@ export function Form() {
     }
   };
   return (
-    <div className="shadow-input w-full max-w-full md:max-w-lg p-4 rounded-2xl md:p-8 bg-zinc-800/85 backdrop-blur-md">
+    <div className={cn(themeClasses.surface.elevated, "shadow-input w-full max-w-full md:max-w-lg p-4 rounded-2xl md:p-8 bg-elevated/85 backdrop-blur-md")}>
       <form className="my-8" onSubmit={handleSubmit} ref={form}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="name">Name*</Label>
@@ -36,7 +37,11 @@ export function Form() {
         </LabelInputContainer>
 
         <button
-          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-zinc-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-500 dark:from-zinc-500 dark:to-zinc-700 backdrop-blur-md dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset] cursor-pointer"
+          className={cn(
+            themeClasses.gradient.primaryAction,
+            themeClasses.text.onAccent,
+            "group/btn relative block h-10 w-full rounded-md font-medium shadow-[0px_1px_0px_0px_var(--color-border-glass-strong)_inset,0px_-1px_0px_0px_var(--color-border-glass-strong)_inset] backdrop-blur-md cursor-pointer"
+          )}
           type="submit"
         >
           Send Email &nbsp; &rarr;
@@ -50,8 +55,8 @@ export function Form() {
 const BottomGradient = () => {
   return (
     <>
-      <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-slate-300 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
-      <span className="absolute inset-x-10 -bottom-px mx-auto block h-px w-1/2 bg-gradient-to-r from-transparent via-slate-300 to-transparent opacity-0 blur-sm transition duration-500 group-hover/btn:opacity-100" />
+      <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-heading-from to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
+      <span className="absolute inset-x-10 -bottom-px mx-auto block h-px w-1/2 bg-gradient-to-r from-transparent via-heading-from to-transparent opacity-0 blur-sm transition duration-500 group-hover/btn:opacity-100" />
     </>
   );
 };
