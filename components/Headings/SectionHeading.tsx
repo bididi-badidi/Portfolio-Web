@@ -1,5 +1,12 @@
 "use client";
+import { themeClasses } from "@/app/styles/themeClasses";
+import { cn } from "@/app/utils/cn";
 import { FadeUpInView } from "../ui/FadeUpInView";
+
+const headingClassName = cn(
+  themeClasses.gradient.heading,
+  "py-4 text-4xl font-bold tracking-tight md:text-5xl"
+);
 
 export function SectionHeading({
   children,
@@ -12,17 +19,13 @@ export function SectionHeading({
 }) {
   return animation ? (
     <FadeUpInView
-      className={`h-[5rem] mb-12 lg:h-[10rem] text-center ${className}`}
+      className={cn("h-[5rem] mb-12 lg:h-[10rem] text-center", className)}
     >
-      <h2 className="bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-4xl font-bold tracking-tight text-transparent md:text-5xl">
-        {children}
-      </h2>
+      <h2 className={headingClassName}>{children}</h2>
     </FadeUpInView>
   ) : (
-    <div className={`text-center ${className}`}>
-      <h2 className="bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-4xl font-bold tracking-tight text-transparent md:text-5xl">
-        {children}
-      </h2>
+    <div className={cn("text-center", className)}>
+      <h2 className={headingClassName}>{children}</h2>
     </div>
   );
 }

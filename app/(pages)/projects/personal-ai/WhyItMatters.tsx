@@ -27,7 +27,7 @@ export const WhyItMatters = ({ id }: { id: string }) => {
         Language Models (LLMs) to solve complex problems by implementing robust
         function calling.
       </ProjectText>
-      <ProjectText className="text-center max-w-[60ch] text-slate-500 ">
+      <ProjectText className="text-center max-w-[60ch] text-muted">
         “Robots will not only replace existing jobs but also create new fields
         and opportunities for humans, focusing on unique human strengths like
         creativity and problem-solving.”

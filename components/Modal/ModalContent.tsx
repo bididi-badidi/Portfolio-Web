@@ -2,6 +2,7 @@
 import React, { useRef, useEffect } from "react";
 import { motion, LayoutGroup } from "motion/react";
 import { useModal } from "@/app/context/ModalContext";
+import { themeClasses } from "@/app/styles/themeClasses";
 import { cn } from "@/app/utils/cn";
 import { useUIState } from "@/app/context/UIStateContext";
 import { ChatInstance } from "@/app/interfaces/Chatbot";
@@ -63,22 +64,24 @@ export function ModalContent() {
                 <motion.li
                   key={chat.id}
                   variants={itemVariants}
-                  className={`py-3 px-6 rounded-3xl text-start justify-center mt-6 max-w-[85%] backdrop-blur-xl border border-white/10 shadow-lg ${
+                  className={cn(
+                    themeClasses.chat.bubbleBase,
                     chat.role == "bot"
                       ? chat.isError
-                        ? "bg-red-500/20 self-start rounded-tl-none shadow-red-500/10 border-red-500/30"
-                        : "bg-indigo-500/20 self-start rounded-tl-none shadow-indigo-500/10"
-                      : "bg-white/5 self-end rounded-tr-none shadow-black/20"
-                  }`}
+                        ? themeClasses.chat.errorBubble
+                        : themeClasses.chat.botBubble
+                      : themeClasses.chat.userBubble,
+                  )}
                 >
                   <span
-                    className={`${
+                    className={cn(
                       chat.role == "bot"
                         ? chat.isError
-                          ? "text-red-200"
-                          : "text-indigo-50"
-                        : "text-slate-100"
-                    } text-sm text-start`}
+                          ? "text-error-text"
+                          : "text-[var(--color-chat-bot-text)]"
+                        : "text-[var(--color-chat-user-text)]",
+                      "text-sm text-start",
+                    )}
                   >
                     {chat.message}
                   </span>

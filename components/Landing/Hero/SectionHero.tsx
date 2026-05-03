@@ -4,18 +4,21 @@ import { ResumeButton } from "./ResumeButton";
 import { LinkPreview } from "@/components/Contact/LinkPreview";
 import { AILink } from "./AILink";
 import { FadeUpInView } from "@/components/ui/FadeUpInView";
+import { themeClasses } from "@/app/styles/themeClasses";
 
 export function SectionHero({ id }: { id: string }) {
+  const heroTextClassName = cn(themeClasses.gradient.heading, "hero-text");
+
   return (
     <div id={id}>
       <Lamp>
         <div
           className={cn(
-            "bg-gradient-to-br from-slate-300 to-slate-500 bg-clip-text text-center font-medium tracking-tight place-items-center",
+            "text-center font-medium tracking-tight place-items-center",
           )}
         >
           <h1 className={cn("py-4 text-4xl md:text-5xl lg:text-5xl mb-4 ")}>
-            <span className={cn("hero-text")}>
+            <span className={heroTextClassName}>
               My name is Zi Shen
               <br />
               <br />I Build{" "}
@@ -28,9 +31,9 @@ export function SectionHero({ id }: { id: string }) {
             >
               <AILink />
             </LinkPreview>{" "}
-            <span className={cn("hero-text")}>Solutions</span>
+            <span className={heroTextClassName}>Solutions</span>
           </h1>
-          <p className={cn("w-[30ch] lg:w-[45ch] lg:text-lg opacity-65 hero-text mb-6")}>
+          <p className={cn(themeClasses.text.primary, "w-[30ch] lg:w-[45ch] lg:text-lg opacity-65 hero-text mb-6")}>
             LLM integrations to automated data pipelines—turning manual tasks into intelligent systems.
           </p>
           <FadeUpInView delay={3.5} initialOpacity={0} className="text-center">

@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FOOTER_LAST_UPDATE } from "@/app/config";
+import { themeClasses } from "@/app/styles/themeClasses";
+import { cn } from "@/app/utils/cn";
 
 export const Footer = () => {
   const year = new Date().getFullYear();
@@ -11,7 +13,7 @@ export const Footer = () => {
       name: "linked-in-icon",
     },
     {
-      link: "https://github.com/ZSHenChan",
+      link: "https://github.com/bididi-badidi",
       icon: "/icons/github.png",
       name: "github-icon",
     },
@@ -40,12 +42,12 @@ export const Footer = () => {
     },
   ];
   return (
-    <div className="relative min-h-[45dvh] bg-black-20 py-[10dvh] px-[10dvw] flex flex-col justify-between">
+    <div className={cn(themeClasses.surface.page, "relative min-h-[45dvh] py-[10dvh] px-[10dvw] flex flex-col justify-between")}>
       <div className="absolute top-12 h-[0.5px] w-[60%] left-[50%] translate-x-[-50%] bg-bright/20" />
       <ul className="flex flex-col lg:flex-row justify-center text-center mb-8 gap-4 lg:gap-12">
         {footerLinks.map((item) => (
           <li key={item.name}>
-            <Link className="font-bold text-xl cursor-pointer hover:text-bright/80" href={item.link}>
+            <Link className={cn(themeClasses.control.navItem, "font-bold text-xl cursor-pointer")} href={item.link}>
               {item.name}
             </Link>
           </li>
@@ -66,7 +68,7 @@ export const Footer = () => {
           </li>
         ))}
       </ul>
-      <p className="text-center text-slate-600">
+      <p className={cn(themeClasses.text.faint, "text-center")}>
         &copy; {year} Zi Shen Chan. All Rights Reserved. Last update: {FOOTER_LAST_UPDATE}
       </p>
     </div>
