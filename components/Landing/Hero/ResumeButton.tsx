@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { downloadResumePdf, getMasterResume } from "@/lib/s3-file-loader";
 import purify from "dompurify";
 import { themeClasses } from "@/app/styles/themeClasses";
+import { AnimatedGlassWindow } from "@/components/ui/AnimatedGlassWindow";
 
 export function ResumeButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -127,11 +128,17 @@ export function ResumeButton() {
         Resume
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-
-          <div className="relative w-full max-w-md bg-background border border-elevated rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <AnimatedGlassWindow
+        open={isOpen}
+        onOutsideClick={() => setIsOpen(false)}
+        backdrop={<div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />}
+        className="z-[100] p-4"
+        panelClassName="w-full max-w-md relative z-50 flex flex-col"
+        panelHeight="auto"
+        glassClassName="pt-0 border-elevated shadow-2xl"
+        tintColor="var(--color-bg-page)"
+        borderRadius="0.75rem"
+      >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-elevated bg-surface/50">
               <div className="flex items-center gap-2">
@@ -227,9 +234,7 @@ export function ResumeButton() {
                   : "Powered by Docx & Gemini 3 Pro"}
               </p>
             </div>
-          </div>
-        </div>
-      )}
+      </AnimatedGlassWindow>
     </>
   );
 }
