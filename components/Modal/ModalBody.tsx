@@ -42,13 +42,7 @@ const modalVariants = {
   },
 };
 
-export const ModalBody = ({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) => {
+export const ModalBody = ({ children, className }: { children: ReactNode; className?: string }) => {
   const { isChatOpen, allowAnimation } = useUIState();
 
   const modalRef = useRef<HTMLDivElement>(null);
@@ -70,17 +64,13 @@ export const ModalBody = ({
 
           <motion.div
             ref={modalRef}
-            className={cn(
-              "h-[70%] w-[95%] lg:w-[75%] relative z-50 flex flex-col",
-              className
-            )}
+            className={cn("h-[70%] w-[95%] lg:w-[75%] relative z-50 flex flex-col", className)}
             variants={allowAnimation ? modalVariants : undefined}
             initial="initial"
             animate="animate"
             exit="exit"
           >
-            <FluidGlass 
-              intensity={0.4} 
+            <FluidGlass
               className="flex-1 flex flex-col pt-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] shadow-black/50"
               containerClassName="h-full w-full"
               borderRadius="2.5rem"

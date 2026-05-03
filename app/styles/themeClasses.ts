@@ -26,6 +26,14 @@ export const themeClasses = {
     overlay: "bg-overlay",
     scrim: "bg-scrim",
   },
+  button: {
+    primary:
+      "bg-glass border border-glass-border text-bright backdrop-blur-xl shadow-[0_0_20px_var(--color-bg-glass)] transition-colors hover:bg-glass-hover hover:border-glass-border-strong hover:shadow-[0_0_25px_var(--color-bg-glass-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+    secondary:
+      "bg-surface/60 border border-subtle text-foreground shadow-sm transition-colors hover:bg-elevated hover:text-bright hover:border-glass-border-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+    ghost:
+      "text-foreground transition-colors hover:text-bright hover:bg-glass focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+  },
   control: {
     focusRing: "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
     iconButton:

@@ -38,9 +38,8 @@ export function Form() {
 
         <button
           className={cn(
-            themeClasses.gradient.primaryAction,
-            themeClasses.text.onAccent,
-            "group/btn relative block h-10 w-full rounded-md font-medium shadow-[0px_1px_0px_0px_var(--color-border-glass-strong)_inset,0px_-1px_0px_0px_var(--color-border-glass-strong)_inset] backdrop-blur-md cursor-pointer"
+            themeClasses.button.primary,
+            "group/btn relative block h-10 w-full rounded-md font-medium cursor-pointer"
           )}
           type="submit"
         >

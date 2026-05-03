@@ -70,7 +70,7 @@ export function ModalContent() {
                       ? chat.isError
                         ? themeClasses.chat.errorBubble
                         : themeClasses.chat.botBubble
-                      : themeClasses.chat.userBubble
+                      : themeClasses.chat.userBubble,
                   )}
                 >
                   <span
@@ -80,7 +80,7 @@ export function ModalContent() {
                           ? "text-error-text"
                           : "text-[var(--color-chat-bot-text)]"
                         : "text-[var(--color-chat-user-text)]",
-                      "text-sm text-start"
+                      "text-sm text-start",
                     )}
                   >
                     {chat.message}

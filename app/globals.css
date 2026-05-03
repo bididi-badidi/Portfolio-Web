@@ -22,6 +22,7 @@
   --palette-cyan-400: #22d3ee;
   --palette-blue-600: #2563eb;
   --palette-blue-500: #3b82f6;
+  --palette-indigo-400: #818cf8;
   --palette-indigo-500: #6366f1;
   --palette-indigo-50: #eef2ff;
   --palette-red-500: #ef4444;
@@ -50,10 +51,10 @@
   --color-border-subtle: var(--palette-slate-700);
   --color-border-glass: rgb(255 255 255 / 0.1);
   --color-border-glass-strong: rgb(255 255 255 / 0.2);
-  --color-ring-focus: rgb(34 211 238 / 0.5);
+  --color-ring-focus: rgb(99 102 241 / 0.5);
 
-  --color-accent-primary: var(--palette-cyan-500);
-  --color-accent-primary-hover: var(--palette-cyan-400);
+  --color-accent-primary: var(--palette-indigo-500);
+  --color-accent-primary-hover: var(--palette-indigo-400);
   --color-accent-secondary: var(--palette-blue-600);
   --color-accent-secondary-hover: var(--palette-blue-500);
 

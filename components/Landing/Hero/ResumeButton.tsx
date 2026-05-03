@@ -122,7 +122,7 @@ export function ResumeButton() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="text-xl lg:text-2xl mt-8 underline cursor-pointer hover:text-bright transition-colors"
+        className={cn(themeClasses.button.secondary, "mt-8 rounded-full px-6 py-2 text-xl lg:text-2xl cursor-pointer")}
       >
         Resume
       </button>
