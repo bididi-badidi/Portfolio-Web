@@ -13,7 +13,7 @@ import purify from "dompurify";
 import { themeClasses } from "@/app/styles/themeClasses";
 import { AnimatedGlassWindow } from "@/components/ui/AnimatedGlassWindow";
 
-export function ResumeButton() {
+export function ResumeButton({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -123,7 +123,11 @@ export function ResumeButton() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={cn(themeClasses.button.secondary, "mt-8 rounded-full px-6 py-2 text-xl lg:text-2xl cursor-pointer")}
+        className={cn(
+          themeClasses.button.secondary,
+          "mt-8 rounded-full px-6 py-2 text-xl lg:text-2xl cursor-pointer",
+          className,
+        )}
       >
         Resume
       </button>

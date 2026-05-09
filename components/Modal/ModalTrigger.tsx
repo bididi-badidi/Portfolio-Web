@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import { motion } from "motion/react";
 
 const TRIGGER_TAP = { scale: 0.98 };
-const MODAL_GLASS_TINT = "var(--color-bg-glass)";
+const MODAL_GLASS_TINT = "rgb(255 255 255 / 0.025)";
 
 export const ModalTrigger = ({
   children,
@@ -37,9 +37,9 @@ export const ModalTrigger = ({
         containerClassName="relative z-10 w-auto h-auto"
         tintColor={MODAL_GLASS_TINT}
         className={cn(
-          themeClasses.surface.glass,
+          "border-white/10 text-bright",
           themeClasses.text.primary,
-          "px-8 py-3 w-fit h-fit cursor-pointer transition-colors flex items-center justify-center shadow-[0_0_20px_var(--color-bg-glass)] hover:shadow-[0_0_25px_var(--color-bg-glass-hover)]",
+          "px-8 py-3 w-fit h-fit cursor-pointer transition-colors flex items-center justify-center shadow-[0_0_16px_rgb(255_255_255_/_0.035)] hover:border-white/20 hover:shadow-[0_0_22px_rgb(255_255_255_/_0.07)]",
         )}
         intensity={0.6}
       >

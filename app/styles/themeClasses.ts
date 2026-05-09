@@ -28,7 +28,7 @@ export const themeClasses = {
   },
   button: {
     primary:
-      "bg-glass border border-glass-border text-bright backdrop-blur-xl shadow-[0_0_20px_var(--color-bg-glass)] transition-colors hover:bg-glass-hover hover:border-glass-border-strong hover:shadow-[0_0_25px_var(--color-bg-glass-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+      "bg-[rgb(255_255_255_/_0.025)] border border-white/10 text-bright backdrop-blur-xl shadow-[0_0_16px_rgb(255_255_255_/_0.035)] transition-colors hover:bg-[rgb(255_255_255_/_0.065)] hover:border-white/20 hover:shadow-[0_0_22px_rgb(255_255_255_/_0.07)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
     secondary:
       "bg-surface/60 border border-subtle text-foreground shadow-sm transition-colors hover:bg-elevated hover:text-bright hover:border-glass-border-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
     ghost:
