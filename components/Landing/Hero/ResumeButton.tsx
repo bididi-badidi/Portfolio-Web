@@ -12,6 +12,10 @@ import { downloadResumePdf, getMasterResume } from "@/lib/s3-file-loader";
 import purify from "dompurify";
 import { themeClasses } from "@/app/styles/themeClasses";
 import { AnimatedGlassWindow } from "@/components/ui/AnimatedGlassWindow";
+import { AnimatedBlobs } from "@/components/ui/AnimatedBlobs";
+import { FluidGlass } from "@/components/ui/FluidGlass";
+
+const PRIMARY_GLASS_TINT = "rgb(255 255 255 / 0.025)";
 
 export function ResumeButton({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -124,12 +128,24 @@ export function ResumeButton({ className }: { className?: string }) {
       <button
         onClick={() => setIsOpen(true)}
         className={cn(
-          themeClasses.button.secondary,
-          "mt-8 rounded-full px-6 py-2 text-xl lg:text-2xl cursor-pointer",
+          "group relative isolate mt-8 overflow-visible rounded-full border-0 bg-transparent p-0 text-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:text-2xl",
           className,
         )}
       >
-        Resume
+        <FluidGlass
+          borderRadius="9999px"
+          containerClassName="relative z-10 w-auto h-auto"
+          tintColor={PRIMARY_GLASS_TINT}
+          className={cn(
+            themeClasses.button.primary,
+            "px-6 py-2 w-fit h-fit cursor-pointer transition-colors flex items-center justify-center shadow-[0_0_16px_rgb(255_255_255_/_0.035)] hover:border-white/20 hover:shadow-[0_0_22px_rgb(255_255_255_/_0.07)]",
+          )}
+        >
+          <div className="absolute inset-0 z-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100">
+            <AnimatedBlobs variant="trigger" />
+          </div>
+          <span className="relative z-10">Resume</span>
+        </FluidGlass>
       </button>
 
       <AnimatedGlassWindow

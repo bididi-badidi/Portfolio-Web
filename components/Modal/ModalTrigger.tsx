@@ -37,8 +37,7 @@ export const ModalTrigger = ({
         containerClassName="relative z-10 w-auto h-auto"
         tintColor={MODAL_GLASS_TINT}
         className={cn(
-          "border-white/10 text-bright",
-          themeClasses.text.primary,
+          themeClasses.button.primary,
           "px-8 py-3 w-fit h-fit cursor-pointer transition-colors flex items-center justify-center shadow-[0_0_16px_rgb(255_255_255_/_0.035)] hover:border-white/20 hover:shadow-[0_0_22px_rgb(255_255_255_/_0.07)]",
         )}
         intensity={0.6}
