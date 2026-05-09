@@ -25,8 +25,8 @@ export function HeroSummaryAction({ start = true }: { start?: boolean }) {
     const runAnimation = async () => {
       await animate(
         "[data-hero-summary]",
-        { opacity: [0, 0.65], scaleX: 1 },
-        { duration: 2.4, ease: "easeOut" },
+        { opacity: 0.65, scaleX: 1 },
+        { duration: 0.2, ease: "easeOut" },
       );
 
       if (isCancelled) return;
@@ -83,7 +83,7 @@ export function HeroSummaryAction({ start = true }: { start?: boolean }) {
           themeClasses.text.primary,
           "col-start-1 row-start-1 w-[30ch] origin-center lg:w-[45ch] lg:text-lg",
         )}
-        initial={{ opacity: 0, scaleX: 1, filter: "blur(0px)" }}
+        initial={{ opacity: 0.65, scaleX: 1, filter: "blur(0px)" }}
       >
         LLM integrations to automated data pipelines—turning manual tasks into intelligent systems.
       </motion.p>

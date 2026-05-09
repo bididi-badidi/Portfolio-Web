@@ -25,10 +25,10 @@ export function SoftAuroraHero({
       )}
     >
       <SoftAuroraBackground />
-      <div className="absolute inset-0 z-[1] bg-background/35" />
-      <div className="absolute inset-x-0 bottom-0 z-[2] h-1/2 bg-gradient-to-b from-transparent via-background/35 to-background" />
-      <div className="absolute inset-x-0 top-0 z-[2] h-32 bg-gradient-to-b from-background/80 to-transparent" />
-      <div className="relative z-10">{children}</div>
+      <div className="absolute inset-0 bg-background/35" />
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent via-background/35 to-background" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background/80 to-transparent" />
+      <div className="relative">{children}</div>
     </ScrollableSection>
   );
 }
