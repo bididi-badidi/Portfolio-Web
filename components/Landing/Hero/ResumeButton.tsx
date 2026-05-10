@@ -14,10 +14,25 @@ import { themeClasses } from "@/app/styles/themeClasses";
 import { AnimatedGlassWindow } from "@/components/ui/AnimatedGlassWindow";
 import { AnimatedBlobs } from "@/components/ui/AnimatedBlobs";
 import { FluidGlass } from "@/components/ui/FluidGlass";
+import { motion } from "motion/react";
 
 const PRIMARY_GLASS_TINT = "rgb(255 255 255 / 0.025)";
 
-export function ResumeButton({ className }: { className?: string }) {
+export function ResumeButton({
+  className,
+  labelDelay = 0,
+  labelInitialOpacity = 1,
+  layoutId,
+  layoutTransition,
+  reserveLabelSpace = false,
+}: {
+  className?: string;
+  labelDelay?: number;
+  labelInitialOpacity?: number;
+  layoutId?: string;
+  layoutTransition?: Record<string, unknown>;
+  reserveLabelSpace?: boolean;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -125,135 +140,146 @@ export function ResumeButton({ className }: { className?: string }) {
 
   return (
     <>
-      <button
+      <motion.button
+        layoutId={layoutId}
+        transition={layoutTransition}
         onClick={() => setIsOpen(true)}
         className={cn(
-          "group relative isolate mt-8 overflow-visible rounded-full border-0 bg-transparent p-0 text-xl cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:text-2xl",
+          "group relative isolate mt-8 h-11 min-w-11 overflow-visible rounded-[9999px] border-0 bg-transparent p-0 text-xl leading-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:text-2xl",
           className,
         )}
+        style={{ borderRadius: 9999 }}
       >
         <FluidGlass
           borderRadius="9999px"
-          containerClassName="relative z-10 w-auto h-auto"
+          containerClassName="relative z-10 w-full h-full"
           tintColor={PRIMARY_GLASS_TINT}
           className={cn(
             themeClasses.button.primary,
-            "px-6 py-2 w-fit h-fit cursor-pointer transition-colors flex items-center justify-center shadow-[0_0_16px_rgb(255_255_255_/_0.035)] hover:border-white/20 hover:shadow-[0_0_22px_rgb(255_255_255_/_0.07)]",
+            "h-11 min-w-11 cursor-pointer transition-colors flex items-center justify-center leading-none shadow-[0_0_16px_rgb(255_255_255_/_0.035)] hover:border-white/20 hover:shadow-[0_0_22px_rgb(255_255_255_/_0.07)]",
+            reserveLabelSpace ? "px-6 py-0" : "px-6 py-0 w-fit",
           )}
         >
           <div className="absolute inset-0 z-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100">
             <AnimatedBlobs variant="trigger" />
           </div>
-          <span className="relative z-10">Resume</span>
+          <motion.span
+            className="relative z-10 block whitespace-nowrap leading-none translate-y-[9px]"
+            initial={{ opacity: labelInitialOpacity }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: labelDelay, duration: 0.24, ease: "easeOut" }}
+            style={{ minWidth: reserveLabelSpace ? "4.6rem" : undefined }}
+          >
+            Resume
+          </motion.span>
         </FluidGlass>
-      </button>
+      </motion.button>
 
       <AnimatedGlassWindow
         open={isOpen}
         onOutsideClick={() => setIsOpen(false)}
         backdrop={<div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />}
-        className="z-[100] p-4"
+        className="z-[100] p-0"
         panelClassName="w-full max-w-md relative z-50 flex flex-col"
         panelHeight="auto"
         glassClassName="pt-0 border-elevated shadow-2xl"
         tintColor="var(--color-bg-page)"
         borderRadius="0.75rem"
       >
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-elevated bg-surface/50">
-              <div className="flex items-center gap-2">
-                {showCustomInput && (
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-elevated bg-surface/50">
+          <div className="flex items-center gap-2">
+            {showCustomInput && (
+              <button onClick={() => setShowCustomInput(false)} className={cn(themeClasses.control.iconButton, "mr-2")}>
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
+            <h3 className="text-xl font-medium text-bright">
+              {showCustomInput ? "Paste Job Description" : "Select Resume Version"}
+            </h3>
+          </div>
+          <button onClick={() => setIsOpen(false)} className={themeClasses.control.iconButton}>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content Body */}
+        <div className="p-4">
+          {!showCustomInput ? (
+            // 1. STANDARD OPTIONS LIST
+            <div className="grid gap-3">
+              {RESUME_OPTIONS.map((option) => {
+                const Icon = option.icon;
+                return (
                   <button
-                    onClick={() => setShowCustomInput(false)}
-                    className={cn(themeClasses.control.iconButton, "mr-2")}
+                    key={option.id}
+                    onClick={() => handleOptionClick(option)}
+                    className={cn(
+                      "flex items-center gap-4 p-4 rounded-lg text-left transition-all border border-transparent",
+                      "hover:bg-surface hover:border-elevated group",
+                    )}
                   >
-                    <ArrowLeft className="w-5 h-5" />
+                    <div className="p-2 rounded-md bg-surface text-foreground group-hover:text-accent-light transition-colors">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-bright group-hover:text-[var(--color-text-on-accent)]">
+                        {option.label}
+                      </div>
+                      <div className="text-xs text-muted">{option.text}</div>
+                    </div>
                   </button>
-                )}
-                <h3 className="text-xl font-medium text-bright">
-                  {showCustomInput ? "Paste Job Description" : "Select Resume Version"}
-                </h3>
+                );
+              })}
+            </div>
+          ) : (
+            // 2. CUSTOM INPUT FORM
+            <div className="space-y-6 animate-in slide-in-from-right-10 duration-200">
+              <div className="relative">
+                <textarea
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  onDoubleClick={handleDoubleClickPaste}
+                  placeholder="Ctrl+V or DOUBLE click to paste the job description or role requirements here..."
+                  className="w-full h-60 p-3 bg-surface border border-elevated rounded-lg text-bright placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none text-sm"
+                  disabled={loading === "Custom"}
+                />
               </div>
-              <button onClick={() => setIsOpen(false)} className={themeClasses.control.iconButton}>
-                <X className="w-5 h-5" />
+
+              <button
+                onClick={handleCustomGeneration}
+                disabled={!jobDescription.trim() || loading === "Custom"}
+                className={cn(
+                  "w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
+                  themeClasses.gradient.primaryAction,
+                  themeClasses.text.onAccent,
+                  "disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale",
+                )}
+              >
+                {loading === "Custom" ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Tailor Resume
+                  </>
+                )}
               </button>
             </div>
+          )}
+        </div>
 
-            {/* Content Body */}
-            <div className="p-4">
-              {!showCustomInput ? (
-                // 1. STANDARD OPTIONS LIST
-                <div className="grid gap-3">
-                  {RESUME_OPTIONS.map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <button
-                        key={option.id}
-                        onClick={() => handleOptionClick(option)}
-                        className={cn(
-                          "flex items-center gap-4 p-4 rounded-lg text-left transition-all border border-transparent",
-                          "hover:bg-surface hover:border-elevated group",
-                        )}
-                      >
-                        <div className="p-2 rounded-md bg-surface text-foreground group-hover:text-accent-light transition-colors">
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-bright group-hover:text-[var(--color-text-on-accent)]">{option.label}</div>
-                          <div className="text-xs text-muted">{option.text}</div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                // 2. CUSTOM INPUT FORM
-                <div className="space-y-6 animate-in slide-in-from-right-10 duration-200">
-                  <div className="relative">
-                    <textarea
-                      value={jobDescription}
-                      onChange={(e) => setJobDescription(e.target.value)}
-                      onDoubleClick={handleDoubleClickPaste}
-                      placeholder="Ctrl+V or DOUBLE click to paste the job description or role requirements here..."
-                      className="w-full h-60 p-3 bg-surface border border-elevated rounded-lg text-bright placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none text-sm"
-                      disabled={loading === "Custom"}
-                    />
-                  </div>
-
-                  <button
-                    onClick={handleCustomGeneration}
-                    disabled={!jobDescription.trim() || loading === "Custom"}
-                    className={cn(
-                      "w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
-                      themeClasses.gradient.primaryAction,
-                      themeClasses.text.onAccent,
-                      "disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale",
-                    )}
-                  >
-                    {loading === "Custom" ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        Tailor Resume
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 bg-surface/30 text-center border-t border-elevated">
-              <p className="text-xs text-muted">
-                {showCustomInput
-                  ? "AI will analyze requirements to highlight best matching skills from my database"
-                  : "Powered by Docx & Gemini 3 Pro"}
-              </p>
-            </div>
+        {/* Footer */}
+        <div className="p-4 bg-surface/30 text-center border-t border-elevated">
+          <p className="text-xs text-muted">
+            {showCustomInput
+              ? "AI will analyze requirements to highlight best matching skills from my database"
+              : "Powered by Docx & Gemini 3 Pro"}
+          </p>
+        </div>
       </AnimatedGlassWindow>
     </>
   );
