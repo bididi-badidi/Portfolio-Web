@@ -1,36 +1,58 @@
 "use client";
 
-import React from "react";
-import { Spotlight } from "@/components/ui/Spotlight";
+import { useState } from "react";
+import { ProjectHeroRings } from "@/components/Projects/ProjectHeroRings";
 import { ScrollableSection } from "@/components/layout/ScrollableSection";
 import { themeClasses } from "@/app/styles/themeClasses";
 import { cn } from "@/app/utils/cn";
 
 export function SpotlightHero({ id }: { id: string }) {
+  const [isHeadingCompact, setIsHeadingCompact] = useState(false);
+  const [isCaptionVisible, setIsCaptionVisible] = useState(false);
+
+  const handleRingsStatic = () => {
+    setIsHeadingCompact(true);
+    window.setTimeout(() => setIsCaptionVisible(true), 520);
+  };
+
   return (
     <ScrollableSection
       id={id}
       className="relative flex h-screen w-screen overflow-hidden rounded-md antialiased place-items-center md:items-center md:justify-center"
     >
-      <Spotlight
-        className="top-30 -left-20 md:top-10 md:-left-10 lg:top-[10dvh] lg:left-[20%]"
-        fill="white"
-      />
-      <div className="relative z-10 mx-auto w-full max-w-7xl p-4 pt-20 md:pt-0">
-        <h1 className={cn(themeClasses.gradient.heroHeading, "bg-opacity-50 text-center text-4xl font-bold md:text-7xl")}>
+      <ProjectHeroRings onStatic={handleRingsStatic} />
+      <div className="relative z-10 mx-auto w-full max-w-7xl p-4">
+        <h1
+          className={cn(
+            themeClasses.gradient.heroHeading,
+            "text-center font-bold transition-[font-size,transform] duration-500 ease-out",
+            isHeadingCompact
+              ? "text-[clamp(2.5rem,9vw,4.5rem)]"
+              : "text-[clamp(3.25rem,12vw,7rem)]",
+          )}
+        >
           Automation Manager
         </h1>
-        <p className="mx-auto mt-4 mb-8 max-w-lg text-center text-base font-normal text-bright">
-          Explore my portfolio interactively! This AI assistant can answer your
-          questions about my skills and projects, or even help you get in touch
-          and navigate the website.
-        </p>
-        <a
-          className="block mx-auto max-w-lg text-center text-base font-bold underline text-bright"
-          href="#why"
+        <div
+          className={cn(
+            "overflow-hidden transition-all duration-700 ease-out",
+            isCaptionVisible
+              ? "max-h-64 translate-y-0 opacity-100"
+              : "max-h-0 translate-y-3 opacity-0",
+          )}
         >
-          Explore
-        </a>
+          <p className="mx-auto mt-4 mb-8 max-w-lg text-center text-base font-normal text-bright">
+            Explore my portfolio interactively! This AI assistant can answer your
+            questions about my skills and projects, or even help you get in touch
+            and navigate the website.
+          </p>
+          <a
+            className="block mx-auto max-w-lg text-center text-base font-bold underline text-bright"
+            href="#why"
+          >
+            Explore
+          </a>
+        </div>
       </div>
     </ScrollableSection>
   );
