@@ -54,7 +54,7 @@
     "@types/node": "^20",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19",
-    "@types/three": "^0.184.1",
+    "@types/three": "0.167.2",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.2.2",

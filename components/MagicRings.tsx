@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-import "./MagicRings.css";
+import styles from "./MagicRings.module.css";
 
 const vertexShader = `
 void main() {
@@ -95,8 +95,8 @@ interface MagicRingsProps {
 type MagicRingsRuntimeProps = Required<Omit<MagicRingsProps, "onStatic">>;
 
 export default function MagicRings({
-  color = '#fc42ff',
-  colorTwo = '#42fcff',
+  color = "#fc42ff",
+  colorTwo = "#42fcff",
   speed = 1,
   ringCount = 6,
   attenuation = 10,
@@ -133,10 +133,29 @@ export default function MagicRings({
   onStaticRef.current = onStatic;
 
   propsRef.current = {
-    color, colorTwo, speed, ringCount, attenuation, lineThickness,
-    baseRadius, radiusStep, scaleRate, opacity, blur, noiseAmount,
-    rotation, ringGap, fadeIn, fadeOut, followMouse, mouseInfluence,
-    hoverScale, parallax, clickBurst, playOnce, staticAt,
+    color,
+    colorTwo,
+    speed,
+    ringCount,
+    attenuation,
+    lineThickness,
+    baseRadius,
+    radiusStep,
+    scaleRate,
+    opacity,
+    blur,
+    noiseAmount,
+    rotation,
+    ringGap,
+    fadeIn,
+    fadeOut,
+    followMouse,
+    mouseInfluence,
+    hoverScale,
+    parallax,
+    clickBurst,
+    playOnce,
+    staticAt,
   };
 
   useEffect(() => {
@@ -151,11 +170,11 @@ export default function MagicRings({
       return;
     }
 
-    if (!renderer.capabilities.isWebGL2) {
-      renderer.dispose();
-      onStaticRef.current?.();
-      return;
-    }
+    // if (!renderer.capabilities.isWebGL2) {
+    //   renderer.dispose();
+    //   onStaticRef.current?.();
+    //   return;
+    // }
 
     renderer.setClearColor(0x000000, 0);
     mount.appendChild(renderer.domElement);
@@ -202,7 +221,7 @@ export default function MagicRings({
       uniforms.uResolution.value.set(w * dpr, h * dpr);
     };
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
 
     const ro = new ResizeObserver(resize);
     ro.observe(mount);
@@ -300,5 +319,11 @@ export default function MagicRings({
     };
   }, []);
 
-  return <div ref={mountRef} className="magic-rings-container" style={blur > 0 ? { filter: `blur(${blur}px)` } : undefined} />;
+  return (
+    <div
+      ref={mountRef}
+      className={styles.container}
+      style={blur > 0 ? { filter: `blur(${blur}px)` } : undefined}
+    />
+  );
 }
