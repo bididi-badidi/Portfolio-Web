@@ -26,7 +26,7 @@ export function Modal() {
       <ModalProvider>
         <ModalTrigger
           onOpen={scrollToBottom}
-          className="fixed bottom-[30px] right-[30px] z-5 cursor-pointer"
+          className="fixed bottom-[42px] right-4 z-5 cursor-pointer sm:hidden"
         >
           <span className="text-center">Initiate AI</span>
         </ModalTrigger>

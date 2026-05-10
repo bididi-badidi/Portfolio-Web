@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: dark;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
