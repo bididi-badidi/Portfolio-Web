@@ -166,10 +166,6 @@ html {
     0px 0px 0px 1px rgba(25, 28, 33, 0.08);
 }
 
-@theme inline {
-  --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
-}
-
 @keyframes text-fade-in {
   0% {
     opacity: 0;
@@ -187,14 +183,13 @@ html {
   animation: text-fade-in 6s ease-in-out forwards;
 }
 
-@keyframes spotlight {
-  0% {
-    opacity: 0;
-    transform: translate(-72%, -62%) scale(0.5);
+@media (prefers-reduced-motion: reduce) {
+  .hero-text {
+    animation: none;
   }
-  100% {
+
+  .hero-text {
     opacity: 1;
-    transform: translate(-50%, -40%) scale(1);
   }
 }
 
