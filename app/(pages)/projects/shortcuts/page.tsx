@@ -28,7 +28,6 @@ export default function PersonalAiPage() {
 
         {/* <Workflows id="workflows" /> */}
       </div>
-
       <div className="h-50"></div>
     </DottedBackground>
   );
