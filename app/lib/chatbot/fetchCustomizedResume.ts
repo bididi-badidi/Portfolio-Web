@@ -1,6 +1,6 @@
 "use server";
 
-import { Type } from "@google/genai";
+import { Type } from "./geminiTypes";
 import { ResumeEntry, SkillsData } from "@/app/interfaces/Resume";
 import { envClient } from "@/app/env/client";
 import { getMasterResume } from "@/lib/s3-file-loader";

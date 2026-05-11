@@ -1,4 +1,4 @@
-import { FunctionCall } from "@google/genai";
+import type { FunctionCall } from "./types";
 import { wrapWithTag } from "./promptUtils";
 
 export function generatePrompt(
