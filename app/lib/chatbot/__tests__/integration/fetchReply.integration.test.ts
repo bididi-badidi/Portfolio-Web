@@ -2,27 +2,42 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import {
   mockGeminiGenerateContent,
-  mockFetchFunctionCalls,
-  mockFetchExcDecisionStruct,
   mockGetKnowledgeData,
-} from "../../../../bun-test-setup";
-import { fetchChatbotReply } from "../fetchReply";
-import { REPLY_ERROR_FALLBACK_MSG } from "../config";
+} from "../../../../../bun-test-setup";
+
+import { fetchChatbotReply } from "../../fetchReply";
+import { REPLY_ERROR_FALLBACK_MSG } from "../../config";
 
 describe("fetchChatbotReply", () => {
+  const noFunctionResponse = { text: "", functionCalls: undefined };
+  const sendEmailResponse = {
+    text: "",
+    functionCalls: [{ name: "SendEmail", args: {} }],
+  };
+  const approvedResponse = { text: JSON.stringify({ approve: true, reason: "safe" }) };
+  const deniedResponse = { text: JSON.stringify({ approve: false, reason: "unsafe" }) };
+  const botResponse = { text: "Bot response" };
+
+  function queueGeminiResponses(...responses: Array<Record<string, unknown> | Error>) {
+    let callIndex = 0;
+    mockGeminiGenerateContent.mockImplementation(() => {
+      const response = responses[Math.min(callIndex, responses.length - 1)];
+      callIndex++;
+
+      if (response instanceof Error) {
+        return Promise.reject(response);
+      }
+
+      return Promise.resolve(response);
+    });
+  }
+
   beforeEach(() => {
-    mockFetchFunctionCalls.mockReset();
-    mockFetchExcDecisionStruct.mockReset();
     mockGetKnowledgeData.mockReset();
     mockGeminiGenerateContent.mockReset();
 
-    mockFetchFunctionCalls.mockImplementation(() =>
-      Promise.resolve({ functionCall: undefined, functionMessage: "", error: false })
-    );
     mockGetKnowledgeData.mockImplementation(() => Promise.resolve({ info: "knowledge" }));
-    mockGeminiGenerateContent.mockImplementation(() =>
-      Promise.resolve({ text: "Bot response" })
-    );
+    queueGeminiResponses(noFunctionResponse, botResponse);
   });
 
   it("should return a basic response when no functions or search are needed", async () => {
@@ -38,13 +53,7 @@ describe("fetchChatbotReply", () => {
   });
 
   it("should handle function calls when approved", async () => {
-    const mockFuncCall = { name: "SendEmail", args: {} };
-    mockFetchFunctionCalls.mockImplementation(() =>
-      Promise.resolve({ functionCall: mockFuncCall, functionMessage: "", error: false })
-    );
-    mockFetchExcDecisionStruct.mockImplementation(() =>
-      Promise.resolve({ approve: true, reason: "safe" })
-    );
+    queueGeminiResponses(sendEmailResponse, approvedResponse, botResponse);
 
     const request = {
       chatHistory: [{ role: "user", message: "Email me" }],
@@ -52,21 +61,15 @@ describe("fetchChatbotReply", () => {
     };
 
     const result = await fetchChatbotReply(request as any);
-    expect(result.functionCall).toEqual(mockFuncCall);
+    expect(result.functionCall).toEqual({ name: "SendEmail", args: {} });
     expect(result.error).toBe(false);
     expect(mockGeminiGenerateContent).toHaveBeenCalled();
-    const prompt = mockGeminiGenerateContent.mock.calls[0][0]?.contents as string;
+    const prompt = mockGeminiGenerateContent.mock.calls[2][0]?.contents as string;
     expect(prompt).toContain('"name":"SendEmail"');
   });
 
   it("should NOT return function call if NOT approved", async () => {
-    const mockFuncCall = { name: "SendEmail", args: {} };
-    mockFetchFunctionCalls.mockImplementation(() =>
-      Promise.resolve({ functionCall: mockFuncCall, functionMessage: "", error: false })
-    );
-    mockFetchExcDecisionStruct.mockImplementation(() =>
-      Promise.resolve({ approve: false, reason: "unsafe" })
-    );
+    queueGeminiResponses(sendEmailResponse, deniedResponse, botResponse);
 
     const request = {
       chatHistory: [{ role: "user", message: "Email me" }],
@@ -78,8 +81,11 @@ describe("fetchChatbotReply", () => {
   });
 
   it("should skip function approval when functionCallResponse has error", async () => {
-    mockFetchFunctionCalls.mockImplementation(() =>
-      Promise.resolve({ functionCall: undefined, functionMessage: "Error", error: true })
+    queueGeminiResponses(
+      new Error("Function call detection down"),
+      new Error("Function call detection down"),
+      new Error("Function call detection down"),
+      botResponse,
     );
 
     const request = {
@@ -88,7 +94,6 @@ describe("fetchChatbotReply", () => {
     };
 
     const result = await fetchChatbotReply(request as any);
-    expect(mockFetchExcDecisionStruct).not.toHaveBeenCalled();
     expect(result.functionCall).toBeUndefined();
     expect(result.error).toBe(false);
   });
@@ -109,8 +114,11 @@ describe("fetchChatbotReply", () => {
   });
 
   it("should return fallback message if Gemini generation fails", async () => {
-    mockGeminiGenerateContent.mockImplementation(() =>
-      Promise.reject(new Error("Gemini explosion"))
+    queueGeminiResponses(
+      noFunctionResponse,
+      new Error("Gemini explosion"),
+      new Error("Gemini explosion"),
+      new Error("Gemini explosion"),
     );
 
     const request = {
@@ -124,9 +132,7 @@ describe("fetchChatbotReply", () => {
   });
 
   it("should return fallback message if Gemini returns empty text", async () => {
-    mockGeminiGenerateContent.mockImplementation(() =>
-      Promise.resolve({ text: "" })
-    );
+    queueGeminiResponses(noFunctionResponse, { text: "" });
 
     const request = {
       chatHistory: [{ role: "user", message: "Hello" }],
@@ -139,9 +145,7 @@ describe("fetchChatbotReply", () => {
   });
 
   it("should return fallback message if Gemini returns whitespace text", async () => {
-    mockGeminiGenerateContent.mockImplementation(() =>
-      Promise.resolve({ text: "   " })
-    );
+    queueGeminiResponses(noFunctionResponse, { text: "   " });
 
     const request = {
       chatHistory: [{ role: "user", message: "Hello" }],
@@ -187,10 +191,7 @@ describe("fetchChatbotReply", () => {
   });
 
   it("should not call function approval when function calling is disabled", async () => {
-    const mockFuncCall = { name: "SendEmail", args: {} };
-    mockFetchFunctionCalls.mockImplementation(() =>
-      Promise.resolve({ functionCall: mockFuncCall, functionMessage: "", error: false })
-    );
+    queueGeminiResponses(sendEmailResponse, botResponse);
 
     const request = {
       chatHistory: [{ role: "user", message: "Email me" }],
@@ -198,18 +199,18 @@ describe("fetchChatbotReply", () => {
     };
 
     const result = await fetchChatbotReply(request as any);
-    expect(mockFetchExcDecisionStruct).not.toHaveBeenCalled();
+    expect(mockGeminiGenerateContent).toHaveBeenCalledTimes(2);
     expect(result.functionCall).toBeUndefined();
     expect(result.error).toBe(false);
   });
 
   it("should continue when function approval check fails", async () => {
-    const mockFuncCall = { name: "SendEmail", args: {} };
-    mockFetchFunctionCalls.mockImplementation(() =>
-      Promise.resolve({ functionCall: mockFuncCall, functionMessage: "", error: false })
-    );
-    mockFetchExcDecisionStruct.mockImplementation(() =>
-      Promise.reject(new Error("Approver down"))
+    queueGeminiResponses(
+      sendEmailResponse,
+      new Error("Approver down"),
+      new Error("Approver down"),
+      new Error("Approver down"),
+      botResponse,
     );
 
     const request = {
@@ -224,13 +225,7 @@ describe("fetchChatbotReply", () => {
   });
 
   it("should keep funcSysMsg when function is detected but denied", async () => {
-    const mockFuncCall = { name: "SendEmail", args: {} };
-    mockFetchFunctionCalls.mockImplementation(() =>
-      Promise.resolve({ functionCall: mockFuncCall, functionMessage: "", error: false })
-    );
-    mockFetchExcDecisionStruct.mockImplementation(() =>
-      Promise.resolve({ approve: false, reason: "unsafe" })
-    );
+    queueGeminiResponses(sendEmailResponse, deniedResponse, botResponse);
 
     const request = {
       chatHistory: [{ role: "user", message: "Email me" }],

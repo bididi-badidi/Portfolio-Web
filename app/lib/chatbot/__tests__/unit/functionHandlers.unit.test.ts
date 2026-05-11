@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, mock, beforeEach, afterEach } from "bun:test";
-import { executeFunctionCall } from "../functionHandlers";
+import { executeFunctionCall } from "../../functionHandlers";
 import { reportErrorMessage } from "@/app/utils/handleReport";
 import {
   CLOSE_MODAL_DELAY_ON_FUNC_CALL_MS,
   SCROLL_DELAY_MS,
-} from "../config";
+} from "../../config";
 
 mock.module("@/app/utils/handleReport", () => ({
   getErrorMessage: mock((err: any) => err?.message || String(err)),

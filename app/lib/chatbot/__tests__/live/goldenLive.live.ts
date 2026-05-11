@@ -2,13 +2,14 @@ import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { readdirSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
-import { fetchFunctionCalls } from "../fetchFunctionCalls";
-import { fetchExcDecisionStruct } from "../fetchFunctionApproval";
-import { fetchChatbotReply } from "../fetchReply";
-import { GeminiService } from "../geminiService";
+import { fetchFunctionCalls } from "../../fetchFunctionCalls";
+import { fetchExcDecisionStruct } from "../../fetchFunctionApproval";
+import { fetchChatbotReply } from "../../fetchReply";
+import { GeminiService } from "../../geminiService";
 import { FunctionCallType } from "@/app/enums/functionCall";
 import { envClient } from "@/app/env/client";
 import { envServer } from "@/app/env/server";
+import { TEST_CONFIG, isLiveEvalMode } from "@/app/test/testConfig";
 import { Type } from "@google/genai";
 
 interface LiveGoldenThresholdConfig {
@@ -52,26 +53,28 @@ interface LoadedLiveGoldenCase extends LiveGoldenCase {
   sourceFile: string;
 }
 
-const CASES_DIR = join(process.cwd(), "testdata", "chatbot-golden-live");
-const REPORT_DIR = join(process.cwd(), "testdata", "chatbot-golden-live", "reports");
-const REPORT_PATH = join(REPORT_DIR, "latest.json");
-const THRESHOLDS_PATH = join(CASES_DIR, "thresholds.json");
-const EVAL_DIR = join(CASES_DIR, "evaluator");
-const EVAL_SYSTEM_PATH = join(EVAL_DIR, "system.md");
-const EVAL_FUNCTIONS_PATH = join(EVAL_DIR, "functions.json");
-const EVAL_PROFILES_PATH = join(EVAL_DIR, "profiles.json");
-const DEFAULT_TIMEOUT_MS = 45000;
-const describeLive = process.env.CHATBOT_LIVE_EVAL === "1" ? describe : describe.skip;
+const rootJoin = (parts: readonly string[]) => join(process.cwd(), ...parts);
+const CASES_DIR = rootJoin(TEST_CONFIG.live.casesDir);
+const REPORT_DIR = rootJoin(TEST_CONFIG.live.reportDir);
+const REPORT_PATH = join(REPORT_DIR, TEST_CONFIG.live.reportFilename);
+const THRESHOLDS_PATH = join(CASES_DIR, TEST_CONFIG.live.thresholdsFilename);
+const EVAL_DIR = join(CASES_DIR, TEST_CONFIG.live.evaluatorDirname);
+const EVAL_SYSTEM_PATH = join(EVAL_DIR, TEST_CONFIG.live.evaluatorSystemFilename);
+const EVAL_FUNCTIONS_PATH = join(EVAL_DIR, TEST_CONFIG.live.evaluatorFunctionsFilename);
+const EVAL_PROFILES_PATH = join(EVAL_DIR, TEST_CONFIG.live.evaluatorProfilesFilename);
+const DEFAULT_TIMEOUT_MS = TEST_CONFIG.timeouts.liveDefaultMs;
+const describeLive = isLiveEvalMode() ? describe : describe.skip;
 
 async function runPreflight() {
   const missing: string[] = [];
-  const requiredEnv = [
-    ["GEMINI_API_KEY", envServer.GEMINI_API_KEY],
-    ["NEXT_PUBLIC_GEMINI_MODEL_DEFAULT", envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT],
-    ["NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL", envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL],
-    ["NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER", envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER],
-    ["NEXT_PUBLIC_DEV_MODE", envClient.NEXT_PUBLIC_DEV_MODE],
-  ] as const;
+  const envValues: Record<(typeof TEST_CONFIG.live.requiredEnvKeys)[number], string | undefined> = {
+    GEMINI_API_KEY: envServer.GEMINI_API_KEY,
+    NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT,
+    NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL,
+    NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER,
+    NEXT_PUBLIC_DEV_MODE: envClient.NEXT_PUBLIC_DEV_MODE,
+  };
+  const requiredEnv = TEST_CONFIG.live.requiredEnvKeys.map((name) => [name, envValues[name]] as const);
 
   for (const [name, value] of requiredEnv) {
     if (!value || !String(value).trim()) {
@@ -93,7 +96,12 @@ async function runPreflight() {
 
 const caseFilter = process.env.CASE;
 const files = readdirSync(CASES_DIR)
-  .filter((f) => f.endsWith(".json") && f !== "thresholds.json" && (!caseFilter || f.includes(caseFilter)))
+  .filter(
+    (f) =>
+      f.endsWith(".json") &&
+      f !== TEST_CONFIG.live.thresholdsFilename &&
+      (!caseFilter || f.includes(caseFilter)),
+  )
   .sort();
 const allCases: LoadedLiveGoldenCase[] = [];
 for (const file of files) {
