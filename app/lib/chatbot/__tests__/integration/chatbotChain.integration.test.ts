@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from "bun:test";
-import { mockGeminiGenerateContent, mockGetMasterResume } from "../../../../bun-test-setup";
+import { mockGeminiGenerateContent, mockGetMasterResume } from "../../../../../bun-test-setup";
 
 /**
  * Tests for chatbot sub-components using the real implementations.
@@ -9,8 +9,8 @@ import { mockGeminiGenerateContent, mockGetMasterResume } from "../../../../bun-
  * NOTE: fetchReply integration tests are in fetchReply.test.ts using sub-module mocks.
  */
 
-import { GeminiService } from "../geminiService";
-import { fetchResumeData } from "../fetchCustomizedResume";
+import { GeminiService } from "../../geminiService";
+import { fetchResumeData } from "../../fetchCustomizedResume";
 
 describe("Chatbot Chain Components", () => {
   beforeEach(() => {

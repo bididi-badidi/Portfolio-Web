@@ -7,10 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:chatbot-golden": "bun test app/lib/chatbot/__tests__/goldenEval.test.ts",
-    "test:chatbot-golden-live": "CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test ./app/lib/chatbot/__tests__/goldenLive.test.ts",
-    "test:chatbot-golden-live:file": "CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test ./app/lib/chatbot/__tests__/goldenLive.test.ts",
-    "test:chatbot-golden-live:ci": "CHATBOT_LIVE_EVAL=1 bun test ./app/lib/chatbot/__tests__/goldenLive.test.ts",
+    "worktree": "bash scripts/worktree-bootstrap.sh",
+    "test": "bun test",
+    "test:unit": "bun test app/lib/chatbot/__tests__/unit app/utils/__tests__/unit",
+    "test:integration": "bun test app/lib/chatbot/__tests__/integration",
+    "test:chatbot-golden-live": "CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test ./app/lib/chatbot/__tests__/live/goldenLive.live.ts",
+    "test:chatbot-golden-live:file": "CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test ./app/lib/chatbot/__tests__/live/goldenLive.live.ts",
+    "test:chatbot-golden-live:ci": "CHATBOT_LIVE_EVAL=1 bun test ./app/lib/chatbot/__tests__/live/goldenLive.live.ts",
     "test:ui": "bun test --preload ./bun-ui-test-setup.ts components/ui/__tests__/"
   },
   "dependencies": {

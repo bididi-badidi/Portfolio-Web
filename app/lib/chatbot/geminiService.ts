@@ -2,6 +2,7 @@ import { getErrorMessage } from "@/app/utils/handleReport";
 import { gemini_client as ai } from "@/lib/gemini";
 import type { GenerateContentConfig } from "./geminiTypes";
 import { MAX_RETRY_COUNT } from "@/app/config/api";
+import { GEMINI_API_VERBOSE_MODE } from "./config";
 
 const GEMINI_TIMEOUT_MS = 15000;
 
@@ -15,6 +16,15 @@ export class GeminiService {
     let lastError: unknown;
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
+        if (GEMINI_API_VERBOSE_MODE) {
+          console.log("--- Gemini generateContent request:", {
+            model,
+            contents,
+            config,
+            attempt: attempt + 1,
+          });
+        }
+
         const response = await Promise.race([
           ai.models.generateContent({
             model,
@@ -25,6 +35,11 @@ export class GeminiService {
             setTimeout(() => reject(new Error("Gemini API timeout")), GEMINI_TIMEOUT_MS)
           ),
         ]);
+
+        if (GEMINI_API_VERBOSE_MODE) {
+          console.log("--- Gemini generateContent response:", response);
+        }
+
         return response;
       } catch (err) {
         lastError = err;
