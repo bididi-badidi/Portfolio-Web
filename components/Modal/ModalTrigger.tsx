@@ -20,7 +20,7 @@ export const ModalTrigger = ({
     <motion.button
       type="button"
       className={cn(
-        "relative isolate overflow-visible rounded-full border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "relative isolate overflow-visible rounded-[14px] border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
       )}
       whileTap={TRIGGER_TAP}
@@ -30,9 +30,9 @@ export const ModalTrigger = ({
       }}
     >
       <GlassSurface
-        width="auto"
-        height={62}
-        borderRadius={9999}
+        width={46}
+        height={46}
+        borderRadius={14}
         displace={0.5}
         distortionScale={-180}
         redOffset={0}
@@ -41,9 +41,9 @@ export const ModalTrigger = ({
         brightness={50}
         opacity={0.93}
         mixBlendMode="screen"
-        className="glass-surface--pill cursor-pointer"
+        className="glass-surface--icon-btn cursor-pointer"
       >
-        <span className="relative z-10 px-8 text-sm font-medium whitespace-nowrap text-bright">
+        <span className="relative z-10 flex items-center justify-center text-bright">
           {children}
         </span>
       </GlassSurface>
