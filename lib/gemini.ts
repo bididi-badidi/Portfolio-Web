@@ -73,11 +73,12 @@ export const gemini_client = {
       config?: GenerateContentConfig;
     }): Promise<GenerateContentResponse> {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${envServer.GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-goog-api-key": envServer.GEMINI_API_KEY,
           },
           body: JSON.stringify(toRequestBody(contents, config)),
         },

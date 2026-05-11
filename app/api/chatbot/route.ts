@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { fetchChatbotReply } from "@/app/lib/chatbot/fetchReply";
 import type { ChatReply, ChatbotRequest } from "@/app/lib/chatbot/types";
 import { REPLY_ERROR_FALLBACK_MSG } from "@/app/lib/chatbot/config";
