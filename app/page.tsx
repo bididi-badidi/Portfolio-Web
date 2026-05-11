@@ -18,7 +18,7 @@ const navItems = [
 export default function Home() {
   return (
     <>
-      <FloatingNav navItems={navItems} showHome={false} />
+      <FloatingNav navItems={navItems} showHome={false} showInitiateAI={true} />
       <SectionHero id="hero" />
       <div className="h-[10rem] bg-gradient-to-b from-background to-transparent" />
       <SectionAbout id="about" />

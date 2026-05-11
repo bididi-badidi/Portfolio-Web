@@ -4,8 +4,8 @@ import { themeClasses } from "@/app/styles/themeClasses";
 import { useState } from "react";
 import { ChatInstance } from "@/app/interfaces/Chatbot";
 import { motion, AnimatePresence } from "motion/react";
-import { fetchChatbotReply } from "@/app/lib/chatbot/fetchReply";
-import { ChatReply } from "@/app/lib/chatbot/types";
+import { fetchChatbotReplyClient } from "@/app/lib/chatbot/fetchReplyClient";
+import type { ChatReply } from "@/app/lib/chatbot/types";
 import { executeFunctionCall } from "@/app/lib/chatbot/functionHandlers";
 import { v4 as uuidv4 } from "uuid";
 import { useModal } from "@/app/context/ModalContext";
@@ -112,7 +112,7 @@ export const ModalFooter = () => {
     let reply: ChatReply;
     try {
       reply = (await Promise.race([
-        fetchChatbotReply({
+        fetchChatbotReplyClient({
           chatHistory: updatedChatHistory.slice(-MAX_CHAT_HISTORY_INSTANCE),
           enableFunctionCalling: enableFuncall,
         }),

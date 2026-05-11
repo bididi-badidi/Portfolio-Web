@@ -17,3 +17,4 @@ No current tasks
 
 ## Phases
 - [x] Phase: Chatbot Bug Fixes & Testing - [Plan](.ai/assets/branches/fix-chatbot/plan.md)
+- [ ] Phase: Navigation Bar Redesign - [Plan](.ai/assets/branches/feat-navigation-bar-redesign/plan.md)

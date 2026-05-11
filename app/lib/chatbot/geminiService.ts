@@ -1,6 +1,6 @@
 import { getErrorMessage } from "@/app/utils/handleReport";
 import { gemini_client as ai } from "@/lib/gemini";
-import { GenerateContentConfig } from "@google/genai";
+import type { GenerateContentConfig } from "./geminiTypes";
 import { MAX_RETRY_COUNT } from "@/app/config/api";
 import { GEMINI_API_VERBOSE_MODE } from "./config";
 

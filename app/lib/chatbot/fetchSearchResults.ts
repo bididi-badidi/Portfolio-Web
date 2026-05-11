@@ -1,7 +1,7 @@
 "use server";
 
 import { getErrorMessage } from "@/app/utils/handleReport";
-import { Type } from "@google/genai";
+import { Type } from "./geminiTypes";
 import { fetchWithRetry } from "@/app/utils/fetchWithRetry";
 import { envClient } from "@/app/env/client";
 import { SEARCH_QUERY_SYN_PROMPT } from "./config";

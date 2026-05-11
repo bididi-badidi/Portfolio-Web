@@ -1,13 +1,10 @@
 import { useUIState } from "@/app/context/UIStateContext";
-import { themeClasses } from "@/app/styles/themeClasses";
 import { cn } from "@/app/utils/cn";
-import { AnimatedBlobs } from "@/components/ui/AnimatedBlobs";
-import { FluidGlass } from "@/components/ui/FluidGlass";
+import GlassSurface from "@/components/GlassSurface";
 import type { ReactNode } from "react";
 import { motion } from "motion/react";
 
 const TRIGGER_TAP = { scale: 0.98 };
-const MODAL_GLASS_TINT = "rgb(255 255 255 / 0.025)";
 
 export const ModalTrigger = ({
   children,
@@ -23,7 +20,7 @@ export const ModalTrigger = ({
     <motion.button
       type="button"
       className={cn(
-        "group relative isolate overflow-visible rounded-full border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "relative isolate overflow-visible rounded-[14px] border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
       )}
       whileTap={TRIGGER_TAP}
@@ -32,21 +29,24 @@ export const ModalTrigger = ({
         setTimeout(() => onOpen(), 100);
       }}
     >
-      <FluidGlass
-        borderRadius="9999px"
-        containerClassName="relative z-10 w-auto h-auto"
-        tintColor={MODAL_GLASS_TINT}
-        className={cn(
-          themeClasses.button.primary,
-          "px-8 py-3 w-fit h-fit cursor-pointer transition-colors flex items-center justify-center shadow-[0_0_16px_rgb(255_255_255_/_0.035)] hover:border-white/20 hover:shadow-[0_0_22px_rgb(255_255_255_/_0.07)]",
-        )}
-        intensity={0.6}
+      <GlassSurface
+        width={46}
+        height={46}
+        borderRadius={14}
+        displace={0.5}
+        distortionScale={-180}
+        redOffset={0}
+        greenOffset={10}
+        blueOffset={20}
+        brightness={50}
+        opacity={0.93}
+        mixBlendMode="screen"
+        className="glass-surface--icon-btn cursor-pointer"
       >
-        <div className="absolute inset-0 z-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100">
-          <AnimatedBlobs variant="trigger" />
-        </div>
-        <span className="relative z-10">{children}</span>
-      </FluidGlass>
+        <span className="relative z-10 flex items-center justify-center text-bright">
+          {children}
+        </span>
+      </GlassSurface>
     </motion.button>
   );
 };

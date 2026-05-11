@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef, useEffect } from "react";
+import { Bot } from "lucide-react";
 import { ModalProvider } from "@/app/context/ModalContext";
 import { ModalTrigger } from "./ModalTrigger";
 import { ModalBody } from "./ModalBody";
@@ -26,9 +27,9 @@ export function Modal() {
       <ModalProvider>
         <ModalTrigger
           onOpen={scrollToBottom}
-          className="fixed bottom-[30px] right-[30px] z-5 cursor-pointer"
+          className="fixed bottom-[42px] right-4 z-5 cursor-pointer sm:hidden"
         >
-          <span className="text-center">Initiate AI</span>
+          <Bot aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
         </ModalTrigger>
         <ModalBody>
           <ModalContent />
