@@ -14,6 +14,9 @@ export interface GlassSurfaceProps {
   displace?: number;
   backgroundOpacity?: number;
   saturation?: number;
+  tintColor?: string;
+  tintOpacity?: number;
+  tintBlendMode?: React.CSSProperties['mixBlendMode'];
   distortionScale?: number;
   redOffset?: number;
   greenOffset?: number;
@@ -55,6 +58,9 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   displace = 0,
   backgroundOpacity = 0,
   saturation = 1,
+  tintColor = 'var(--color-accent-primary)',
+  tintOpacity = 0.14,
+  tintBlendMode = 'screen',
   distortionScale = -180,
   redOffset = 0,
   greenOffset = 10,
@@ -192,6 +198,9 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     borderRadius: `${borderRadius}px`,
     '--glass-frost': backgroundOpacity,
     '--glass-saturation': saturation,
+    '--glass-tint': tintColor,
+    '--glass-tint-opacity': tintOpacity,
+    '--glass-tint-blend-mode': tintBlendMode,
     '--filter-id': `url(#${filterId})`
   } as React.CSSProperties;
 

@@ -28,12 +28,12 @@ export function AnimatedGlassWindow({
   ambient,
   children,
   className,
-  panelClassName = "w-[95%] lg:w-[75%] relative z-50 flex flex-col",
+  panelClassName = "w-[min(94vw,56rem)] relative z-50 flex flex-col",
   panelHeight = "70%",
   glassClassName,
   glassContainerClassName,
   tintColor,
-  borderRadius = "2.5rem",
+  borderRadius = "14px",
 }: {
   open: boolean;
   allowAnimation?: boolean;
@@ -94,7 +94,7 @@ export function AnimatedGlassWindow({
           >
             <FluidGlass
               className={cn(
-                "flex-1 flex flex-col pt-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] shadow-black/50",
+                "flex-1 flex flex-col overflow-hidden border-glass-border-strong shadow-[0_24px_80px_rgb(0_0_0_/_0.48),inset_0_1px_0_rgb(255_255_255_/_0.16)]",
                 glassClassName,
               )}
               containerClassName={cn("h-full w-full", glassContainerClassName)}

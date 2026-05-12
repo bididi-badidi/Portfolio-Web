@@ -1,6 +1,4 @@
 "use client";
-import { cn } from "@/app/utils/cn";
-import { themeClasses } from "@/app/styles/themeClasses";
 import { useState } from "react";
 import { ChatInstance } from "@/app/interfaces/Chatbot";
 import { motion, AnimatePresence } from "motion/react";
@@ -19,11 +17,6 @@ import {
   REPLY_ERROR_FALLBACK_MSG
 } from "@/app/lib/chatbot/config";
 import { AnimatedToggleButton } from "../Buttons/AnimatedToggleButton";
-
-const AnimationToggleButton = () => {
-  const { allowAnimation, setAllowAnimation } = useUIState();
-  return <AnimatedToggleButton text="Animation" isOn={allowAnimation} setIsOn={setAllowAnimation} ambient={false} />;
-};
 
 const FunctionCallToggleButton = ({ isOn, setIsOn }: { isOn: boolean; setIsOn: (open: boolean) => void }) => {
   const { isChatOpen } = useUIState();
@@ -165,7 +158,7 @@ export const ModalFooter = () => {
           initial="hidden"
           animate={uiState.isChatOpen ? "visible" : "hidden"}
           exit="hidden"
-          className={cn(themeClasses.surface.glass, "relative flex gap-4 justify-end p-4 backdrop-blur-2xl border-x-0 border-b-0")}
+          className="relative flex gap-4 justify-end border-x-0 border-b-0 border-t border-glass-border bg-[rgb(255_255_255_/_0.035)] p-4 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.08)] backdrop-blur-3xl"
         >
           <AnimatePresence>
             {!isFocus && (
@@ -176,7 +169,6 @@ export const ModalFooter = () => {
                 animate={isFocus ? "hidden" : "visible"}
                 exit="hidden"
               >
-                <AnimationToggleButton />
                 <FunctionCallToggleButton isOn={enableFuncall} setIsOn={setEnableFuncall} />
               </motion.div>
             )}

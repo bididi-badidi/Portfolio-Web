@@ -28,7 +28,7 @@ export const themeClasses = {
   },
   button: {
     primary:
-      "bg-[rgb(255_255_255_/_0.025)] border border-white/10 text-bright backdrop-blur-xl shadow-[0_0_16px_rgb(255_255_255_/_0.035)] transition-colors hover:bg-[rgb(255_255_255_/_0.065)] hover:border-white/20 hover:shadow-[0_0_22px_rgb(255_255_255_/_0.07)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+      "border border-white/15 bg-white/[0.035] text-bright backdrop-blur-xl shadow-[inset_0_1px_0_rgb(255_255_255_/_0.18),0_0_18px_rgb(255_255_255_/_0.045)] transition-[background-color,border-color,box-shadow,filter] hover:border-white/25 hover:bg-white/[0.07] hover:shadow-[inset_0_1px_0_rgb(255_255_255_/_0.28),0_0_24px_rgb(129_140_248_/_0.18)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
     secondary:
       "bg-surface/60 border border-subtle text-foreground shadow-sm transition-colors hover:bg-elevated hover:text-bright hover:border-glass-border-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
     ghost:
@@ -42,12 +42,12 @@ export const themeClasses = {
   },
   chat: {
     bubbleBase:
-      "py-3 px-6 rounded-3xl text-start justify-center mt-6 max-w-[85%] backdrop-blur-xl border border-glass-border shadow-lg",
+      "py-3 px-5 rounded-[14px] text-start justify-center mt-6 max-w-[85%] backdrop-blur-2xl border border-glass-border shadow-[0_16px_48px_rgb(0_0_0_/_0.22),inset_0_1px_0_rgb(255_255_255_/_0.08)]",
     botBubble:
-      "bg-[var(--color-chat-bot-bg)] text-[var(--color-chat-bot-text)] self-start rounded-tl-none shadow-indigo-500/10",
+      "bg-[var(--color-chat-bot-bg)] text-[var(--color-chat-bot-text)] self-start rounded-tl-[4px] shadow-indigo-500/10",
     userBubble:
-      "bg-[var(--color-chat-user-bg)] text-[var(--color-chat-user-text)] self-end rounded-tr-none shadow-black/20",
+      "bg-[var(--color-chat-user-bg)] text-[var(--color-chat-user-text)] self-end rounded-tr-[4px] shadow-black/20",
     errorBubble:
-      "bg-error-bg text-error-text self-start rounded-tl-none shadow-error/10 border-error-border",
+      "bg-error-bg text-error-text self-start rounded-tl-[4px] shadow-error/10 border-error-border",
   },
 } as const;

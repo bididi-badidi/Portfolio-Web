@@ -12,11 +12,8 @@ import { downloadResumePdf, getMasterResume } from "@/lib/s3-file-loader";
 import purify from "dompurify";
 import { themeClasses } from "@/app/styles/themeClasses";
 import { AnimatedGlassWindow } from "@/components/ui/AnimatedGlassWindow";
-import { AnimatedBlobs } from "@/components/ui/AnimatedBlobs";
-import { FluidGlass } from "@/components/ui/FluidGlass";
+import { GlassButton } from "@/components/Buttons/GlassButton";
 import { motion } from "motion/react";
-
-const PRIMARY_GLASS_TINT = "rgb(255 255 255 / 0.025)";
 
 export function ResumeButton({
   className,
@@ -140,40 +137,30 @@ export function ResumeButton({
 
   return (
     <>
-      <motion.button
+      <GlassButton
         layoutId={layoutId}
         transition={layoutTransition}
         onClick={() => setIsOpen(true)}
         className={cn(
-          "group relative isolate mt-8 h-11 min-w-11 overflow-visible rounded-[9999px] border-0 bg-transparent p-0 text-xl leading-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:text-2xl",
+          "mt-8 h-11 min-w-11 text-xl lg:text-2xl",
           className,
         )}
-        style={{ borderRadius: 9999 }}
+        borderRadius="14px"
+        contentClassName={cn(
+          "px-6 py-0",
+          reserveLabelSpace ? "" : "w-fit",
+        )}
       >
-        <FluidGlass
-          borderRadius="9999px"
-          containerClassName="relative z-10 w-full h-full"
-          tintColor={PRIMARY_GLASS_TINT}
-          className={cn(
-            themeClasses.button.primary,
-            "h-11 min-w-11 cursor-pointer transition-colors flex items-center justify-center leading-none shadow-[0_0_16px_rgb(255_255_255_/_0.035)] hover:border-white/20 hover:shadow-[0_0_22px_rgb(255_255_255_/_0.07)]",
-            reserveLabelSpace ? "px-6 py-0" : "px-6 py-0 w-fit",
-          )}
+        <motion.span
+          className="block whitespace-nowrap leading-none"
+          initial={{ opacity: labelInitialOpacity }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: labelDelay, duration: 0.24, ease: "easeOut" }}
+          style={{ minWidth: reserveLabelSpace ? "4.6rem" : undefined }}
         >
-          <div className="absolute inset-0 z-0 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100">
-            <AnimatedBlobs variant="trigger" />
-          </div>
-          <motion.span
-            className="relative z-10 block whitespace-nowrap leading-none translate-y-[9px]"
-            initial={{ opacity: labelInitialOpacity }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: labelDelay, duration: 0.24, ease: "easeOut" }}
-            style={{ minWidth: reserveLabelSpace ? "4.6rem" : undefined }}
-          >
-            Resume
-          </motion.span>
-        </FluidGlass>
-      </motion.button>
+          Resume
+        </motion.span>
+      </GlassButton>
 
       <AnimatedGlassWindow
         open={isOpen}

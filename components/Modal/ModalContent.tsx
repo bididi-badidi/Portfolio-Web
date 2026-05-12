@@ -49,12 +49,12 @@ export function ModalContent() {
   };
 
   return (
-    <div className={cn("flex flex-col-reverse flex-1 px-4 pb-4 h-full overflow-y-scroll")}>
+    <div className={cn("flex h-full flex-1 flex-col-reverse overflow-y-auto px-4 pb-5 pt-14 md:px-6")}>
       <motion.ul
         variants={allowAnimation ? containerVariants : undefined}
         initial="hidden"
         animate={isChatOpen ? "visible" : "exit"}
-        className="w-full pb-2 flex flex-col items-stretch"
+        className="flex w-full flex-col items-stretch pb-2"
       >
         <LayoutGroup>
           {isChatOpen &&

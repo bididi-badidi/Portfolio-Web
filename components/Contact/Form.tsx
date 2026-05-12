@@ -6,6 +6,7 @@ import { cn } from "@/app/utils/cn";
 import { themeClasses } from "@/app/styles/themeClasses";
 import { sendFormEmail } from "@/app/api/sendEmail";
 import { EMAIL_ADDRESS } from "@/app/config";
+import { GlassButton } from "@/components/Buttons/GlassButton";
 
 export function Form() {
   const form = useRef<HTMLFormElement>(null);
@@ -36,16 +37,13 @@ export function Form() {
           <Input name="content" id="content" placeholder="send some thoughts" type="text" />
         </LabelInputContainer>
 
-        <button
-          className={cn(
-            themeClasses.button.primary,
-            "group/btn relative block h-10 w-full rounded-md font-medium cursor-pointer"
-          )}
+        <GlassButton
+          className="group/btn h-10 w-full"
           type="submit"
         >
           Send Email &nbsp; &rarr;
           <BottomGradient />
-        </button>
+        </GlassButton>
       </form>
     </div>
   );
