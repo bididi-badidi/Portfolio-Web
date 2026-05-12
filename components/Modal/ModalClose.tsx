@@ -1,4 +1,5 @@
 import { useUIState } from "@/app/context/UIStateContext";
+import { X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 const iconVariants = {
@@ -25,24 +26,14 @@ export const ModalClose = () => {
           animate={isChatOpen ? "visible" : "hidden"}
           exit="hidden"
           onClick={() => setChatOpen(false)}
-          className="absolute top-4 right-4 group cursor-pointer"
+          aria-label="Close chat"
+          className="group absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-[14px] border-0 bg-transparent p-0 cursor-pointer text-bright focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-bright h-4 w-4 group-hover:scale-125 group-hover:rotate-3 transition duration-200"
-          >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M18 6l-12 12" />
-            <path d="M6 6l12 12" />
-          </svg>
+          <X
+            aria-hidden="true"
+            className="h-5 w-5 transition duration-200 group-hover:scale-110 group-hover:text-foreground"
+            strokeWidth={1.9}
+          />
         </motion.button>
       )}
     </AnimatePresence>

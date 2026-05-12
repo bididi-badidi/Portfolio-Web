@@ -2,6 +2,10 @@
 
 This file provides guidance to GEMINI Code when working with code in this repository.
 
+## Design Reference
+
+Read `DESIGN.md` before changing visual design, glass surfaces, navigation, buttons, modals, or project page layouts. It records the portfolio's glass design language and component rules.
+
 ## Commands
 
 Use **Bun** as the package manager (bun.lockb is present).

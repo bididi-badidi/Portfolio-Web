@@ -6,13 +6,13 @@ import { AnimatePresence, LayoutGroup, motion, useInView, useReducedMotion } fro
 import { useEffect, useRef, useState } from "react";
 import { ResumeButton } from "./ResumeButton";
 
-const RESUME_LAYOUT_ID = "hero-resume-pill";
+const RESUME_LAYOUT_ID = "hero-resume-button";
 const RESUME_MORPH_TRANSITION = {
   layout: {
     type: "spring",
-    stiffness: 360,
-    damping: 30,
-    mass: 0.7,
+    stiffness: 300,
+    damping: 34,
+    mass: 0.82,
   },
 };
 
@@ -20,7 +20,7 @@ export function HeroSummaryAction({ start = true }: { start?: boolean }) {
   const scope = useRef<HTMLDivElement>(null);
   const isInView = useInView(scope, { once: true });
   const shouldReduceMotion = useReducedMotion();
-  const [phase, setPhase] = useState<"summary" | "pill" | "button">("summary");
+  const [phase, setPhase] = useState<"summary" | "square" | "button">("summary");
   const isResumeReady = phase === "button";
 
   useEffect(() => {
@@ -31,16 +31,16 @@ export function HeroSummaryAction({ start = true }: { start?: boolean }) {
       return;
     }
 
-    const revealPill = window.setTimeout(() => {
-      setPhase("pill");
+    const revealSquare = window.setTimeout(() => {
+      setPhase("square");
     }, 120);
 
     const morphToResume = window.setTimeout(() => {
       setPhase("button");
-    }, 620);
+    }, 700);
 
     return () => {
-      window.clearTimeout(revealPill);
+      window.clearTimeout(revealSquare);
       window.clearTimeout(morphToResume);
     };
   }, [isInView, shouldReduceMotion, start]);
@@ -91,12 +91,12 @@ export function HeroSummaryAction({ start = true }: { start?: boolean }) {
         </AnimatePresence>
 
         <AnimatePresence mode="popLayout">
-          {phase === "pill" && (
+          {phase === "square" && (
             <motion.div
-              key="pill"
+              key="square"
               layoutId={RESUME_LAYOUT_ID}
-              className="col-start-1 row-start-1 h-11 w-11 rounded-[9999px] border border-white/10 bg-[rgb(255_255_255_/_0.025)] shadow-[0_0_16px_rgb(255_255_255_/_0.035)] backdrop-blur-xl"
-              style={{ borderRadius: 9999 }}
+              className="col-start-1 row-start-1 h-11 w-11 rounded-[14px] border border-white/10 bg-[rgb(255_255_255_/_0.025)] shadow-[0_0_16px_rgb(255_255_255_/_0.035)] backdrop-blur-xl"
+              style={{ borderRadius: 14 }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 1 }}

@@ -17,6 +17,18 @@
   z-index: -1;
 }
 
+.glass-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--glass-tint, transparent);
+  opacity: var(--glass-tint-opacity, 0);
+  mix-blend-mode: var(--glass-tint-blend-mode, screen);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .glass-surface__content {
   width: 100%;
   height: 100%;
@@ -78,12 +90,10 @@
   }
 
   .glass-surface--fallback::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: inherit;
-    z-index: -1;
+    background: var(--glass-tint, rgba(255, 255, 255, 0.15));
+    opacity: var(--glass-tint-opacity, 0.15);
+    mix-blend-mode: var(--glass-tint-blend-mode, screen);
+    z-index: 0;
   }
 }
 
@@ -94,7 +104,7 @@
     }
 
     .glass-surface--fallback::before {
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--glass-tint, rgba(255, 255, 255, 0.05));
     }
   }
 }
@@ -120,6 +130,38 @@
 /* Pill button variant — removes content padding so height is exact */
 .glass-surface--pill .glass-surface__content {
   padding: 0;
+}
+
+/* Primary button variant — mirrors the dock glass density at button scale */
+.glass-surface--primary-button {
+  cursor: pointer;
+}
+
+.glass-surface--primary-button .glass-surface__content {
+  padding: 0;
+}
+
+.glass-surface--primary-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    0 0 18px rgba(255, 255, 255, 0.045);
+  pointer-events: none;
+  transition: border-color 180ms ease-out, box-shadow 180ms ease-out;
+  z-index: 1;
+}
+
+.glass-surface--primary-button:hover::after {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.12),
+    0 0 24px rgba(129, 140, 248, 0.18);
 }
 
 /* Icon button variant — removes content padding for exact 46×46 sizing */
