@@ -13,7 +13,7 @@ export const Overlay = ({ className }: { className?: string }) => {
       }}
       exit={{
         opacity: 0,
-        backdropFilter: "blur(0px)",
+        backdropFilter: "blur(0px) saturate(1.25)",
         transition: { delay: 1 },
       }}
       className={cn("fixed inset-0 z-50 h-full w-full bg-[rgb(2_6_23_/_0.58)]", className)}

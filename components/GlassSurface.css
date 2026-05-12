@@ -90,12 +90,10 @@
   }
 
   .glass-surface--fallback::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: inherit;
-    z-index: -1;
+    background: var(--glass-tint, rgba(255, 255, 255, 0.15));
+    opacity: var(--glass-tint-opacity, 0.15);
+    mix-blend-mode: var(--glass-tint-blend-mode, screen);
+    z-index: 0;
   }
 }
 
@@ -106,7 +104,7 @@
     }
 
     .glass-surface--fallback::before {
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--glass-tint, rgba(255, 255, 255, 0.05));
     }
   }
 }

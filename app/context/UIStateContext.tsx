@@ -8,7 +8,6 @@ import React, {
 
 interface UIStateContextProps {
   allowAnimation: boolean;
-  setAllowAnimation: (open: boolean) => void;
   scrollToSection: (sectionId: string) => void;
   isChatOpen: boolean;
   setChatOpen: (open: boolean) => void;
@@ -55,9 +54,22 @@ export const UIStateContextProvider: React.FC<{
     });
   }, []);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncAnimationPreference = () => {
+      setAllowAnimation(!mediaQuery.matches);
+    };
+
+    syncAnimationPreference();
+    mediaQuery.addEventListener("change", syncAnimationPreference);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncAnimationPreference);
+    };
+  }, []);
+
   const UIStateContextValue: UIStateContextProps = {
     allowAnimation,
-    setAllowAnimation,
     isChatOpen,
     setChatOpen,
     scrollToSection,

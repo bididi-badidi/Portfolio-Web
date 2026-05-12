@@ -55,7 +55,7 @@ export function GlassButton({
         )}
         <span
           className={cn(
-            "relative z-10 flex h-full w-full items-center justify-center gap-2 whitespace-nowrap px-4 text-sm font-medium leading-none",
+            "relative z-10 flex h-full w-full items-center justify-center gap-2 whitespace-nowrap px-4 font-medium leading-none text-inherit",
             contentClassName,
           )}
         >

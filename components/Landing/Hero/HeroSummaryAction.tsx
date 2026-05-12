@@ -31,7 +31,7 @@ export function HeroSummaryAction({ start = true }: { start?: boolean }) {
       return;
     }
 
-    const revealPill = window.setTimeout(() => {
+    const revealSquare = window.setTimeout(() => {
       setPhase("square");
     }, 120);
 
@@ -40,7 +40,7 @@ export function HeroSummaryAction({ start = true }: { start?: boolean }) {
     }, 700);
 
     return () => {
-      window.clearTimeout(revealPill);
+      window.clearTimeout(revealSquare);
       window.clearTimeout(morphToResume);
     };
   }, [isInView, shouldReduceMotion, start]);
