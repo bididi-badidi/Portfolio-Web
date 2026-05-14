@@ -131,6 +131,38 @@ Do not build page sections as nested cards. Use full-width sections and reserve 
 
 Text should be readable over glass. If a background is noisy, increase glass density rather than making text pure white everywhere.
 
+## Project Subpages
+
+Use the Personal AI subpage as the reference for project detail pages:
+
+- Wrap the page in `DottedBackground`.
+- Add `FloatingNav` with short anchor labels that map to every major section.
+- Keep the content in a centered vertical column: `w-full items-center justify-center flex flex-col lg:px-[10dvw]`.
+- Start with `ProjectSpotlightHero`, backed by `ProjectHeroRings`, inside a full-screen `ScrollableSection`.
+- Use large gradient hero headings from `themeClasses.gradient.heroHeading`.
+- Let the hero animation settle before revealing the caption and CTA.
+- Structure the body as stacked `ScrollableSection` blocks with generous viewport spacing, usually `mb-[15dvh]` to `mb-[20dvh]`.
+- Use `SectionHeading` for section titles and `ProjectText` for narrative copy.
+- Use `ProjectTechStack` for icon rows instead of hand-built tech grids.
+- Use `ProjectDetail` for feature and implementation rows. Prefer `multipleCol` for paired media/text sections.
+- Put media first and explanatory text second in `ProjectDetail`; on desktop this becomes a `5fr 3fr` grid.
+- Keep detail media at stable sizes, commonly `height="300px"` and `width={600}` for diagrams or screenshots.
+- Align technical deep-dive copy left on desktop with `lg:text-start`, but keep top-level narrative text centered.
+- Use `LinkPreview` sparingly for external source links, related internal demos, and the final GitHub link.
+- Leave bottom breathing room after the final section so the floating nav does not crowd the content.
+
+Recommended section order for similar project pages:
+
+1. Hero
+2. Why it matters
+3. Tech stack
+4. Features
+5. Workflows or architecture
+6. Deep dive / implementation details
+7. External demo or repository link
+
+Keep the tone narrative: open with the user-facing value, then move into features, workflows, and implementation. Avoid turning project pages into dashboards or documentation pages; they should feel like guided case studies.
+
 ## Do And Do Not
 
 Do:
@@ -148,4 +180,3 @@ Do not:
 - Use circle or pill shapes for the resume/primary button animation.
 - Use glass without a border or highlight.
 - Overuse heavy glows.
-

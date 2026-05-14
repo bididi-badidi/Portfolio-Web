@@ -6,3 +6,6 @@
 - [x] Phase 3: "Built by AI" Surprise Element: Implemented and integrated the `BuiltByAI` component in the root layout.
 - [x] Redesign chat window with liquid glass aesthetic (React Bits + FluidGlass + AnimatedBlobs)
 - [x] Redesign contact section card to match the chat modal glass aesthetic.
+- [x] Agentic Workflows project content: Added landing timeline preview and a dedicated project subpage for Deep Research and Assistants workflows.
+- [x] Agentic Workflows technology icons: Added ChatGPT, Claude, and LangChain PNG assets in 64px and 256px sizes and included them in the core technology stack. 
+- [x] Agentic Workflows subpages: Removed the overview architecture section and added dedicated Deep Research and Assistants detail pages linked from the project timeline.
