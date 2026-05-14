@@ -15,10 +15,12 @@ function PersonalAIProject() {
       >
         <ProjectText>Fine-tuned AI to handle queries.</ProjectText>
         <LinkPreview
-          url="https://github.com/ZSHenChan/Portfolio-Web"
+          url="./projects/personal-ai"
           className="text-xl lg:text-3xl font-bold"
+          isStatic
+          imageSrc="/image/preview-personal-ai.png"
         >
-          Github
+          Learn More
         </LinkPreview>
       </ProjectDetail>
       <ProjectDetail

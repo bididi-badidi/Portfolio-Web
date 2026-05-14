@@ -1,12 +1,19 @@
 "use client";
 import React, { useRef } from "react";
+import { cn } from "@/app/utils/cn";
 
 interface TimelineEntry {
   title: string;
   content: React.ReactNode;
 }
 
-export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
+export const Timeline = ({
+  data,
+  titleClassName,
+}: {
+  data: TimelineEntry[];
+  titleClassName?: string;
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -22,13 +29,23 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
               <div className="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-black flex items-center justify-center">
                 <div className="h-4 w-4 rounded-full bg-elevated border border-subtle p-2" />
               </div>
-              <h3 className="hidden md:block text-xl md:pl-20 md:text-3xl lg:text-5xl font-bold text-neutral-500">
+              <h3
+                className={cn(
+                  "hidden md:block text-xl md:pl-20 md:text-3xl lg:text-5xl font-bold text-neutral-500",
+                  titleClassName,
+                )}
+              >
                 {item.title}
               </h3>
             </div>
 
             <div className="relative pl-20 pr-4 md:pl-4 w-full">
-              <h3 className="mb-20 md:hidden block text-2xl text-left font-bold text-neutral-500 dark:text-neutral-500">
+              <h3
+                className={cn(
+                  "mb-20 md:hidden block text-2xl text-left font-bold text-neutral-500 dark:text-neutral-500",
+                  titleClassName,
+                )}
+              >
                 {item.title}
               </h3>
               {item.content}{" "}

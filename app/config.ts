@@ -2,7 +2,7 @@ import { Code, BarChart, Briefcase, FileText, Bot } from "lucide-react";
 import { ResumeOption } from "./interfaces/Resume";
 
 //* GENERAL
-export const FOOTER_LAST_UPDATE = "06 Feb 2026";
+export const FOOTER_LAST_UPDATE = "14 May 2026";
 
 //* CONTACTS
 export const EMAIL_ADDRESS = "zshen2002@gmail.com";
