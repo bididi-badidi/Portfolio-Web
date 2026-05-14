@@ -10,7 +10,7 @@ const navItems = [
   { name: "Why", link: "#why" },
   { name: "Tech", link: "#techstack" },
   { name: "Features", link: "#features" },
-  { name: "Workflows", link: "#workflows" },
+  // { name: "Workflows", link: "#workflows" },
 ] as navItemInterface[];
 
 export default function PersonalAiPage() {
