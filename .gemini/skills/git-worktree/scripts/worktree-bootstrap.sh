@@ -2,25 +2,55 @@
 set -euo pipefail
 
 usage() {
-  cat <<'USAGE'
+  local command_name
+  command_name="$(basename "$0")"
+
+  cat <<USAGE
 Usage:
-  npm run worktree -- add <path> <branch> [--base <ref>] [--env-source <path>] [--install|--no-install]
-  npm run worktree -- setup <path> [--env-source <path>] [--install|--no-install]
+  $command_name add <path> <branch> [--base <ref>] [--env-source <path>] [--install|--no-install]
+  $command_name setup <path> [--env-source <path>] [--install|--no-install]
 
 Examples:
-  npm run worktree -- add ../portfolio-feature feature/my-branch
-  npm run worktree -- add ../portfolio-existing existing-branch
-  npm run worktree -- add ../portfolio-fix fix/chatbot --base main --env-source .
-  npm run worktree -- setup ../portfolio-feature --no-install
+  $command_name add ../my-project/feature/my-branch feature/my-branch
+  $command_name add ../my-project/existing-branch existing-branch
+  $command_name add ../my-project/fix/issue fix/issue --base main --env-source .
+  $command_name setup ../my-project/feature/my-branch --no-install
 
 Environment:
-  PACKAGE_MANAGER=npm|bun|pnpm|yarn  Package manager for dependency install. Default: npm.
+  PACKAGE_MANAGER=auto|npm|bun|pnpm|yarn  Package manager for dependency install. Default: auto.
 USAGE
 }
 
 die() {
   echo "worktree-bootstrap: $*" >&2
   exit 1
+}
+
+sync_from_origin() {
+  local origin_url
+  local current_branch
+
+  origin_url="$(git remote get-url origin 2>/dev/null)" || {
+    echo "No origin remote configured; skipped source checkout sync"
+    return
+  }
+
+  echo "Syncing source checkout from origin"
+  git fetch --prune origin
+
+  current_branch="$(git branch --show-current)"
+  if [[ -z "$current_branch" ]]; then
+    echo "Detached HEAD; fetched origin but skipped pull"
+    return
+  fi
+
+  if git rev-parse --abbrev-ref --symbolic-full-name "@{u}" >/dev/null 2>&1; then
+    git merge --ff-only "@{u}"
+  elif git show-ref --verify --quiet "refs/remotes/origin/$current_branch"; then
+    git merge --ff-only "origin/$current_branch"
+  else
+    echo "No upstream or origin/$current_branch branch found; fetched origin but skipped pull"
+  fi
 }
 
 copy_env_files() {
@@ -33,6 +63,7 @@ copy_env_files() {
   shopt -s nullglob
   local env_files=("$source_dir"/.env "$source_dir"/.env.*)
   shopt -u nullglob
+
   for env_file in "${env_files[@]}"; do
     [[ -f "$env_file" ]] || continue
     cp -p "$env_file" "$target_dir/$(basename "$env_file")"
@@ -48,7 +79,24 @@ copy_env_files() {
 
 install_dependencies() {
   local target_dir="$1"
-  local package_manager="${PACKAGE_MANAGER:-npm}"
+  local package_manager="${PACKAGE_MANAGER:-auto}"
+
+  if [[ ! -f "$target_dir/package.json" ]]; then
+    echo "No package.json found in $target_dir; skipped dependency install"
+    return
+  fi
+
+  if [[ "$package_manager" == "auto" ]]; then
+    if [[ -f "$target_dir/bun.lockb" || -f "$target_dir/bun.lock" ]]; then
+      package_manager="bun"
+    elif [[ -f "$target_dir/pnpm-lock.yaml" ]]; then
+      package_manager="pnpm"
+    elif [[ -f "$target_dir/yarn.lock" ]]; then
+      package_manager="yarn"
+    else
+      package_manager="npm"
+    fi
+  fi
 
   case "$package_manager" in
     npm)
@@ -142,6 +190,8 @@ done
 mkdir -p "$(dirname "$target_path")"
 
 if [[ "$mode" == "add" ]]; then
+  sync_from_origin
+
   if git show-ref --verify --quiet "refs/heads/$branch"; then
     [[ -z "$base_ref" ]] || die "--base cannot be used with existing branch: $branch"
     git worktree add "$target_path" "$branch"

@@ -1,7 +1,7 @@
 ---
 name: coding-workflow
 version: 1.0.0
-description: Use this skill IMMEDIATELY AFTER any coding task, code modification, feature implementation, or bug fix is performed. Trigger this skill whenever you write, edit, or refactor Python code. It enforces the project's mandatory quality checklist: running linting, executing unit tests, and ensuring the .gitignore file is up to date.
+description: "Use this skill IMMEDIATELY AFTER any coding task, code modification, feature implementation, or bug fix is performed. Trigger this skill whenever you write, edit, or refactor Python code. It enforces the project's mandatory quality checklist: running linting, executing unit tests, and ensuring the .gitignore file is up to date."
 ---
 
 # Post-Coding Workflow

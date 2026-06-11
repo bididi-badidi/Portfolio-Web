@@ -49,3 +49,4 @@ testdata/chatbot-golden-live/reports
 # local agent assets
 .ai/assets/branches
 .ai/assets/session_notes.md
+.ai/assets/branches/

@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-version: 2.0.0
+version: 2.0.1
 description: "Use this skill whenever the task involves any part of the git development lifecycle. Triggers: 'commit message', 'git commit', 'conventional commits', 'create branch', 'git checkout', 'git switch', 'git push', 'feature branch', 'hotfix', 'merge conflict', 'pull request', 'PR description', 'gh pr create', 'code review', 'merge strategy', 'squash merge', 'branching strategy', 'changelog', 'semantic versioning'. Do NOT use for GitHub Actions workflow YAML files — use the github-workflows skill instead."
 ---
 
@@ -184,6 +184,8 @@ Closes #12
 
 Rules: fill every section from `git diff --stat` and the commit log. Never leave placeholder comments. Delete the Screenshots section if not applicable.
 
+Default to creating a ready/open pull request. Do not create a draft pull request or pass `--draft` unless the user explicitly asks for a draft.
+
 **Create via CLI:**
 
 ```bash
@@ -197,10 +199,10 @@ Other useful PR commands:
 
 ```bash
 gh pr list
-gh pr view --diff           # review your own diff before marking ready
+gh pr view --diff           # review your own diff before requesting review or merge
 gh pr review 42 --approve
 gh pr review 42 --request-changes --body "Please add error handling"
-gh pr ready 42              # convert draft to ready
+gh pr ready 42              # only for drafts the user explicitly requested
 ```
 
 ### 6. Merge and clean up

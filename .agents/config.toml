@@ -1,0 +1,9 @@
+# Project-scoped Codex configuration.
+# Codex loads this file after the user trusts the project.
+
+[mcp_servers.memory]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-memory"]
+
+[mcp_servers.memory.env]
+MEMORY_FILE_PATH = ".ai/assets/memory.jsonl"
