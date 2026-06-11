@@ -1,4 +1,4 @@
-import { type FunctionDeclaration, Type } from "@google/genai";
+import { type FunctionDeclaration, Type } from "./geminiTypes";
 import { FunctionCallType } from "@/app/enums/functionCall";
 // import { ProjectDemoType } from "@/app/enums/projectDemo";
 

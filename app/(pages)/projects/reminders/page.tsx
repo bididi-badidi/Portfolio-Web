@@ -18,7 +18,7 @@ export default function RemindersPage() {
           <SectionHeading className="md:text-5xl " animation={false}>
             Reminders Playground
           </SectionHeading>
-          <ProjectText className="text-slate-500 text-center max-w-[70ch]">
+          <ProjectText className="text-muted text-center max-w-[70ch]">
             For security reasons, reminders created via chat window are not
             displayed here. <br />
             To observe the reminder creation process, use the input field below.

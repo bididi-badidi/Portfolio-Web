@@ -1,43 +1,36 @@
 import { cn } from "@/lib/utils";
-import { Lamp } from "@/components/Landing/Hero/Lamp";
-import { ResumeButton } from "./ResumeButton";
 import { LinkPreview } from "@/components/Contact/LinkPreview";
 import { AILink } from "./AILink";
-import { FadeUpInView } from "@/components/ui/FadeUpInView";
+import { themeClasses } from "@/app/styles/themeClasses";
+import { SoftAuroraHero } from "./SoftAuroraHero";
+import { HeroIntroSequence } from "./HeroIntroSequence";
 
 export function SectionHero({ id }: { id: string }) {
+  const heroTextClassName = cn(themeClasses.gradient.heroHeading, "hero-text");
+
   return (
-    <div id={id}>
-      <Lamp>
-        <div
-          className={cn(
-            "bg-gradient-to-br from-slate-300 to-slate-500 bg-clip-text text-center font-medium tracking-tight place-items-center",
-          )}
-        >
-          <h1 className={cn("py-4 text-4xl md:text-5xl lg:text-5xl mb-4 ")}>
-            <span className={cn("hero-text")}>
-              My name is Zi Shen
-              <br />
-              <br />I Build{" "}
-            </span>
+    <SoftAuroraHero id={id}>
+      <div className={cn("text-center font-medium tracking-tight place-items-center")}>
+        <h1 className={cn("py-4 text-4xl md:text-5xl lg:text-5xl mb-4 ")}>
+          <span className={heroTextClassName}>
+            My name is Zi Shen
+            <br />
+            <br />I Build{" "}
+          </span>
+          <span>
             <LinkPreview
               url="./projects/personal-ai"
-              className={cn("relative text-5xl lg:text-6xl font-bold inline-block")}
+              className={cn("relative z-50 text-6xl md:text-7xl lg:text-8xl font-bold inline-block leading-none")}
               isStatic
               imageSrc="/image/preview-personal-ai.png"
             >
               <AILink />
             </LinkPreview>{" "}
-            <span className={cn("hero-text")}>Solutions</span>
-          </h1>
-          <p className={cn("w-[30ch] lg:w-[45ch] lg:text-lg opacity-65 hero-text mb-6")}>
-            LLM integrations to automated data pipelines—turning manual tasks into intelligent systems.
-          </p>
-          <FadeUpInView delay={3.5} initialOpacity={0} className="text-center">
-            <ResumeButton />
-          </FadeUpInView>
-        </div>
-      </Lamp>
-    </div>
+          </span>
+          <span className={heroTextClassName}>Solutions</span>
+        </h1>
+        <HeroIntroSequence />
+      </div>
+    </SoftAuroraHero>
   );
 }

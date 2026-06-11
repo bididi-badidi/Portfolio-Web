@@ -78,7 +78,7 @@ export const AnimatedToggleButton = ({
 
 const buttonVariants = {
   off: {
-    backgroundColor: "#e2e8f0",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     boxShadow: "0 0 0px transparent",
     transition: {
       backgroundColor: { duration: 0.5 },
@@ -89,7 +89,7 @@ const buttonVariants = {
     },
   },
   on: {
-    backgroundColor: "#1f2937",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     boxShadow: "0 0 0px transparent",
     transition: {
       backgroundColor: { duration: 0.5 },
@@ -100,12 +100,12 @@ const buttonVariants = {
     },
   },
   ambient: {
-    backgroundColor: "#1f2937",
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
     boxShadow: [
-      "0 0 8px #e2e8f0",
-      "0 0 16px #e2e8f0",
-      "0 0 8px #e2e8f0",
-      "0 0 1px #e2e8f0",
+      "0 0 8px rgba(255, 255, 255, 0.3)",
+      "0 0 16px rgba(255, 255, 255, 0.3)",
+      "0 0 8px rgba(255, 255, 255, 0.3)",
+      "0 0 1px rgba(255, 255, 255, 0.3)",
       "0 0 0px transparent",
     ],
     transition: {
@@ -121,9 +121,9 @@ const buttonVariants = {
 
 const toggleVariants = {
   off: {
-    backgroundColor: "#1f2937",
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
   },
   on: {
-    backgroundColor: "#e2e8f0",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
   },
 };

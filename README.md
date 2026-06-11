@@ -36,7 +36,6 @@ bun run test:chatbot-golden-live
 Run only a specific JSON test file group (filename filter):
 
 ```bash
-CASE=security bun run test:chatbot-golden-live
 CASE=navigate-projects bun run test:chatbot-golden-live
 CASE=security bun run test:chatbot-golden-live:file
 ```

@@ -1,10 +1,9 @@
 "use client";
-import { cn } from "@/app/utils/cn";
 import { useState } from "react";
 import { ChatInstance } from "@/app/interfaces/Chatbot";
 import { motion, AnimatePresence } from "motion/react";
-import { fetchChatbotReply } from "@/app/lib/chatbot/fetchReply";
-import { ChatReply } from "@/app/lib/chatbot/types";
+import { fetchChatbotReplyClient } from "@/app/lib/chatbot/fetchReplyClient";
+import type { ChatReply } from "@/app/lib/chatbot/types";
 import { executeFunctionCall } from "@/app/lib/chatbot/functionHandlers";
 import { v4 as uuidv4 } from "uuid";
 import { useModal } from "@/app/context/ModalContext";
@@ -18,11 +17,6 @@ import {
   REPLY_ERROR_FALLBACK_MSG
 } from "@/app/lib/chatbot/config";
 import { AnimatedToggleButton } from "../Buttons/AnimatedToggleButton";
-
-const AnimationToggleButton = () => {
-  const { allowAnimation, setAllowAnimation } = useUIState();
-  return <AnimatedToggleButton text="Animation" isOn={allowAnimation} setIsOn={setAllowAnimation} ambient={false} />;
-};
 
 const FunctionCallToggleButton = ({ isOn, setIsOn }: { isOn: boolean; setIsOn: (open: boolean) => void }) => {
   const { isChatOpen } = useUIState();
@@ -99,7 +93,7 @@ export const ModalFooter = () => {
 
     setIsThinking(true);
     const botId = generateRandomId();
-    setTimeout(
+    const timeoutId = setTimeout(
       () =>
         setChatHistory((chatHistory: ChatInstance[]) => [
           ...chatHistory,
@@ -111,7 +105,7 @@ export const ModalFooter = () => {
     let reply: ChatReply;
     try {
       reply = (await Promise.race([
-        fetchChatbotReply({
+        fetchChatbotReplyClient({
           chatHistory: updatedChatHistory.slice(-MAX_CHAT_HISTORY_INSTANCE),
           enableFunctionCalling: enableFuncall,
         }),
@@ -127,6 +121,7 @@ export const ModalFooter = () => {
       };
     }
 
+    clearTimeout(timeoutId);
     setIsThinking(false);
     setChatHistory((prev) =>
       prev
@@ -163,7 +158,7 @@ export const ModalFooter = () => {
           initial="hidden"
           animate={uiState.isChatOpen ? "visible" : "hidden"}
           exit="hidden"
-          className={cn("relative flex gap-4 justify-end p-4 backdrop-blur-2xl bg-white/5")}
+          className="relative flex gap-4 justify-end border-x-0 border-b-0 border-t border-glass-border bg-[rgb(255_255_255_/_0.035)] p-4 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.08)] backdrop-blur-3xl"
         >
           <AnimatePresence>
             {!isFocus && (
@@ -174,7 +169,6 @@ export const ModalFooter = () => {
                 animate={isFocus ? "hidden" : "visible"}
                 exit="hidden"
               >
-                <AnimationToggleButton />
                 <FunctionCallToggleButton isOn={enableFuncall} setIsOn={setEnableFuncall} />
               </motion.div>
             )}

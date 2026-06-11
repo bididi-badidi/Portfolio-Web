@@ -1,6 +1,7 @@
 "use server";
 
-import { FunctionCall, Type } from "@google/genai";
+import { Type } from "./geminiTypes";
+import type { FunctionCall } from "./types";
 import { envClient } from "@/app/env/client";
 import { DECIDE_FUNCTION_CALL_SYS_INSTURCTION } from "./config";
 import { GeminiService } from "./geminiService";

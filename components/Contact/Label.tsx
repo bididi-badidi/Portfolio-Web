@@ -4,6 +4,7 @@
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 
+import { themeClasses } from "@/app/styles/themeClasses";
 import { cn } from "@/app/utils/cn";
 
 const Label = React.forwardRef<
@@ -13,7 +14,8 @@ const Label = React.forwardRef<
   <LabelPrimitive.Root
     ref={ref}
     className={cn(
-      "text-sm font-medium text-zinc-300 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+      themeClasses.text.primary,
+      "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
       className
     )}
     {...props}

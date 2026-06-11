@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/app/utils/cn";
 import { ScrollableSection } from "../../layout/ScrollableSection";
 
+// TODO: Retire this lamp hero once the React Bits Soft Aurora hero is fully implemented and visually verified.
 export function Lamp({ children }: { children: React.ReactNode }) {
   const [showOverlay, setShowOverlay] = useState(true);
   return (
@@ -30,7 +31,7 @@ export function Lamp({ children }: { children: React.ReactNode }) {
               opacity: 0,
             }}
             className={cn(
-              "fixed inset-0 h-[100dvh] w-[100dvw] bg-black/95 z-40"
+              "fixed inset-0 h-[100dvh] w-[100dvw] bg-scrim z-40"
             )}
           />
         )}

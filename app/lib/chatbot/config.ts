@@ -2,7 +2,13 @@ import { ProjectDemoType } from "@/app/enums/projectDemo";
 import { envClient } from "@/app/env/client";
 import { REPLY_SYN_PROMPT } from "./prompts";
 
-export const DEBUG_MODE = envClient.NEXT_PUBLIC_DEV_MODE ?? false;
+const parseBooleanConfig = (value: string | boolean | undefined): boolean => {
+  if (typeof value === "boolean") return value;
+  return value?.toLowerCase() === "true";
+};
+
+export const DEBUG_MODE = parseBooleanConfig(envClient.NEXT_PUBLIC_DEV_MODE);
+export const GEMINI_API_VERBOSE_MODE = DEBUG_MODE;
 
 //* ChatModal
 export const CLOSE_MODAL_DELAY_ON_FUNC_CALL_MS = 300;

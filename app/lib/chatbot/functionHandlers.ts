@@ -8,7 +8,7 @@ import {
 } from "@/app/enums/ReminderEnums";
 import { Reminder } from "@/app/interfaces/Reminder";
 import { FunctionCallType } from "@/app/enums/functionCall";
-import { FunctionCall } from "@google/genai";
+import type { FunctionCall } from "./types";
 import { getErrorMessage, reportErrorMessage } from "@/app/utils/handleReport";
 import {
   CLOSE_MODAL_DELAY_ON_FUNC_CALL_MS,

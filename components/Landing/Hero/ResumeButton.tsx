@@ -10,8 +10,26 @@ import { RESUME_OPTIONS } from "@/app/config";
 import toast from "react-hot-toast";
 import { downloadResumePdf, getMasterResume } from "@/lib/s3-file-loader";
 import purify from "dompurify";
+import { themeClasses } from "@/app/styles/themeClasses";
+import { AnimatedGlassWindow } from "@/components/ui/AnimatedGlassWindow";
+import { GlassButton } from "@/components/Buttons/GlassButton";
+import { motion } from "motion/react";
 
-export function ResumeButton() {
+export function ResumeButton({
+  className,
+  labelDelay = 0,
+  labelInitialOpacity = 1,
+  layoutId,
+  layoutTransition,
+  reserveLabelSpace = false,
+}: {
+  className?: string;
+  labelDelay?: number;
+  labelInitialOpacity?: number;
+  layoutId?: string;
+  layoutTransition?: Record<string, unknown>;
+  reserveLabelSpace?: boolean;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -119,115 +137,137 @@ export function ResumeButton() {
 
   return (
     <>
-      <button
+      <GlassButton
+        layoutId={layoutId}
+        transition={layoutTransition}
         onClick={() => setIsOpen(true)}
-        className="text-xl lg:text-2xl mt-8 underline cursor-pointer hover:text-bright transition-colors"
+        className={cn(
+          "mt-8 h-11 min-w-11 text-xl lg:text-2xl",
+          className,
+        )}
+        borderRadius="14px"
+        contentClassName={cn(
+          "px-6 py-0",
+          reserveLabelSpace ? "" : "w-fit",
+        )}
       >
-        Resume
-      </button>
+        <motion.span
+          className="block whitespace-nowrap leading-none"
+          initial={{ opacity: labelInitialOpacity }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: labelDelay, duration: 0.24, ease: "easeOut" }}
+          style={{ minWidth: reserveLabelSpace ? "4.6rem" : undefined }}
+        >
+          Resume
+        </motion.span>
+      </GlassButton>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+      <AnimatedGlassWindow
+        open={isOpen}
+        onOutsideClick={() => setIsOpen(false)}
+        backdrop={<div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />}
+        className="z-[100] p-0"
+        panelClassName="w-full max-w-md relative z-50 flex flex-col"
+        panelHeight="auto"
+        glassClassName="pt-0 border-elevated shadow-2xl"
+        tintColor="var(--color-bg-page)"
+        borderRadius="0.75rem"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-elevated bg-surface/50">
+          <div className="flex items-center gap-2">
+            {showCustomInput && (
+              <button onClick={() => setShowCustomInput(false)} className={cn(themeClasses.control.iconButton, "mr-2")}>
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
+            <h3 className="text-xl font-medium text-bright">
+              {showCustomInput ? "Paste Job Description" : "Select Resume Version"}
+            </h3>
+          </div>
+          <button onClick={() => setIsOpen(false)} className={themeClasses.control.iconButton}>
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-          <div className="relative w-full max-w-md bg-background border border-elevated rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-elevated bg-surface/50">
-              <div className="flex items-center gap-2">
-                {showCustomInput && (
+        {/* Content Body */}
+        <div className="p-4">
+          {!showCustomInput ? (
+            // 1. STANDARD OPTIONS LIST
+            <div className="grid gap-3">
+              {RESUME_OPTIONS.map((option) => {
+                const Icon = option.icon;
+                return (
                   <button
-                    onClick={() => setShowCustomInput(false)}
-                    className="mr-2 text-foreground hover:text-white transition-colors"
+                    key={option.id}
+                    onClick={() => handleOptionClick(option)}
+                    className={cn(
+                      "flex items-center gap-4 p-4 rounded-lg text-left transition-all border border-transparent",
+                      "hover:bg-surface hover:border-elevated group",
+                    )}
                   >
-                    <ArrowLeft className="w-5 h-5" />
+                    <div className="p-2 rounded-md bg-surface text-foreground group-hover:text-accent-light transition-colors">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-bright group-hover:text-[var(--color-text-on-accent)]">
+                        {option.label}
+                      </div>
+                      <div className="text-xs text-muted">{option.text}</div>
+                    </div>
                   </button>
-                )}
-                <h3 className="text-xl font-medium text-bright">
-                  {showCustomInput ? "Paste Job Description" : "Select Resume Version"}
-                </h3>
+                );
+              })}
+            </div>
+          ) : (
+            // 2. CUSTOM INPUT FORM
+            <div className="space-y-6 animate-in slide-in-from-right-10 duration-200">
+              <div className="relative">
+                <textarea
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  onDoubleClick={handleDoubleClickPaste}
+                  placeholder="Ctrl+V or DOUBLE click to paste the job description or role requirements here..."
+                  className="w-full h-60 p-3 bg-surface border border-elevated rounded-lg text-bright placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none text-sm"
+                  disabled={loading === "Custom"}
+                />
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-foreground hover:text-white transition-colors">
-                <X className="w-5 h-5" />
+
+              <button
+                onClick={handleCustomGeneration}
+                disabled={!jobDescription.trim() || loading === "Custom"}
+                className={cn(
+                  "w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
+                  themeClasses.gradient.primaryAction,
+                  themeClasses.text.onAccent,
+                  "disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale",
+                )}
+              >
+                {loading === "Custom" ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Tailor Resume
+                  </>
+                )}
               </button>
             </div>
-
-            {/* Content Body */}
-            <div className="p-4">
-              {!showCustomInput ? (
-                // 1. STANDARD OPTIONS LIST
-                <div className="grid gap-3">
-                  {RESUME_OPTIONS.map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <button
-                        key={option.id}
-                        onClick={() => handleOptionClick(option)}
-                        className={cn(
-                          "flex items-center gap-4 p-4 rounded-lg text-left transition-all border border-transparent",
-                          "hover:bg-surface hover:border-elevated group",
-                        )}
-                      >
-                        <div className="p-2 rounded-md bg-surface text-foreground group-hover:text-accent-light transition-colors">
-                          <Icon className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-bright group-hover:text-white">{option.label}</div>
-                          <div className="text-xs text-slate-500">{option.text}</div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                // 2. CUSTOM INPUT FORM
-                <div className="space-y-6 animate-in slide-in-from-right-10 duration-200">
-                  <div className="relative">
-                    <textarea
-                      value={jobDescription}
-                      onChange={(e) => setJobDescription(e.target.value)}
-                      onDoubleClick={handleDoubleClickPaste}
-                      placeholder="Ctrl+V or DOUBLE click to paste the job description or role requirements here..."
-                      className="w-full h-60 p-3 bg-surface border border-elevated rounded-lg text-bright placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none text-sm"
-                      disabled={loading === "Custom"}
-                    />
-                  </div>
-
-                  <button
-                    onClick={handleCustomGeneration}
-                    disabled={!jobDescription.trim() || loading === "Custom"}
-                    className={cn(
-                      "w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all",
-                      "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-accent hover:to-blue-500 text-white",
-                      "disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale",
-                    )}
-                  >
-                    {loading === "Custom" ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        Tailor Resume
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 bg-surface/30 text-center border-t border-elevated">
-              <p className="text-xs text-slate-500">
-                {showCustomInput
-                  ? "AI will analyze requirements to highlight best matching skills from my database"
-                  : "Powered by Docx & Gemini 3 Pro"}
-              </p>
-            </div>
-          </div>
+          )}
         </div>
-      )}
+
+        {/* Footer */}
+        <div className="p-4 bg-surface/30 text-center border-t border-elevated">
+          <p className="text-xs text-muted">
+            {showCustomInput
+              ? "AI will analyze requirements to highlight best matching skills from my database"
+              : "Powered by Docx & Gemini 3 Pro"}
+          </p>
+        </div>
+      </AnimatedGlassWindow>
     </>
   );
 }
