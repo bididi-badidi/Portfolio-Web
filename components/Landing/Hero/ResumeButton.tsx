@@ -4,9 +4,11 @@ import { saveAs } from "file-saver";
 import { cn } from "@/lib/utils";
 import { Loader2, X, Sparkles, ArrowLeft } from "lucide-react";
 import { generateResume } from "@/lib/docx";
-import { draftResume } from "@/app/lib/chatbot/agenticResume/draftResume";
-import { reviewResume } from "@/app/lib/chatbot/agenticResume/reviewResume";
-import { refineResume } from "@/app/lib/chatbot/agenticResume/refineResume";
+// agentic pipeline — kept for standalone script use
+// import { draftResume } from "@/app/lib/chatbot/agenticResume/draftResume";
+// import { reviewResume } from "@/app/lib/chatbot/agenticResume/reviewResume";
+// import { refineResume } from "@/app/lib/chatbot/agenticResume/refineResume";
+import { fetchResumeData } from "@/app/lib/chatbot/fetchCustomizedResume";
 import { ResumeOption } from "@/app/interfaces/Resume";
 import { RESUME_OPTIONS } from "@/app/config";
 import toast from "react-hot-toast";
@@ -82,15 +84,8 @@ export function ResumeButton({
       const masterData = await getMasterResume();
       const masterDataStr = JSON.stringify(masterData);
 
-      const draft = await draftResume(sanitizedJobDescription, masterDataStr);
+      const finalData = await fetchResumeData(sanitizedJobDescription, masterDataStr);
 
-      toast.loading("Reviewing generated content...", { id: toastId });
-      const comments = await reviewResume(sanitizedJobDescription, draft);
-
-      toast.loading("Refining resume...", { id: toastId });
-      const finalData = await refineResume(sanitizedJobDescription, draft, comments, masterDataStr);
-
-      toast.loading("Finalizing...", { id: toastId });
       const blob = await generateResume(finalData);
 
       toast.success("Resume generated!", { id: toastId });

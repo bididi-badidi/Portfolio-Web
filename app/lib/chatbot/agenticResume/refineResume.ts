@@ -37,16 +37,19 @@ export const refineResume = async (
   jobDescription: string,
   draft: ResumeDraft,
   comments: ReviewComments,
-  masterDataStr: string
+  masterDataStr: string,
 ): Promise<FinalResumeData> => {
-  const model =
-    envClient.NEXT_PUBLIC_GEMINI_MODEL_RESUME ??
-    envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT;
+  const model = envClient.NEXT_PUBLIC_GEMINI_MODEL_RESUME ?? envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT;
 
   try {
     const refined = await GeminiService.generateJSON<ResumeDraft>(
       model,
-      refineUserPrompt(jobDescription, masterDataStr, JSON.stringify(draft, null, 2), JSON.stringify(comments, null, 2)),
+      refineUserPrompt(
+        jobDescription,
+        masterDataStr,
+        JSON.stringify(draft, null, 2),
+        JSON.stringify(comments, null, 2),
+      ),
       REFINE_SYSTEM_INSTRUCTION,
       {
         type: Type.OBJECT,
@@ -60,8 +63,7 @@ export const refineResume = async (
         properties: {
           summary: {
             type: Type.STRING,
-            description:
-              "A refined professional summary tailored to the target job description.",
+            description: "A refined professional summary tailored to the target job description.",
           },
           "Work Experiences & Internships": {
             type: Type.ARRAY,
@@ -85,7 +87,9 @@ export const refineResume = async (
             },
           },
         },
-      }
+      },
+      2,
+      60000,
     );
 
     const masterResume = JSON.parse(masterDataStr) as FinalResumeData;

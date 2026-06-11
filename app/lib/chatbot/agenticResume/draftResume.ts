@@ -39,13 +39,8 @@ export interface ResumeDraft {
   skills: SkillsData;
 }
 
-export const draftResume = async (
-  jobDescription: string,
-  masterData: string
-): Promise<ResumeDraft> => {
-  const model =
-    envClient.NEXT_PUBLIC_GEMINI_MODEL_RESUME ??
-    envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT;
+export const draftResume = async (jobDescription: string, masterData: string): Promise<ResumeDraft> => {
+  const model = envClient.NEXT_PUBLIC_GEMINI_MODEL_RESUME ?? envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT;
 
   try {
     return await GeminiService.generateJSON<ResumeDraft>(
@@ -64,8 +59,7 @@ export const draftResume = async (
         properties: {
           summary: {
             type: Type.STRING,
-            description:
-              "A professional summary tailored to the target job description.",
+            description: "A professional summary tailored to the target job description.",
           },
           "Work Experiences & Internships": {
             type: Type.ARRAY,
@@ -86,23 +80,22 @@ export const draftResume = async (
             properties: {
               Technical: {
                 type: Type.STRING,
-                description:
-                  "A comma-separated string of technical tools and languages.",
+                description: "A comma-separated string of technical tools and languages.",
               },
               "Soft Skills": {
                 type: Type.STRING,
-                description:
-                  "A comma-separated string of interpersonal skills.",
+                description: "A comma-separated string of interpersonal skills.",
               },
               Interests: {
                 type: Type.STRING,
-                description:
-                  "A comma-separated string of personal hobbies or interests.",
+                description: "A comma-separated string of personal hobbies or interests.",
               },
             },
           },
         },
-      }
+      },
+      undefined,
+      30000,
     );
   } catch (err) {
     console.error("[agentic-resume:draft]", {

@@ -244,9 +244,9 @@ export const generateResume = async (resumeData: FinalResumeData) => {
           ),
 
           // --- EXPERIENCE ---
-          ...createSection("Work Experiences & Internships", resumeData["Work Experiences & Internships"]),
+          ...createSection("Work Experiences & Internships", resumeData["Work Experiences & Internships"], { bulletDetails: true }),
           ...createSection("Selected Projects", resumeData["Personal Projects"], { bulletDetails: true }),
-          ...createSection("Leadership Experiences", resumeData["Leadership Experiences"]),
+          ...createSection("Leadership Experiences", resumeData["Leadership Experiences"], { bulletDetails: true }),
         ],
       },
     ],
