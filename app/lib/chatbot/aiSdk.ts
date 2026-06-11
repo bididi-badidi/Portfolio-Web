@@ -14,8 +14,12 @@ const google = createGoogleGenerativeAI({
   apiKey: envServer.GEMINI_API_KEY,
 });
 
+// Keep model configuration constrained to the provider's text-model boundary.
+// The env vars must contain Gemini text model IDs accepted by @ai-sdk/google.
+type GoogleTextModelId = Parameters<typeof google>[0];
+
 interface ChatbotTextOptions<TOOLS extends ToolSet> {
-  model: string;
+  model: GoogleTextModelId;
   prompt: string;
   system?: string;
   tools?: TOOLS;
@@ -26,7 +30,7 @@ interface ChatbotTextOptions<TOOLS extends ToolSet> {
 }
 
 interface ChatbotObjectOptions<SCHEMA extends FlexibleSchema<unknown>> {
-  model: string;
+  model: GoogleTextModelId;
   prompt: string;
   system?: string;
   schema: SCHEMA;
@@ -36,8 +40,8 @@ interface ChatbotObjectOptions<SCHEMA extends FlexibleSchema<unknown>> {
   maxOutputTokens?: number;
 }
 
-function googleModel(model: string) {
-  return google(model as Parameters<typeof google>[0]);
+function googleModel(model: GoogleTextModelId) {
+  return google(model);
 }
 
 function timeoutSignal() {

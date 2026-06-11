@@ -16,6 +16,17 @@ import { ChatReply, ChatbotRequest } from "./types";
 import { generatePrompt } from "./generatePrompt";
 import { generateChatbotText } from "./aiSdk";
 
+let knowledgeDataPromise: Promise<unknown> | undefined;
+
+function getCachedKnowledgeData() {
+  knowledgeDataPromise ??= getKnowledgeData().catch((err) => {
+    knowledgeDataPromise = undefined;
+    throw err;
+  });
+
+  return knowledgeDataPromise;
+}
+
 function toPromptHistoryString(chatHistory: ChatbotRequest["chatHistory"]) {
   return JSON.stringify(
     chatHistory.map((chat) => ({
@@ -87,7 +98,7 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
 
     let knowledgeData: unknown = {};
     try {
-      knowledgeData = await getKnowledgeData();
+      knowledgeData = await getCachedKnowledgeData();
     } catch (err) {
       console.error(`getKnowledgeData error: ${getErrorMessage(err)}`);
     }

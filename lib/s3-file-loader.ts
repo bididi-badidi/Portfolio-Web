@@ -3,18 +3,19 @@ import { FinalResumeData } from "@/app/interfaces/Resume";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { KnowledgeItem } from "@/app/interfaces/Chatbot";
 import { LLM_KNOWLEDGE_FILENAME, MASTER_RESUME_FILENAME } from "@/app/config";
+import { envServer } from "@/app/env/server";
 
 const s3 = new S3Client({
-  region: process.env.AWS_REGION,
+  region: envServer.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: envServer.AWS_ACCESS_KEY_ID,
+    secretAccessKey: envServer.AWS_SECRET_ACCESS_KEY,
   },
 });
 
 export async function getMasterResume(key: string = MASTER_RESUME_FILENAME): Promise<FinalResumeData> {
   const command = new GetObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: envServer.AWS_BUCKET_NAME,
     Key: key,
   });
 
@@ -28,7 +29,7 @@ export async function getMasterResume(key: string = MASTER_RESUME_FILENAME): Pro
 
 export const getKnowledgeData = async (key: string = LLM_KNOWLEDGE_FILENAME): Promise<KnowledgeItem> => {
   const command = new GetObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: envServer.AWS_BUCKET_NAME,
     Key: key,
   });
 
@@ -42,7 +43,7 @@ export const getKnowledgeData = async (key: string = LLM_KNOWLEDGE_FILENAME): Pr
 
 const getGeneralPdf = async (key: string) => {
   const command = new GetObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: envServer.AWS_BUCKET_NAME,
     Key: key,
   });
 

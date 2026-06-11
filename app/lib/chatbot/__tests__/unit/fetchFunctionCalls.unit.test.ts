@@ -14,7 +14,7 @@ describe("fetchFunctionCalls", () => {
     mockGeminiGenerateContent.mockImplementation(() =>
       Promise.resolve({
         text: "",
-        functionCalls: [{ name: "SendEmail", args: { email: "a@b.com" } }],
+        toolCalls: [{ toolName: "SendEmail", input: { email: "a@b.com" } }],
       })
     );
 
@@ -39,15 +39,40 @@ describe("fetchFunctionCalls", () => {
     mockGeminiGenerateContent.mockImplementation(() =>
       Promise.resolve({
         text: "",
-        functionCalls: [
-          { name: "SendEmail", args: {} },
-          { name: "NavigateSection", args: { section: "contact" } },
+        toolCalls: [
+          { toolName: "SendEmail", input: {} },
+          { toolName: "NavigateSection", input: { section: "contact" } },
         ],
       })
     );
 
     const result = await fetchFunctionCalls("conversation");
     expect(result.functionCall?.name).toBe("SendEmail");
+  });
+
+  it("should return no function call when the AI SDK returns an empty toolCalls array", async () => {
+    mockGeminiGenerateContent.mockImplementation(() =>
+      Promise.resolve({ text: "No action needed.", toolCalls: [] })
+    );
+
+    const result = await fetchFunctionCalls("conversation");
+    expect(result.error).toBe(false);
+    expect(result.functionCall).toBeUndefined();
+    expect(result.functionMessage).toBe("No action needed.");
+  });
+
+  it("should ignore malformed tool args without failing the request", async () => {
+    mockGeminiGenerateContent.mockImplementation(() =>
+      Promise.resolve({
+        text: "I could not safely parse the requested action.",
+        toolCalls: [{ toolName: "SendEmail", input: "not-an-object" }],
+      })
+    );
+
+    const result = await fetchFunctionCalls("conversation");
+    expect(result.error).toBe(false);
+    expect(result.functionCall).toBeUndefined();
+    expect(result.functionMessage).toBe("I could not safely parse the requested action.");
   });
 
   it("should return error: true and fallback message when Gemini throws", async () => {

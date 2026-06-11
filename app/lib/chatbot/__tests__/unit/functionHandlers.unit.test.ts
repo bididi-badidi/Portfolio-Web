@@ -17,6 +17,8 @@ describe("functionHandlers", () => {
   let mockUiState: any;
   let timeoutCalls: number[];
   let originalSetTimeout: typeof globalThis.setTimeout;
+  let originalConsoleWarn: typeof console.warn;
+  let consoleWarnMock: ReturnType<typeof mock>;
 
   beforeEach(() => {
     mockAppActions = {
@@ -30,6 +32,9 @@ describe("functionHandlers", () => {
       setChatOpen: mock(),
     };
     (reportErrorMessage as any).mockClear();
+    originalConsoleWarn = console.warn;
+    consoleWarnMock = mock();
+    console.warn = consoleWarnMock as typeof console.warn;
 
     timeoutCalls = [];
     originalSetTimeout = globalThis.setTimeout;
@@ -42,6 +47,7 @@ describe("functionHandlers", () => {
 
   afterEach(() => {
     globalThis.setTimeout = originalSetTimeout;
+    console.warn = originalConsoleWarn;
   });
 
   it("should return early when functionCall is undefined", async () => {
@@ -235,6 +241,9 @@ describe("functionHandlers", () => {
 
       await executeFunctionCall(functionCall, mockAppActions, mockUiState);
       expect(reportErrorMessage).toHaveBeenCalledWith("Unknown Function Called");
+      expect(consoleWarnMock).toHaveBeenCalledWith(
+        'No function handler registered for "unknown_func"',
+      );
     });
 
     it("should call reportErrorMessage (not browser reportError) when handler throws", async () => {

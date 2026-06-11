@@ -42,8 +42,18 @@
 }
 
 .glass-surface--svg {
+  background: hsl(0 0% 100% / var(--glass-frost, 0));
   background: light-dark(hsl(0 0% 100% / var(--glass-frost, 0)), hsl(0 0% 0% / var(--glass-frost, 0)));
   backdrop-filter: var(--filter-id) saturate(var(--glass-saturation, 1));
+  box-shadow:
+    0 0 2px 1px color-mix(in oklch, black, transparent 85%) inset,
+    0 0 10px 4px color-mix(in oklch, black, transparent 90%) inset,
+    0px 4px 16px rgba(17, 17, 26, 0.05),
+    0px 8px 24px rgba(17, 17, 26, 0.05),
+    0px 16px 56px rgba(17, 17, 26, 0.05),
+    0px 4px 16px rgba(17, 17, 26, 0.05) inset,
+    0px 8px 24px rgba(17, 17, 26, 0.05) inset,
+    0px 16px 56px rgba(17, 17, 26, 0.05) inset;
   box-shadow:
     0 0 2px 1px light-dark(color-mix(in oklch, black, transparent 85%), color-mix(in oklch, white, transparent 65%))
       inset,
@@ -55,6 +65,21 @@
     0px 4px 16px rgba(17, 17, 26, 0.05) inset,
     0px 8px 24px rgba(17, 17, 26, 0.05) inset,
     0px 16px 56px rgba(17, 17, 26, 0.05) inset;
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass-surface--svg {
+    background: hsl(0 0% 0% / var(--glass-frost, 0));
+    box-shadow:
+      0 0 2px 1px color-mix(in oklch, white, transparent 65%) inset,
+      0 0 10px 4px color-mix(in oklch, white, transparent 85%) inset,
+      0px 4px 16px rgba(17, 17, 26, 0.05),
+      0px 8px 24px rgba(17, 17, 26, 0.05),
+      0px 16px 56px rgba(17, 17, 26, 0.05),
+      0px 4px 16px rgba(17, 17, 26, 0.05) inset,
+      0px 8px 24px rgba(17, 17, 26, 0.05) inset,
+      0px 16px 56px rgba(17, 17, 26, 0.05) inset;
+  }
 }
 
 .glass-surface--fallback {
@@ -110,8 +135,15 @@
 }
 
 .glass-surface:focus-visible {
+  outline: 2px solid #007aff;
   outline: 2px solid light-dark(#007aff, #0a84ff);
   outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass-surface:focus-visible {
+    outline-color: #0a84ff;
+  }
 }
 
 /* Dock variant — removes centering so the nav can control its own layout */

@@ -1,6 +1,21 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+const AWS_ENV_KEYS = [
+  "AWS_REGION",
+  "AWS_ACCESS_KEY_ID",
+  "AWS_SECRET_ACCESS_KEY",
+  "AWS_BUCKET_NAME",
+] as const;
+
+const configuredAwsEnvKeys = AWS_ENV_KEYS.filter((key) => process.env[key]);
+if (configuredAwsEnvKeys.length > 0 && configuredAwsEnvKeys.length < AWS_ENV_KEYS.length) {
+  const missingKeys = AWS_ENV_KEYS.filter((key) => !process.env[key]);
+  throw new Error(
+    `Incomplete AWS configuration. Provide all AWS env vars together. Missing: ${missingKeys.join(", ")}`,
+  );
+}
+
 export const envServer = createEnv({
   emptyStringAsUndefined: true,
   server: {

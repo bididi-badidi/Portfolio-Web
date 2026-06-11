@@ -117,6 +117,6 @@ export const executeFunctionCall = async (
     }
   } else {
     reportErrorMessage("Unknown Function Called");
-    console.error(handler);
+    console.warn(`No function handler registered for "${functionName}"`);
   }
 };

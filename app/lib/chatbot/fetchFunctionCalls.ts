@@ -10,6 +10,10 @@ import { getErrorMessage } from "@/app/utils/handleReport";
 import { generateChatbotText } from "./aiSdk";
 import { functionCallTools } from "./functionCalls";
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 export async function fetchFunctionCalls(conversation: string): Promise<FunctionCallResponse> {
   try {
     const response = await generateChatbotText({
@@ -20,10 +24,20 @@ export async function fetchFunctionCalls(conversation: string): Promise<Function
     });
 
     const funcCallRaw = response.toolCalls?.[0];
-    const funcCall = funcCallRaw?.toolName ? {
-      name: funcCallRaw.toolName,
-      args: (funcCallRaw.input as Record<string, unknown>) || {},
-    } : undefined;
+    let funcCall: FunctionCallResponse["functionCall"];
+
+    if (funcCallRaw?.toolName) {
+      if (funcCallRaw.input === undefined || isRecord(funcCallRaw.input)) {
+        funcCall = {
+          name: funcCallRaw.toolName,
+          args: funcCallRaw.input ?? {},
+        };
+      } else {
+        console.warn(
+          `Ignoring malformed tool call args for ${funcCallRaw.toolName}: expected object input`,
+        );
+      }
+    }
 
     return {
       functionCall: funcCall,
