@@ -1,14 +1,21 @@
-import { GoogleGenAI } from "@google/genai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { generateText } from "ai";
 
 const apiKey = process.env.GEMINI_API_KEY;
-const client = new GoogleGenAI({ apiKey: apiKey! });
+
+if (!apiKey) {
+  console.error("GEMINI_API_KEY is not set");
+  process.exit(1);
+}
+
+const google = createGoogleGenerativeAI({ apiKey });
 
 async function test() {
   try {
     console.log("Testing gemini-2.0-flash...");
-    const response = await client.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: [{ role: "user", parts: [{ text: "Hi" }] }],
+    const response = await generateText({
+      model: google("gemini-2.0-flash"),
+      prompt: "Hi",
     });
     console.log("Response:", response.text);
   } catch (error) {

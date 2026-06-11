@@ -69,11 +69,43 @@ if (!LIVE_EVAL_MODE) {
 
   // ── Shared mocks for all test files ──
   // bun:test mock.module is global, so ALL test files must share the same mock instances.
-  mock.module("@/lib/gemini", () => ({
-    gemini_client: {
-      models: {
-        generateContent: mockGeminiGenerateContent,
-      },
+  mock.module("@/app/lib/chatbot/aiSdk", () => ({
+    generateChatbotText: async (args: Record<string, unknown>) => {
+      const response = await mockGeminiGenerateContent({
+        ...args,
+        contents: args.prompt,
+        config: {
+          systemInstruction: args.system,
+        },
+      });
+      return {
+        ...response,
+        toolCalls:
+          response.toolCalls ??
+          response.functionCalls?.map((functionCall: { name?: string; args?: Record<string, unknown> }) => ({
+            toolName: functionCall.name,
+            input: functionCall.args,
+          })),
+      };
+    },
+    generateChatbotObject: async (args: Record<string, unknown>) => {
+      const response = await mockGeminiGenerateContent({
+        ...args,
+        contents: args.prompt,
+        config: {
+          systemInstruction: args.system,
+          schema: args.schema,
+        },
+      });
+
+      if (response.object) return response;
+      if (!response.text) throw new Error("Empty response from Gemini");
+
+      try {
+        return { object: JSON.parse(response.text) };
+      } catch {
+        throw new Error("Invalid JSON response from Gemini");
+      }
     },
   }));
 

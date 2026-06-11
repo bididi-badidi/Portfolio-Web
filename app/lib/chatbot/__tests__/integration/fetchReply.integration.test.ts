@@ -83,8 +83,6 @@ describe("fetchChatbotReply", () => {
   it("should skip function approval when functionCallResponse has error", async () => {
     queueGeminiResponses(
       new Error("Function call detection down"),
-      new Error("Function call detection down"),
-      new Error("Function call detection down"),
       botResponse,
     );
 
@@ -207,8 +205,6 @@ describe("fetchChatbotReply", () => {
   it("should continue when function approval check fails", async () => {
     queueGeminiResponses(
       sendEmailResponse,
-      new Error("Approver down"),
-      new Error("Approver down"),
       new Error("Approver down"),
       botResponse,
     );

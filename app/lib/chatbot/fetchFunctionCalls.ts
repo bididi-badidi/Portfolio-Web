@@ -1,34 +1,28 @@
 "use server";
 
-import { functionCallList } from "./functionCalls";
 import {
   FETCH_FAIL_FALLBACK_MSG,
   FUNCTION_CALL_SYS_INSTRUCTION,
 } from "./config";
 import { envClient } from "@/app/env/client";
-import { GeminiService } from "./geminiService";
 import { FunctionCallResponse } from "./types";
 import { getErrorMessage } from "@/app/utils/handleReport";
+import { generateChatbotText } from "./aiSdk";
+import { functionCallTools } from "./functionCalls";
 
 export async function fetchFunctionCalls(conversation: string): Promise<FunctionCallResponse> {
   try {
-    const response = await GeminiService.generateContent(
-      envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL,
-      conversation,
-      {
-        systemInstruction: FUNCTION_CALL_SYS_INSTRUCTION,
-        tools: [
-          {
-            functionDeclarations: [...functionCallList],
-          },
-        ],
-      }
-    );
+    const response = await generateChatbotText({
+      model: envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL,
+      prompt: conversation,
+      system: FUNCTION_CALL_SYS_INSTRUCTION,
+      tools: functionCallTools,
+    });
 
-    const funcCallRaw = response.functionCalls ? response.functionCalls[0] : undefined;
-    const funcCall = funcCallRaw?.name ? {
-      name: funcCallRaw.name,
-      args: (funcCallRaw.args as Record<string, unknown>) || {},
+    const funcCallRaw = response.toolCalls?.[0];
+    const funcCall = funcCallRaw?.toolName ? {
+      name: funcCallRaw.toolName,
+      args: (funcCallRaw.input as Record<string, unknown>) || {},
     } : undefined;
 
     return {

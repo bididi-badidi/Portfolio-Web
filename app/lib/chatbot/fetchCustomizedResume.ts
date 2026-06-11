@@ -1,36 +1,31 @@
 "use server";
 
-import { Type } from "./geminiTypes";
 import { ResumeEntry, SkillsData } from "@/app/interfaces/Resume";
 import { envClient } from "@/app/env/client";
 import { getMasterResume } from "@/lib/s3-file-loader";
-import { GeminiService } from "./geminiService";
+import { z } from "zod";
+import { generateChatbotObject } from "./aiSdk";
 
-const ResumeEntrySchema = {
-  type: Type.OBJECT,
-  required: ["title", "role", "date", "bullets"],
-  properties: {
-    title: {
-      type: Type.STRING,
-      description: "Name of the company, organization, or project title.",
-    },
-    role: {
-      type: Type.STRING,
-      description: "Job title or role held. If none, use an empty string.",
-    },
-    date: {
-      type: Type.STRING,
-      description: "The duration of the experience (e.g., 'Jan 2025 - Present').",
-    },
-    bullets: {
-      type: Type.ARRAY,
-      description: "List of bullet points describing achievements.",
-      items: {
-        type: Type.STRING,
-      },
-    },
-  },
-};
+const resumeEntrySchema = z.object({
+  title: z.string().describe("Name of the company, organization, or project title."),
+  role: z.string().describe("Job title or role held. If none, use an empty string."),
+  date: z.string().describe("The duration of the experience (e.g., 'Jan 2025 - Present')."),
+  bullets: z.array(z.string()).describe("List of bullet points describing achievements."),
+});
+
+const completeTemplateSchema = z.object({
+  summary: z.string().describe("A professional summary tailored to the target job description."),
+  "Work Experiences & Internships": z.array(resumeEntrySchema),
+  "Personal Projects": z.array(resumeEntrySchema),
+  "Leadership Experiences": z.array(resumeEntrySchema),
+  skills: z
+    .object({
+      Technical: z.string().describe("A comma-separated string of technical tools and languages."),
+      "Soft Skills": z.string().describe("A comma-separated string of interpersonal skills."),
+      Interests: z.string().describe("A comma-separated string of personal hobbies or interests."),
+    })
+    .describe("A categorized list of skills and interests."),
+});
 
 interface CompleteTemplateStructure {
   summary: string;
@@ -50,60 +45,21 @@ export const fetchResumeData = async (job_description: string, master_data: stri
   User Master Data:
   ${master_data}`;
 
-  const result = await GeminiService.generateJSON<CompleteTemplateStructure>(
-    resumeModel,
+  const result = await generateChatbotObject({
+    model: resumeModel,
     prompt,
-    "You are a resume expert that tailors resumes to job descriptions.",
-    {
-      type: Type.OBJECT,
-      required: ["summary", "Work Experiences & Internships", "Personal Projects", "Leadership Experiences"],
-      properties: {
-        summary: {
-          type: Type.STRING,
-          description: "A professional summary tailored to the target job description.",
-        },
-        "Work Experiences & Internships": {
-          type: Type.ARRAY,
-          items: ResumeEntrySchema,
-        },
-        "Personal Projects": {
-          type: Type.ARRAY,
-          items: ResumeEntrySchema,
-        },
-        "Leadership Experiences": {
-          type: Type.ARRAY,
-          items: ResumeEntrySchema,
-        },
-        skills: {
-          type: Type.OBJECT,
-          description: "A categorized list of skills and interests.",
-          required: ["Technical", "Soft Skills", "Interests"],
-          properties: {
-            "Technical": {
-              type: Type.STRING,
-              description: "A comma-separated string of technical tools and languages.",
-            },
-            "Soft Skills": {
-              type: Type.STRING,
-              description: "A comma-separated string of interpersonal skills.",
-            },
-            "Interests": {
-              type: Type.STRING,
-              description: "A comma-separated string of personal hobbies or interests.",
-            },
-          },
-        },
-      },
-    }
-  );
+    system: "You are a resume expert that tailors resumes to job descriptions.",
+    schema: completeTemplateSchema,
+  });
+  const resume = result.object as CompleteTemplateStructure;
 
   return {
     header: MASTER_RESUME_DATA.header,
     education: MASTER_RESUME_DATA.education,
-    summary: result.summary,
-    "Work Experiences & Internships": result["Work Experiences & Internships"],
-    "Personal Projects": result["Personal Projects"],
-    "Leadership Experiences": result["Leadership Experiences"],
-    skills: result.skills,
+    summary: resume.summary,
+    "Work Experiences & Internships": resume["Work Experiences & Internships"],
+    "Personal Projects": resume["Personal Projects"],
+    "Leadership Experiences": resume["Leadership Experiences"],
+    skills: resume.skills,
   };
 };

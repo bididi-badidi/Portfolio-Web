@@ -1,12 +1,17 @@
 "use server";
 
-import { Type } from "./geminiTypes";
 import type { FunctionCall } from "./types";
 import { envClient } from "@/app/env/client";
 import { DECIDE_FUNCTION_CALL_SYS_INSTURCTION } from "./config";
-import { GeminiService } from "./geminiService";
 import { FunctionExcDecision } from "./types";
 import { getErrorMessage } from "@/app/utils/handleReport";
+import { z } from "zod";
+import { generateChatbotObject } from "./aiSdk";
+
+const functionExcDecisionSchema = z.object({
+  approve: z.boolean(),
+  reason: z.string(),
+});
 
 export async function fetchExcDecisionStruct(
   conversation: string,
@@ -21,19 +26,14 @@ ${JSON.stringify(functionCall)}
 ${specificDescription}`;
 
   try {
-    return await GeminiService.generateJSON<FunctionExcDecision>(
-      envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER,
+    const result = await generateChatbotObject({
+      model: envClient.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER,
       prompt,
-      DECIDE_FUNCTION_CALL_SYS_INSTURCTION,
-      {
-        type: Type.OBJECT,
-        required: ["approve", "reason"],
-        properties: {
-          approve: { type: Type.BOOLEAN },
-          reason: { type: Type.STRING },
-        },
-      }
-    );
+      system: DECIDE_FUNCTION_CALL_SYS_INSTURCTION,
+      schema: functionExcDecisionSchema,
+    });
+
+    return result.object as FunctionExcDecision;
   } catch (err) {
     const errMsg = getErrorMessage(err);
     console.error(`fetchExcDecisionStruct error: ${errMsg}`);

@@ -5,12 +5,12 @@ import { randomUUID } from "node:crypto";
 import { fetchFunctionCalls } from "../../fetchFunctionCalls";
 import { fetchExcDecisionStruct } from "../../fetchFunctionApproval";
 import { fetchChatbotReply } from "../../fetchReply";
-import { GeminiService } from "../../geminiService";
 import { FunctionCallType } from "@/app/enums/functionCall";
 import { envClient } from "@/app/env/client";
 import { envServer } from "@/app/env/server";
 import { TEST_CONFIG, isLiveEvalMode } from "@/app/test/testConfig";
-import { Type } from "@google/genai";
+import { z } from "zod";
+import { generateChatbotObject } from "../../aiSdk";
 
 interface LiveGoldenThresholdConfig {
   overallPassRate: number;
@@ -467,24 +467,18 @@ describeLive("chatbot golden live eval", () => {
           };
 
           try {
-            evaluatorResult = await GeminiService.generateJSON<EvaluatorResult>(
-              evaluatorModel,
-              JSON.stringify(evaluatorInput),
-              `${evaluatorSystemInstruction}\n\n${profile?.instruction ?? ""}`,
-              {
-                type: Type.OBJECT,
-                required: ["verdict", "confidence", "reasons"],
-                properties: {
-                  verdict: { type: Type.STRING, enum: ["pass", "fail"] },
-                  confidence: { type: Type.NUMBER },
-                  reasons: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                  },
-                  notes: { type: Type.STRING },
-                },
-              },
-            );
+            const result = await generateChatbotObject({
+              model: evaluatorModel,
+              prompt: JSON.stringify(evaluatorInput),
+              system: `${evaluatorSystemInstruction}\n\n${profile?.instruction ?? ""}`,
+              schema: z.object({
+                verdict: z.enum(["pass", "fail"]),
+                confidence: z.number(),
+                reasons: z.array(z.string()),
+                notes: z.string().optional(),
+              }),
+            });
+            evaluatorResult = result.object as EvaluatorResult;
           } catch (err) {
             evaluatorError = err instanceof Error ? err.message : String(err);
             evaluatorResult = {

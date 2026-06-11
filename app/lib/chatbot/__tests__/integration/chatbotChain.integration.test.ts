@@ -9,7 +9,6 @@ import { mockGeminiGenerateContent, mockGetMasterResume } from "../../../../../b
  * NOTE: fetchReply integration tests are in fetchReply.test.ts using sub-module mocks.
  */
 
-import { GeminiService } from "../../geminiService";
 import { fetchResumeData } from "../../fetchCustomizedResume";
 
 describe("Chatbot Chain Components", () => {
@@ -18,28 +17,6 @@ describe("Chatbot Chain Components", () => {
     mockGetMasterResume.mockReset();
 
     mockGetMasterResume.mockImplementation(() => Promise.resolve({ header: {}, education: {} }));
-  });
-
-  // ── GeminiService ──
-
-  describe("GeminiService (via shared mock)", () => {
-    it("should handle successful content generation", async () => {
-      mockGeminiGenerateContent.mockImplementation(() => Promise.resolve({ text: "Success" }));
-      const res = await GeminiService.generateContent("model", "hi");
-      expect(res.text).toBe("Success");
-    });
-
-    it("should retry on failure", async () => {
-      let callCount = 0;
-      mockGeminiGenerateContent.mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) return Promise.reject(new Error("Fail"));
-        return Promise.resolve({ text: "Success" });
-      });
-      const res = await GeminiService.generateContent("model", "hi", {}, 2);
-      expect(res.text).toBe("Success");
-      expect(mockGeminiGenerateContent).toHaveBeenCalledTimes(2);
-    });
   });
 
   // ── fetchResumeData ──

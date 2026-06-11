@@ -1,4 +1,5 @@
-import { type FunctionDeclaration, Type } from "./geminiTypes";
+import { tool } from "ai";
+import { z } from "zod";
 import { FunctionCallType } from "@/app/enums/functionCall";
 // import { ProjectDemoType } from "@/app/enums/projectDemo";
 
@@ -24,117 +25,78 @@ funcSysMsgDict.set(
   "A new tab is open for the project demo."
 );
 
-const addNewReminderDeclaration: FunctionDeclaration = {
-  name: FunctionCallType.AddNewReminder.name,
-  parameters: {
-    type: Type.OBJECT,
-    description: FunctionCallType.AddNewReminder.description,
-    properties: {
-      title: {
-        type: Type.STRING,
-        description:
-          "The title for the reminder. Keep this as short as possible, and use the rest details as description.",
-      },
-      dueDate: {
-        type: Type.STRING,
-        description:
-          "The due date for the new reminder. Must be either undefined or in YYYY-MM-DD format.",
-      },
-      time: {
-        type: Type.STRING,
-        description:
-          "The due time for the new reminder. Must be in undefined or in hh:mm:ss format. return undefined if user did not suggest. CANNOT exist without due date.",
-      },
-      description: {
-        type: Type.STRING,
-        description: "The description for the reminder. Optional",
-      },
-      reminderType: {
-        type: Type.STRING,
-        description:
-          "The reminder type. Select from the options based on the conversation history.",
-        enum: ["Work", "Personal"],
-      },
-    },
-    required: ["title", "dueDate", "reminderType"],
-  },
-};
+const addNewReminderDeclaration = tool({
+  description: FunctionCallType.AddNewReminder.description,
+  inputSchema: z.object({
+    title: z
+      .string()
+      .describe("The title for the reminder. Keep this as short as possible, and use the rest details as description."),
+    dueDate: z
+      .string()
+      .describe("The due date for the new reminder. Must be either undefined or in YYYY-MM-DD format."),
+    time: z
+      .string()
+      .optional()
+      .describe(
+        "The due time for the new reminder. Must be in undefined or in hh:mm:ss format. return undefined if user did not suggest. CANNOT exist without due date.",
+      ),
+    description: z.string().optional().describe("The description for the reminder. Optional"),
+    reminderType: z
+      .enum(["Work", "Personal"])
+      .describe("The reminder type. Select from the options based on the conversation history."),
+  }),
+});
 
-const navigateSectionDeclaration: FunctionDeclaration = {
-  name: FunctionCallType.NavigateSection.name,
-  parameters: {
-    type: Type.OBJECT,
-    description: FunctionCallType.NavigateSection.description,
-    properties: {
-      section: {
-        type: Type.STRING,
-        description: "The specific section to navigate to.",
-        enum: ["contact", "hero", "techstack", "about"],
-      },
-    },
-    required: ["section"],
-  },
-};
+const navigateSectionDeclaration = tool({
+  description: FunctionCallType.NavigateSection.description,
+  inputSchema: z.object({
+    section: z
+      .enum(["contact", "hero", "techstack", "about"])
+      .describe("The specific section to navigate to."),
+  }),
+});
 
-const navigateProjectsDeclaration: FunctionDeclaration = {
-  name: FunctionCallType.NavigateProjects.name,
-  parameters: {
-    type: Type.OBJECT,
-    description: FunctionCallType.NavigateProjects.description,
-    properties: {
-      project: {
-        type: Type.STRING,
-        description:
-          "The target project to navigate to. The option 'projects' is only applicable only if the users ask to see all the projects.",
-        enum: [
-          "projects",
-          "reminder-api",
-          "xcuisite",
-          "sccc",
-          "hologram",
-          "personal-assistant",
-          "automation-manager",
-          "stock-ai",
-          "event-capture",
-        ],
-      },
-    },
-    required: ["project"],
-  },
-};
+const navigateProjectsDeclaration = tool({
+  description: FunctionCallType.NavigateProjects.description,
+  inputSchema: z.object({
+    project: z
+      .enum([
+        "projects",
+        "reminder-api",
+        "xcuisite",
+        "sccc",
+        "hologram",
+        "personal-assistant",
+        "automation-manager",
+        "stock-ai",
+        "event-capture",
+      ])
+      .describe(
+        "The target project to navigate to. The option 'projects' is only applicable only if the users ask to see all the projects.",
+      ),
+  }),
+});
 
-const sendEmailDeclaration: FunctionDeclaration = {
-  name: FunctionCallType.SendEmail.name,
-  parameters: {
-    type: Type.OBJECT,
-    description: FunctionCallType.SendEmail.description,
-    properties: {
-      email: {
-        type: Type.STRING,
-        description: "user email. This field cannot be empty or unknown.",
-      },
-      name: {
-        type: Type.STRING,
-        description: "user name. This field cannot be empty or unknown.",
-      },
-      title: {
-        type: Type.STRING,
-        description:
-          "A short title for the email. This field cannot be empty or unknown. This field can be read from the conversation by summarize.",
-      },
-      description: {
-        type: Type.STRING,
-        description:
-          "A brief email description. This field is optional and can be deduced from the conversation.",
-      },
-    },
-    required: ["name", "email", "title"],
-  },
-};
+const sendEmailDeclaration = tool({
+  description: FunctionCallType.SendEmail.description,
+  inputSchema: z.object({
+    email: z.string().describe("user email. This field cannot be empty or unknown."),
+    name: z.string().describe("user name. This field cannot be empty or unknown."),
+    title: z
+      .string()
+      .describe(
+        "A short title for the email. This field cannot be empty or unknown. This field can be read from the conversation by summarize.",
+      ),
+    description: z
+      .string()
+      .optional()
+      .describe("A brief email description. This field is optional and can be deduced from the conversation."),
+  }),
+});
 
-export const functionCallList = [
-  sendEmailDeclaration,
-  navigateProjectsDeclaration,
-  navigateSectionDeclaration,
-  addNewReminderDeclaration,
-];
+export const functionCallTools = {
+  [FunctionCallType.SendEmail.name]: sendEmailDeclaration,
+  [FunctionCallType.NavigateProjects.name]: navigateProjectsDeclaration,
+  [FunctionCallType.NavigateSection.name]: navigateSectionDeclaration,
+  [FunctionCallType.AddNewReminder.name]: addNewReminderDeclaration,
+};

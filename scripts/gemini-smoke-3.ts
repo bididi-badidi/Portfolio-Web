@@ -1,4 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { generateText } from "ai";
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -7,29 +8,25 @@ if (!apiKey) {
   process.exit(1);
 }
 
-const client = new GoogleGenAI({
-  apiKey: apiKey,
-});
+const google = createGoogleGenerativeAI({ apiKey });
 
 async function test() {
   try {
     console.log("Testing gemini-3-flash-preview...");
-    // @google/genai SDK might have different method names depending on version
-    // Based on the package.json it is ^0.8.0
-    const response = await client.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: [{ role: "user", parts: [{ text: "Hello, who are you?" }] }],
+    const response = await generateText({
+      model: google("gemini-3-flash-preview"),
+      prompt: "Hello, who are you?",
     });
     console.log("Response Text:", response.text);
   } catch (error) {
     console.error("Error Message:", error instanceof Error ? error.message : error);
     // Log more details if available
-    if (error && typeof error === 'object') {
-        try {
-            console.error("Full Error:", JSON.stringify(error, null, 2));
-        } catch (e) {
-            console.error("Could not stringify error");
-        }
+    if (error && typeof error === "object") {
+      try {
+        console.error("Full Error:", JSON.stringify(error, null, 2));
+      } catch {
+        console.error("Could not stringify error");
+      }
     }
   }
 }

@@ -12,9 +12,18 @@ import {
 import { fetchExcDecisionStruct } from "./fetchFunctionApproval";
 import { FunctionCallType } from "@/app/enums/functionCall";
 import { getKnowledgeData } from "@/lib/s3-file-loader";
-import { GeminiService } from "./geminiService";
 import { ChatReply, ChatbotRequest } from "./types";
 import { generatePrompt } from "./generatePrompt";
+import { generateChatbotText } from "./aiSdk";
+
+function toPromptHistoryString(chatHistory: ChatbotRequest["chatHistory"]) {
+  return JSON.stringify(
+    chatHistory.map((chat) => ({
+      ...chat,
+      role: chat.role === "model" || chat.role === "bot" ? "assistant" : chat.role,
+    })),
+  );
+}
 
 export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatReply> {
   try {
@@ -33,7 +42,7 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
       };
     }
 
-    const conversationHistoryString = JSON.stringify(request.chatHistory);
+    const conversationHistoryString = toPromptHistoryString(request.chatHistory);
 
     const functionCallResponseRaw = await fetchFunctionCalls(conversationHistoryString);
     const functionCallResponse = functionCallResponseRaw ?? {
@@ -93,11 +102,11 @@ export async function fetchChatbotReply(request: ChatbotRequest): Promise<ChatRe
       functionExecApproved ? functionCallResponse.functionCall : undefined,
     );
 
-    const response = await GeminiService.generateContent(
-      envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT,
+    const response = await generateChatbotText({
+      model: envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT,
       prompt,
-      GEMINI_GENERATION_CONFIG
-    );
+      ...GEMINI_GENERATION_CONFIG,
+    });
 
     const replyText = response.text;
     if (!replyText || (typeof replyText === "string" && replyText.trim().length === 0)) {
