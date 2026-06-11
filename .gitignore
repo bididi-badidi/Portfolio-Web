@@ -50,3 +50,9 @@ testdata/chatbot-golden-live/reports
 .ai/assets/branches
 .ai/assets/session_notes.md
 .ai/assets/branches/
+
+# generated resume artifacts
+master_data.json
+*.docx
+~$*.docx
+testdata/resume/

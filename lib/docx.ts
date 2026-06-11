@@ -6,7 +6,6 @@ import {
   Paragraph,
   TextRun,
   ExternalHyperlink,
-  HeadingLevel,
   AlignmentType,
   TabStopType,
   BorderStyle,
@@ -14,24 +13,41 @@ import {
 } from "docx";
 import { ResumeEntry, FinalResumeData } from "@/app/interfaces/Resume";
 
-const parseRichText = (text: string) => {
+const FONT_FAMILY = "Times New Roman";
+const CONTENT_SIZE = 20; // 10pt, expressed in half-points for DOCX.
+const SUMMARY_SIZE = 17; // 8.5pt.
+const HEADER_SIZE = 28; // 14pt.
+const SECTION_SPACING = { before: 80, after: 20 };
+const CONTENT_SPACING = { after: 10, line: 252 };
+const VERTICAL_MARGIN_TWIPS = 432; // 0.3in exactly.
+const NAVY_BLUE = "1F4E79";
+
+const parseRichText = (text: string, size = CONTENT_SIZE) => {
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return parts.map((part) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return new TextRun({
         text: part.slice(2, -2),
         bold: true,
-        font: "Times New Roman",
+        font: FONT_FAMILY,
+        size,
       });
     }
-    return new TextRun({ text: part, font: "Times New Roman" });
+    return new TextRun({ text: part, font: FONT_FAMILY, size });
   });
 };
 
 const createSectionTitle = (title: string) => {
   return new Paragraph({
-    text: title.toUpperCase(),
-    heading: HeadingLevel.HEADING_1,
+    children: [
+      new TextRun({
+        text: title.toUpperCase(),
+        font: FONT_FAMILY,
+        bold: true,
+        size: CONTENT_SIZE,
+        color: NAVY_BLUE,
+      }),
+    ],
     border: {
       bottom: {
         color: "auto",
@@ -40,13 +56,7 @@ const createSectionTitle = (title: string) => {
         size: 6,
       },
     },
-    spacing: { before: 200, after: 40 },
-    run: {
-      font: "Times New Roman",
-      bold: true,
-      size: 18,
-      color: "1F4E79", // RGB(31, 78, 121)
-    },
+    spacing: SECTION_SPACING,
   });
 };
 
@@ -62,38 +72,49 @@ const createSubheading = (leftText: string, rightDate: string) => {
       new TextRun({
         text: leftText,
         bold: true,
-        font: "Times New Roman",
+        font: FONT_FAMILY,
+        size: CONTENT_SIZE,
       }),
       new TextRun({
         text: `\t${rightDate}`,
-        font: "Times New Roman",
+        font: FONT_FAMILY,
+        size: CONTENT_SIZE,
       }),
     ],
+    spacing: CONTENT_SPACING,
   });
 };
 
-const createSection = (sectionTitle: string, entries: ResumeEntry[]) => {
+const createContentParagraph = (children: TextRun[]) =>
+  new Paragraph({
+    children,
+    spacing: CONTENT_SPACING,
+  });
+
+const createBulletParagraph = (children: TextRun[]) =>
+  new Paragraph({
+    bullet: { level: 0 },
+    children,
+    spacing: CONTENT_SPACING,
+  });
+
+const createSection = (sectionTitle: string, entries: ResumeEntry[], options: { bulletDetails?: boolean } = {}) => {
   return [
     createSectionTitle(sectionTitle),
 
     ...entries.flatMap((entry) => {
-      const headerText = entry.role
-        ? `${entry.title} | ${entry.role}`
-        : entry.title;
+      const headerText = entry.role ? `${entry.title} | ${entry.role}` : entry.title;
 
       return [
         createSubheading(headerText, entry.date),
 
-        ...entry.bullets.map(
-          (bullet) =>
-            new Paragraph({
-              bullet: { level: 0 },
-              children: parseRichText(bullet),
-              spacing: { after: 50 },
-            }),
+        ...entry.bullets.map((bullet) =>
+          options.bulletDetails
+            ? createBulletParagraph(parseRichText(bullet))
+            : createContentParagraph(parseRichText(bullet)),
         ),
 
-        new Paragraph({ spacing: { after: 100 } }),
+        new Paragraph({ spacing: { after: 60 } }),
       ];
     }),
   ];
@@ -106,7 +127,8 @@ export const generateResume = async (resumeData: FinalResumeData) => {
       default: {
         document: {
           run: {
-            font: "Times New Roman",
+            font: FONT_FAMILY,
+            size: CONTENT_SIZE,
           },
         },
       },
@@ -116,8 +138,8 @@ export const generateResume = async (resumeData: FinalResumeData) => {
         properties: {
           page: {
             margin: {
-              top: convertInchesToTwip(0.5),
-              bottom: convertInchesToTwip(0.5),
+              top: VERTICAL_MARGIN_TWIPS,
+              bottom: VERTICAL_MARGIN_TWIPS,
               left: convertInchesToTwip(0.5),
               right: convertInchesToTwip(0.5),
             },
@@ -131,72 +153,100 @@ export const generateResume = async (resumeData: FinalResumeData) => {
               new TextRun({
                 text: resumeData.header.name,
                 bold: true,
-                size: 40,
+                font: FONT_FAMILY,
+                size: HEADER_SIZE,
               }),
-            ], // 20pt
-          }),
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            children: [new TextRun(resumeData.header.contact)],
+              new TextRun({
+                text: resumeData.header.contact ? ` | ${resumeData.header.contact}` : "",
+                font: FONT_FAMILY,
+                size: HEADER_SIZE,
+              }),
+            ],
+            spacing: CONTENT_SPACING,
           }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             children: resumeData.header.links.flatMap((link, index) => [
-              new TextRun({ text: `${link.label}: ` }),
+              new TextRun({
+                text: `${link.label}: `,
+                bold: true,
+                font: FONT_FAMILY,
+                size: CONTENT_SIZE,
+              }),
               new ExternalHyperlink({
                 children: [
                   new TextRun({
                     text: link.text,
                     style: "Hyperlink",
                     color: "0000FF",
+                    font: FONT_FAMILY,
+                    size: CONTENT_SIZE,
                     underline: { type: "single" },
                   }),
                 ],
                 link: link.url,
               }),
               index < resumeData.header.links.length - 1
-                ? new TextRun(" | ")
-                : new TextRun(""),
+                ? new TextRun({
+                    text: " | ",
+                    font: FONT_FAMILY,
+                    size: CONTENT_SIZE,
+                  })
+                : new TextRun({ text: "", font: FONT_FAMILY, size: CONTENT_SIZE }),
             ]),
+            spacing: { ...CONTENT_SPACING, after: 80 },
           }),
 
           // --- SUMMARY ---
           createSectionTitle("Summary"),
-          new Paragraph({ children: [new TextRun(resumeData.summary)] }),
+          new Paragraph({
+            children: parseRichText(resumeData.summary, SUMMARY_SIZE),
+            spacing: CONTENT_SPACING,
+          }),
 
           // --- EDUCATION ---
           createSectionTitle("Education"),
           ...resumeData.education.flatMap((edu) => [
             createSubheading(edu.institution, edu.date),
-            new Paragraph({ text: edu.degree }),
-            new Paragraph({ text: edu.gpa }),
+            createContentParagraph([
+              new TextRun({
+                text: edu.degree,
+                font: FONT_FAMILY,
+                size: CONTENT_SIZE,
+                italics: true,
+              }),
+            ]),
+            createContentParagraph([
+              new TextRun({
+                text: edu.gpa,
+                font: FONT_FAMILY,
+                size: CONTENT_SIZE,
+              }),
+            ]),
           ]),
 
-          // --- EXPERIENCE ---
-          ...createSection(
-            "Work Experiences & Internships",
-            resumeData["Work Experiences & Internships"],
-          ),
-          ...createSection(
-            "Personal Projects",
-            resumeData["Personal Projects"],
-          ),
-          ...createSection(
-            "Leadership Experiences",
-            resumeData["Leadership Experiences"],
+          // --- SKILLS ---
+          createSectionTitle("Technical Skills"),
+          ...Object.entries(resumeData.skills).map(([key, value]) =>
+            createContentParagraph([
+              new TextRun({
+                text: `${key}: `,
+                bold: true,
+                font: FONT_FAMILY,
+                size: CONTENT_SIZE,
+              }),
+              new TextRun({
+                text: value,
+                font: FONT_FAMILY,
+                size: CONTENT_SIZE,
+              }),
+            ]),
           ),
 
-          // --- SKILLS (Miscellaneous) ---
-          createSectionTitle("Miscellaneous"),
-          ...Object.entries(resumeData.skills).map(
-            ([key, value]) =>
-              new Paragraph({
-                children: [
-                  new TextRun({ text: `${key}: `, bold: true }),
-                  new TextRun(value),
-                ],
-              }),
-          ),
+          // --- EXPERIENCE ---
+          ...createSection("Work Experiences & Internships", resumeData["Work Experiences & Internships"]),
+          ...createSection("Selected Projects", resumeData["Personal Projects"], { bulletDetails: true }),
+          ...createSection("Leadership Experiences", resumeData["Leadership Experiences"]),
         ],
       },
     ],
