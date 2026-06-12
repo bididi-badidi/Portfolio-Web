@@ -56,3 +56,5 @@ master_data.json
 *.docx
 ~$*.docx
 testdata/resume/
+*.pyc
+resume-server/__pycache__/

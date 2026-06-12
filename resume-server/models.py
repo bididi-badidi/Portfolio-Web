@@ -54,8 +54,14 @@ class MasterResumeData(BaseModel):
             header=HeaderData(**data["header"]),
             education=[EducationEntry(**e) for e in data["education"]],
             summary=data.get("summary", ""),
-            work_experiences=[ResumeEntry(**e) for e in data.get("Work Experiences & Internships", [])],
-            personal_projects=[ResumeEntry(**e) for e in data.get("Personal Projects", [])],
-            leadership_experiences=[ResumeEntry(**e) for e in data.get("Leadership Experiences", [])],
+            work_experiences=[
+                ResumeEntry(**e) for e in data.get("Work Experiences & Internships", [])
+            ],
+            personal_projects=[
+                ResumeEntry(**e) for e in data.get("Personal Projects", [])
+            ],
+            leadership_experiences=[
+                ResumeEntry(**e) for e in data.get("Leadership Experiences", [])
+            ],
             skills=SkillsData(**data.get("skills", {"Technical": ""})),
         )
