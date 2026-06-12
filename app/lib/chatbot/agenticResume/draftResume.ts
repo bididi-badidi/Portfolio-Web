@@ -71,24 +71,17 @@ export const draftResume = async (jobDescription: string, masterData: string): P
           },
           "Leadership Experiences": {
             type: Type.ARRAY,
+            description: "A list of relevant leadership experiences. Leave empty if not required.",
             items: ResumeEntrySchema,
           },
           skills: {
             type: Type.OBJECT,
-            description: "A categorized list of skills and interests.",
-            required: ["Technical", "Soft Skills", "Interests"],
+            description: "A categorized list of skills.",
+            required: ["Technical"],
             properties: {
               Technical: {
                 type: Type.STRING,
                 description: "A comma-separated string of technical tools and languages.",
-              },
-              "Soft Skills": {
-                type: Type.STRING,
-                description: "A comma-separated string of interpersonal skills.",
-              },
-              Interests: {
-                type: Type.STRING,
-                description: "A comma-separated string of personal hobbies or interests.",
               },
             },
           },

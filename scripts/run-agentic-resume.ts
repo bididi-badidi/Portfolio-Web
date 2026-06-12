@@ -9,15 +9,41 @@
  * Requires env vars: GEMINI_API_KEY, AWS_*, NEXT_PUBLIC_GEMINI_MODEL_*
  */
 
-import { readFile, mkdir, writeFile } from "node:fs/promises";
-import { resolve, dirname } from "node:path";
+import { readFile, mkdir, writeFile, access } from "node:fs/promises";
+import { resolve, dirname, extname } from "node:path";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { generateResume } from "../lib/docx";
 import type { FinalResumeData, ResumeEntry, SkillsData } from "../app/interfaces/Resume";
+import {
+  DRAFT_SYSTEM_INSTRUCTION,
+  draftUserPrompt,
+  REVIEW_SYSTEM_INSTRUCTION,
+  reviewUserPrompt,
+  FACTCHECK_SYSTEM_INSTRUCTION,
+  factcheckUserPrompt,
+  REFINE_SYSTEM_INSTRUCTION,
+  refineUserPrompt,
+} from "../app/lib/chatbot/agenticResume/prompts";
 
 // --- helpers ---
 
 const getArg = (prefix: string) => process.argv.find((a) => a.startsWith(prefix))?.split("=")[1];
+
+async function resolveOutputPath(requestedPath: string): Promise<string> {
+  const ext = extname(requestedPath);
+  const base = requestedPath.slice(0, -ext.length);
+  let candidate = requestedPath;
+  let version = 2;
+  while (true) {
+    try {
+      await access(candidate);
+      candidate = `${base}-v${version}${ext}`;
+      version++;
+    } catch {
+      return candidate;
+    }
+  }
+}
 
 const log = (stage: string, msg?: string) => console.log(`[agentic-resume:${stage}]${msg ? " " + msg : ""}`);
 
@@ -32,7 +58,7 @@ const env = {
   MODEL_REVIEWER:
     process.env.NEXT_PUBLIC_GEMINI_MODEL_RESUME_REVIEWER ??
     process.env.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT ??
-    "gemini-2.0-flash",
+    "gemini-3.1-pro",
 };
 
 // --- Gemini ---
@@ -68,6 +94,30 @@ async function geminiJSON<T>(
   const text = json.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") ?? "";
   if (!text) throw new Error("Empty Gemini response");
   return JSON.parse(text) as T;
+}
+
+async function geminiText(model: string, systemInstruction: string, userPrompt: string): Promise<string> {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": env.GEMINI_API_KEY,
+    },
+    body: JSON.stringify({
+      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+      systemInstruction: { parts: [{ text: systemInstruction }] },
+    }),
+  });
+
+  const json = (await response.json()) as {
+    candidates?: { content?: { parts?: { text?: string }[] } }[];
+    error?: { message?: string };
+  };
+  if (!response.ok) throw new Error(json.error?.message ?? `Gemini error ${response.status}`);
+
+  const text = json.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") ?? "";
+  if (!text) throw new Error("Empty Gemini response");
+  return text;
 }
 
 // --- S3 ---
@@ -127,44 +177,16 @@ interface ResumeDraft {
   skills: SkillsData;
 }
 
-interface ReviewComments {
-  overallRelevance: number;
-  summaryFeedback: string;
-  sectionFeedback: { section: string; entryTitle?: string; issue: string; suggestion: string }[];
-  missingKeywords: string[];
-}
-
-const ReviewSchema = {
-  type: "OBJECT",
-  required: ["overallRelevance", "summaryFeedback", "sectionFeedback", "missingKeywords"],
-  properties: {
-    overallRelevance: { type: "NUMBER" },
-    summaryFeedback: { type: "STRING" },
-    sectionFeedback: {
-      type: "ARRAY",
-      items: {
-        type: "OBJECT",
-        required: ["section", "issue", "suggestion"],
-        properties: {
-          section: { type: "STRING" },
-          entryTitle: { type: "STRING" },
-          issue: { type: "STRING" },
-          suggestion: { type: "STRING" },
-        },
-      },
-    },
-    missingKeywords: { type: "ARRAY", items: { type: "STRING" } },
-  },
-};
 
 // --- main ---
 
 const main = async () => {
   const jdFilePath = getArg("--jd-file=");
-  const outputPath = resolve(getArg("--out=") ?? `./zi-shen-chan-agentic-resume.docx`);
+  const jdInline = getArg("--jd=");
+  const outputPath = resolve(getArg("--out=") ?? `/Users/user/Downloads/zishenchan-resume.docx`);
 
-  if (!jdFilePath) {
-    console.error("Usage: bun --env-file=.env.local run scripts/run-agentic-resume.ts --jd-file=<path> [--out=<path>]");
+  if (!jdFilePath && !jdInline) {
+    console.error("Usage: bun --env-file=.env.local run scripts/run-agentic-resume.ts --jd-file=<path>|--jd=<text> [--out=<path>]");
     process.exit(1);
   }
   if (!env.GEMINI_API_KEY) {
@@ -172,8 +194,9 @@ const main = async () => {
     process.exit(1);
   }
 
-  const jobDescription = await readFile(resolve(jdFilePath), "utf-8");
+  const jobDescription = jdInline ?? await readFile(resolve(jdFilePath!), "utf-8");
   log("init", `JD loaded (${jobDescription.length} chars)`);
+  log("init", `Models — draft/refine: ${env.MODEL_RESUME} | reviewer: ${env.MODEL_REVIEWER}`);
 
   log("master", "Fetching master resume from S3...");
   const masterResume = await fetchMasterResume();
@@ -183,29 +206,25 @@ const main = async () => {
   log("draft", "Agent 1: drafting tailored resume...");
   const draft = await geminiJSON<ResumeDraft>(
     env.MODEL_RESUME,
-    "You are a resume expert that tailors resumes to job descriptions.",
-    `instruction: You are a resume expert.\nFilter and format the user's master resume data into the requested structure specifically for the Job Description: "${jobDescription}".\n\nUser Master Data:\n${masterDataStr}`,
+    DRAFT_SYSTEM_INSTRUCTION,
+    draftUserPrompt(jobDescription, masterDataStr),
     DraftSchema,
   );
   log("draft", "Done.");
 
-  log("review", "Agent 2: reviewing draft against JD...");
-  const comments = await geminiJSON<ReviewComments>(
-    env.MODEL_REVIEWER,
-    "You are a senior technical recruiter reviewing a tailored resume against a job description. Only comment on relevance, gaps, and JD-keyword alignment. Do not rewrite content.",
-    `You are reviewing the following resume draft against the job description below.\n\nJob Description:\n${jobDescription}\n\nResume Draft:\n${JSON.stringify(draft, null, 2)}`,
-    ReviewSchema,
-  );
-  log(
-    "review",
-    `Done. Relevance: ${comments.overallRelevance}/10. Issues: ${comments.sectionFeedback.length}. Missing keywords: ${comments.missingKeywords.join(", ") || "none"}.`,
-  );
+  log("review", "Agent 2a + 2b: running reviewer and fact-checker concurrently...");
+  const draftJson = JSON.stringify(draft, null, 2);
+  const [reviewComments, factCheckComments] = await Promise.all([
+    geminiText(env.MODEL_REVIEWER, REVIEW_SYSTEM_INSTRUCTION, reviewUserPrompt(jobDescription, draftJson)),
+    geminiText(env.MODEL_REVIEWER, FACTCHECK_SYSTEM_INSTRUCTION, factcheckUserPrompt(masterDataStr, draftJson)),
+  ]);
+  log("factcheck", `\n${factCheckComments}`);
 
   log("refine", "Agent 3: refining based on feedback...");
   const refined = await geminiJSON<ResumeDraft>(
     env.MODEL_RESUME,
-    "You are a resume expert refining your earlier draft based on reviewer feedback. Apply the comments without exceeding the truthfulness of the original master data. Do not invent experience or skills not present in the original draft.",
-    `You produced the following resume draft. A reviewer has critiqued it. Apply the actionable feedback while staying truthful to the user's master data.\n\nJob Description:\n${jobDescription}\n\nOriginal Master Data (source of truth):\n${masterDataStr}\n\nYour Draft:\n${JSON.stringify(draft, null, 2)}\n\nReviewer Comments:\n${JSON.stringify(comments, null, 2)}`,
+    REFINE_SYSTEM_INSTRUCTION,
+    refineUserPrompt(jobDescription, masterDataStr, draftJson, reviewComments, factCheckComments),
     DraftSchema,
   );
   log("refine", "Done.");
@@ -220,10 +239,11 @@ const main = async () => {
   const blob = await generateResume(finalData);
   const buffer = Buffer.from(await blob.arrayBuffer());
 
-  await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, buffer);
+  const finalOutputPath = await resolveOutputPath(outputPath);
+  await mkdir(dirname(finalOutputPath), { recursive: true });
+  await writeFile(finalOutputPath, buffer);
 
-  log("done", `Resume written to: ${outputPath}`);
+  log("done", `Resume written to: ${finalOutputPath}`);
 };
 
 main().catch((err) => {

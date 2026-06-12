@@ -6,7 +6,6 @@ import { envClient } from "@/app/env/client";
 import { GeminiService } from "../geminiService";
 import { getErrorMessage } from "@/app/utils/handleReport";
 import { ResumeDraft } from "./draftResume";
-import { ReviewComments } from "./reviewResume";
 import { REFINE_SYSTEM_INSTRUCTION, refineUserPrompt } from "./prompts";
 
 const ResumeEntrySchema = {
@@ -36,8 +35,9 @@ const ResumeEntrySchema = {
 export const refineResume = async (
   jobDescription: string,
   draft: ResumeDraft,
-  comments: ReviewComments,
+  comments: string,
   masterDataStr: string,
+  factCheckComments: string,
 ): Promise<FinalResumeData> => {
   const model = envClient.NEXT_PUBLIC_GEMINI_MODEL_RESUME ?? envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT;
 
@@ -48,7 +48,8 @@ export const refineResume = async (
         jobDescription,
         masterDataStr,
         JSON.stringify(draft, null, 2),
-        JSON.stringify(comments, null, 2),
+        comments,
+        factCheckComments,
       ),
       REFINE_SYSTEM_INSTRUCTION,
       {
@@ -67,23 +68,24 @@ export const refineResume = async (
           },
           "Work Experiences & Internships": {
             type: Type.ARRAY,
+            description: "Leave empty if not required.",
             items: ResumeEntrySchema,
           },
           "Personal Projects": {
             type: Type.ARRAY,
+            description: "Leave empty if not required.",
             items: ResumeEntrySchema,
           },
           "Leadership Experiences": {
             type: Type.ARRAY,
+            description: "A list of relevant leadership experiences. Leave empty if not required.",
             items: ResumeEntrySchema,
           },
           skills: {
             type: Type.OBJECT,
-            required: ["Technical", "Soft Skills", "Interests"],
+            required: ["Technical"],
             properties: {
               Technical: { type: Type.STRING },
-              "Soft Skills": { type: Type.STRING },
-              Interests: { type: Type.STRING },
             },
           },
         },

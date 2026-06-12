@@ -99,6 +99,7 @@ const createBulletParagraph = (children: TextRun[]) =>
   });
 
 const createSection = (sectionTitle: string, entries: ResumeEntry[], options: { bulletDetails?: boolean } = {}) => {
+  if (!entries.length) return [];
   return [
     createSectionTitle(sectionTitle),
 
