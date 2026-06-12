@@ -3,16 +3,14 @@ import { useState } from "react";
 import { saveAs } from "file-saver";
 import { cn } from "@/lib/utils";
 import { Loader2, X, Sparkles, ArrowLeft } from "lucide-react";
-import { generateResume } from "@/lib/docx";
 // agentic pipeline — kept for standalone script use
 // import { draftResume } from "@/app/lib/chatbot/agenticResume/draftResume";
 // import { reviewResume } from "@/app/lib/chatbot/agenticResume/reviewResume";
 // import { refineResume } from "@/app/lib/chatbot/agenticResume/refineResume";
-import { fetchResumeData } from "@/app/lib/chatbot/fetchCustomizedResume";
 import { ResumeOption } from "@/app/interfaces/Resume";
 import { RESUME_OPTIONS } from "@/app/config";
 import toast from "react-hot-toast";
-import { downloadResumePdf, getMasterResume } from "@/lib/s3-file-loader";
+import { downloadResumePdf } from "@/lib/s3-file-loader";
 import purify from "dompurify";
 import { themeClasses } from "@/app/styles/themeClasses";
 import { AnimatedGlassWindow } from "@/components/ui/AnimatedGlassWindow";
@@ -81,12 +79,17 @@ export function ResumeButton({
     try {
       setLoading("Custom");
 
-      const masterData = await getMasterResume();
-      const masterDataStr = JSON.stringify(masterData);
+      const response = await fetch("/api/resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobDescription: sanitizedJobDescription }),
+      });
 
-      const finalData = await fetchResumeData(sanitizedJobDescription, masterDataStr);
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
 
-      const blob = await generateResume(finalData);
+      const blob = await response.blob();
 
       toast.success("Resume generated!", { id: toastId });
 

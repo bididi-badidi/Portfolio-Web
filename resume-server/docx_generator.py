@@ -6,7 +6,6 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Pt, RGBColor, Inches
-from docx.oxml.ns import nsmap
 
 FONT_FAMILY = "Times New Roman"
 CONTENT_PT = 10
@@ -35,7 +34,9 @@ def _set_spacing(paragraph, before_pt=0, after_pt=0, line_rule=None):
         pf.space_after = Pt(after_pt)
 
 
-def _parse_rich_text(paragraph, text: str, size_pt: float = CONTENT_PT, bold_override: bool = False):
+def _parse_rich_text(
+    paragraph, text: str, size_pt: float = CONTENT_PT, bold_override: bool = False
+):
     parts = re.split(r"(\*\*.*?\*\*)", text)
     for part in parts:
         if part.startswith("**") and part.endswith("**"):
@@ -93,7 +94,11 @@ def _section(doc: Document, title: str, entries: list):
         return
     _section_title(doc, title)
     for entry in entries:
-        header = f"{entry['title']} | {entry['role']}" if entry.get("role") else entry["title"]
+        header = (
+            f"{entry['title']} | {entry['role']}"
+            if entry.get("role")
+            else entry["title"]
+        )
         _subheading(doc, header, entry["date"])
         for bullet in entry.get("bullets", []):
             _bullet(doc, bullet)
@@ -141,7 +146,11 @@ def generate_docx(data: dict) -> bytes:
             label_run.font.size = Pt(CONTENT_PT)
 
             # Hyperlink
-            r_id = links_p.part.relate_to(link["url"], "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink", is_external=True)
+            r_id = links_p.part.relate_to(
+                link["url"],
+                "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink",
+                is_external=True,
+            )
             hyperlink = OxmlElement("w:hyperlink")
             hyperlink.set(qn("r:id"), r_id)
             r = OxmlElement("w:r")

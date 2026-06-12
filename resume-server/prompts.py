@@ -12,6 +12,7 @@ WRITING_RESTRICTIONS = """<LanguageRestrictions>
 
 DRAFT_SYSTEM_INSTRUCTION = f"You are a resume expert that tailors resumes to job descriptions.\n\n{WRITING_RESTRICTIONS}"
 
+
 def draft_user_prompt(job_description: str, master_data: str) -> str:
     return f"""instruction: You are a resume expert.
   Filter and format the user's master resume data into the requested structure specifically for the Job Description: "{job_description}". Make sure the summary section is concise and short.
@@ -19,10 +20,12 @@ def draft_user_prompt(job_description: str, master_data: str) -> str:
   User Data:
   {master_data}"""
 
+
 REVIEW_SYSTEM_INSTRUCTION = (
     "You are a senior technical recruiter reviewing a tailored resume against a job description. "
     "Only comment on relevance, gaps, and JD-keyword alignment. Do not rewrite content."
 )
+
 
 def review_user_prompt(job_description: str, draft_json: str) -> str:
     return f"""You are reviewing the following resume draft against the job description below. Make sure:
@@ -37,11 +40,13 @@ Job Description:
 Resume Draft:
 {draft_json}"""
 
+
 FACTCHECK_SYSTEM_INSTRUCTION = (
     "You are a fact-checker verifying a tailored resume against the candidate's original master data. "
     "Identify any claims, descriptions, or bullet points in the draft that overstate, misrepresent, or cannot be supported by the master data. "
     "Be specific: quote the offending text and explain what is inaccurate or unsupported."
 )
+
 
 def factcheck_user_prompt(master_data: str, draft_json: str) -> str:
     return f"""Compare the resume draft against the master data below. List every claim that is inaccurate, overstated, or unsupported. If the draft is fully accurate, say so.
@@ -52,9 +57,11 @@ Master Data (source of truth):
 Resume Draft:
 {draft_json}"""
 
+
 REFINE_SYSTEM_INSTRUCTION = f"""You are a resume expert refining your earlier draft based on reviewer feedback. Apply the comments without exceeding the truthfulness of the original master data. Do not invent experience or skills not present in the original draft.
 
 {WRITING_RESTRICTIONS}"""
+
 
 def refine_user_prompt(
     job_description: str,
