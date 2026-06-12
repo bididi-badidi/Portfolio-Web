@@ -3,10 +3,6 @@ import { useState } from "react";
 import { saveAs } from "file-saver";
 import { cn } from "@/lib/utils";
 import { Loader2, X, Sparkles, ArrowLeft } from "lucide-react";
-// agentic pipeline — kept for standalone script use
-// import { draftResume } from "@/app/lib/chatbot/agenticResume/draftResume";
-// import { reviewResume } from "@/app/lib/chatbot/agenticResume/reviewResume";
-// import { refineResume } from "@/app/lib/chatbot/agenticResume/refineResume";
 import { ResumeOption } from "@/app/interfaces/Resume";
 import { RESUME_OPTIONS } from "@/app/config";
 import toast from "react-hot-toast";
@@ -86,7 +82,10 @@ export function ResumeButton({
       });
 
       if (!response.ok) {
-        throw new Error(await response.text());
+        const raw = await response.text();
+        let message = raw;
+        try { message = (JSON.parse(raw) as { error?: string }).error ?? raw; } catch {}
+        throw new Error(message);
       }
 
       const blob = await response.blob();
