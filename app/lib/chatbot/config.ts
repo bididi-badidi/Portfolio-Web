@@ -6,7 +6,7 @@ const parseBooleanConfig = (value: string | boolean | undefined): boolean => {
   if (typeof value === "boolean") return value;
   return value?.toLowerCase() === "true";
 };
-
+export const GEMINI_DEFAULT_TIMEOUT_MS = 15000;
 export const DEBUG_MODE = parseBooleanConfig(envClient.NEXT_PUBLIC_DEV_MODE);
 export const GEMINI_API_VERBOSE_MODE = DEBUG_MODE;
 

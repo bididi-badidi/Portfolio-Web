@@ -50,6 +50,13 @@ Detailed case format and evaluator setup:
 
 - [testdata/chatbot-golden-live/README.md](./testdata/chatbot-golden-live/README.md)
 
+### Running Agentic Resume Generation
+
+```bash
+bun --env-file=.env.local run scripts/run-agentic-resume.ts --jd=
+bun --env-file=.env.local run scripts/run-agentic-resume.ts --jd-file=testdata/resume/test-jd.txt
+```
+
 ### Unit Tests
 
 Run all tests:

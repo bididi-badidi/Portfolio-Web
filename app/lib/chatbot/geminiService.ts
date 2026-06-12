@@ -2,16 +2,15 @@ import { getErrorMessage } from "@/app/utils/handleReport";
 import { gemini_client as ai } from "@/lib/gemini";
 import type { GenerateContentConfig } from "./geminiTypes";
 import { MAX_RETRY_COUNT } from "@/app/config/api";
-import { GEMINI_API_VERBOSE_MODE } from "./config";
-
-const GEMINI_TIMEOUT_MS = 15000;
+import { GEMINI_API_VERBOSE_MODE, GEMINI_DEFAULT_TIMEOUT_MS } from "./config";
 
 export class GeminiService {
   static async generateContent(
     model: string,
     contents: string | any[], // eslint-disable-line @typescript-eslint/no-explicit-any
     config?: GenerateContentConfig,
-    retries: number = MAX_RETRY_COUNT
+    retries: number = MAX_RETRY_COUNT,
+    timeout_ms: number = GEMINI_DEFAULT_TIMEOUT_MS,
   ) {
     let lastError: unknown;
     for (let attempt = 0; attempt < retries; attempt++) {
@@ -31,9 +30,7 @@ export class GeminiService {
             contents,
             config,
           }),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("Gemini API timeout")), GEMINI_TIMEOUT_MS)
-          ),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Gemini API timeout")), timeout_ms)),
         ]);
 
         if (GEMINI_API_VERBOSE_MODE) {
@@ -54,7 +51,8 @@ export class GeminiService {
     contents: string | any[], // eslint-disable-line @typescript-eslint/no-explicit-any
     systemInstruction: string,
     schema: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-    retries: number = MAX_RETRY_COUNT
+    retries: number = MAX_RETRY_COUNT,
+    timeout_ms: number = GEMINI_DEFAULT_TIMEOUT_MS,
   ): Promise<T> {
     const response = await this.generateContent(
       model,
@@ -64,7 +62,8 @@ export class GeminiService {
         responseMimeType: "application/json",
         responseSchema: schema,
       },
-      retries
+      retries,
+      timeout_ms,
     );
 
     const text = response.text;
