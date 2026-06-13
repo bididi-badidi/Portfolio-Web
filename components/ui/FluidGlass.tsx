@@ -8,7 +8,6 @@ interface FluidGlassProps {
   children?: React.ReactNode;
   className?: string;
   containerClassName?: string;
-  intensity?: number; // 0 to 1
   tintColor?: string;
   borderRadius?: string;
 }
@@ -59,9 +58,6 @@ export const FluidGlass: React.FC<FluidGlassProps> = ({
           className,
         )}
       >
-        {/* Fluid Highlight Layer */}
-        <motion.div className="absolute inset-0 pointer-events-none" />
-
         <div className="relative z-10 w-full h-full flex flex-col">{children}</div>
       </motion.div>
     </div>

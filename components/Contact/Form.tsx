@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Label } from "./Label";
 import { Input } from "./Input";
 import { cn } from "@/app/utils/cn";
@@ -12,11 +12,21 @@ import { Send } from "lucide-react";
 
 export function Form() {
   const form = useRef<HTMLFormElement>(null);
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (form.current) {
-      sendFormEmail({ formDetails: form.current });
+    if (!form.current || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await sendFormEmail({ formDetails: form.current });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   return (
@@ -52,6 +62,7 @@ export function Form() {
             className="group/btn mt-4 h-11 w-full"
             contentClassName="gap-2"
             type="submit"
+            disabled={isSubmitting}
           >
             <Send className="h-4 w-4" aria-hidden="true" />
             Send Email
