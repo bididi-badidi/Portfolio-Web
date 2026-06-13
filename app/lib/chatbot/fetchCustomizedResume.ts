@@ -40,9 +40,9 @@ export const fetchResumeData = async (job_description: string, master_data: stri
   const resumeModel = envClient.NEXT_PUBLIC_GEMINI_MODEL_RESUME ?? envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT;
 
   const prompt = `instruction: You are a resume expert. 
-  Filter and format the user's master resume data into the requested structure specifically for the Job Description: "${job_description}".
+  Filter and format the user's master resume data into the requested structure specifically for the Job Description: "${job_description}". Maximum 2 points for each project or experience.
   
-  User Master Data:
+  User Data:
   ${master_data}`;
 
   const result = await generateChatbotObject({

@@ -1,0 +1,77 @@
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git status(?: [^;&|<>]*)?\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git diff(?: [^;&|<>]*)?\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git log(?: [^;&|<>]*)?\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git show(?: [^;&|<>]*)?\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git branch\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git branch --show-current\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git rev-parse(?: [^;&|<>]+)?\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git remote -v\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git remote get-url origin\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git ls-files(?: [^;&|<>]*)?\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git worktree list\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git fetch origin\""
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandRegex = "git fetch --prune origin\""
+decision = "allow"
+priority = 100

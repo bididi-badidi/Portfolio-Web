@@ -1,4 +1,9 @@
 {
+  "policyPaths": [".gemini/policies"],
+  "skills": {
+    "enabled": true,
+    "disabled": []
+  },
   "mcp": {
     "allowed": ["memory"],
     "excluded": []

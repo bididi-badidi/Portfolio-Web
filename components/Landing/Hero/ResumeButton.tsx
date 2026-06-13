@@ -3,12 +3,10 @@ import { useState } from "react";
 import { saveAs } from "file-saver";
 import { cn } from "@/lib/utils";
 import { Loader2, X, Sparkles, ArrowLeft } from "lucide-react";
-import { generateResume } from "@/lib/docx";
-import { fetchResumeData } from "@/app/lib/chatbot/fetchCustomizedResume";
 import { ResumeOption } from "@/app/interfaces/Resume";
 import { RESUME_OPTIONS } from "@/app/config";
 import toast from "react-hot-toast";
-import { downloadResumePdf, getMasterResume } from "@/lib/s3-file-loader";
+import { downloadResumePdf } from "@/lib/s3-file-loader";
 import purify from "dompurify";
 import { themeClasses } from "@/app/styles/themeClasses";
 import { AnimatedGlassWindow } from "@/components/ui/AnimatedGlassWindow";
@@ -72,44 +70,38 @@ export function ResumeButton({
     if (!jobDescription.trim()) return;
 
     const sanitizedJobDescription = purify.sanitize(jobDescription);
-
-    const toastId = toast.loading("Fetching Required Data...");
+    const toastId = toast.loading("Generating resume...");
 
     try {
       setLoading("Custom");
-      const master_data = await getMasterResume();
 
-      toast.loading("Initializing prompts...", { id: toastId });
+      const response = await fetch("/api/resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobDescription: sanitizedJobDescription }),
+      });
 
-      setTimeout(() => {
-        toast.loading("Handpicking Experiences..", { id: toastId });
-      }, 4000);
+      if (!response.ok) {
+        const raw = await response.text();
+        let message = raw;
+        try { message = (JSON.parse(raw) as { error?: string }).error ?? raw; } catch {}
+        throw new Error(message);
+      }
 
-      setTimeout(() => {
-        toast.loading("Phrasing Details...", { id: toastId });
-      }, 8000);
+      const blob = await response.blob();
 
-      const customized_data = await fetchResumeData(sanitizedJobDescription, JSON.stringify(master_data));
-      if (!customized_data) throw new Error("No data returned from LLM");
-
-      toast.loading("Generating Resume...", { id: toastId });
-      const blob = await generateResume(customized_data);
-
-      toast.loading("Finalizing...", { id: toastId });
-
-      await new Promise((resolve) => setTimeout(resolve, 500));
       toast.success("Resume generated!", { id: toastId });
 
       await new Promise((resolve) => setTimeout(resolve, 500));
-      saveAs(blob, `zi_shen_chan_custom_resume.docx`);
+      saveAs(blob, "zi_shen_chan_custom_resume.docx");
 
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setIsOpen(false);
       setShowCustomInput(false);
       setJobDescription("");
     } catch (error) {
-      console.error("Resume generation failed:", error);
-      toast.error("Resume generated failed. Please try again later.", {
+      console.error("Resume generation failed (client):", error);
+      toast.error("Something went wrong generating your resume. Please try again later.", {
         id: toastId,
       });
     } finally {
