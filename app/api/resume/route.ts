@@ -3,7 +3,7 @@ import { envServer } from "@/app/env/server";
 import { getErrorMessage } from "@/app/utils/handleReport";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
@@ -32,10 +32,7 @@ export async function POST(request: NextRequest) {
 
       if (!response.ok) {
         const details = await response.text();
-        return NextResponse.json(
-          { error: details || "Resume server request failed" },
-          { status: response.status },
-        );
+        return NextResponse.json({ error: details || "Resume server request failed" }, { status: response.status });
       }
 
       if (!response.body) {
@@ -55,9 +52,8 @@ export async function POST(request: NextRequest) {
       clearTimeout(timeout);
     }
   } catch (err) {
-    const message = err instanceof DOMException && err.name === "AbortError"
-      ? "Resume generation timed out"
-      : getErrorMessage(err);
+    const message =
+      err instanceof DOMException && err.name === "AbortError" ? "Resume generation timed out" : getErrorMessage(err);
 
     console.error(`resume API error: ${message}`);
     return NextResponse.json({ error: message }, { status: 500 });
