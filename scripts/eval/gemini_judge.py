@@ -5,14 +5,13 @@ from typing import Any
 
 import google.generativeai as genai
 from langchain_core.language_models.llms import LLM
-from pydantic import ConfigDict, PrivateAttr
+from pydantic.v1 import PrivateAttr
 
 
 class GeminiJudge(LLM):
     """LangChain-compatible Gemini judge for RAGAS metric prompts."""
 
     model_name: str | None = None
-    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     _model: genai.GenerativeModel = PrivateAttr()
 
