@@ -36,7 +36,7 @@ env:
   NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER || 'gemini-1.5-flash' }}
   NEXT_PUBLIC_GEMINI_MODEL_RESUME: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_RESUME || 'gemini-1.5-flash' }}
   NEXT_PUBLIC_GEMINI_MODEL_JUDGE: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_JUDGE || 'gemini-1.5-flash' }}
-  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'dummy-key' }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   REMINDER_API_TOKEN: "dummy-token"
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
   AWS_ACCESS_KEY_ID: "dummy-key-id"
@@ -62,6 +62,13 @@ jobs:
           python-version: "3.12"
           cache: "pip"
           cache-dependency-path: "scripts/eval/requirements.txt"
+
+      - name: Validate Gemini API key
+        if: env.GEMINI_API_KEY == ''
+        run: |
+          echo "::error::GEMINI_API_KEY repository secret is required for live RAGAS scoring."
+          echo "Add the secret in GitHub Actions settings, or run the Python harness locally without EVAL_BASE_URL for offline plumbing checks."
+          exit 1
 
       - name: Install Node dependencies
         run: bun install --frozen-lockfile

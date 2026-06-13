@@ -63,3 +63,5 @@ non-zero when a metric falls below its threshold.
 Because offline mode scores `answer = ground_truth`, all metrics are expected to
 be `1.0` and should only be used to validate harness plumbing. Replace it with
 a live RAGAS baseline after intentionally accepting model and prompt behavior.
+Track that replacement as `TODO(issue-34-follow-up)` when CI has a configured
+`GEMINI_API_KEY` and the first API-backed report has been reviewed.
