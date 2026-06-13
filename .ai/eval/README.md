@@ -21,12 +21,18 @@ python scripts/eval/ragas_eval.py --feature all --out .ai/eval/reports
 
 Without `EVAL_BASE_URL`, the runner uses each example's `ground_truth` as the
 answer. That mode is useful for validating dataset shape, report generation,
-and threshold handling without API keys. With `EVAL_BASE_URL`, collectors call:
+and threshold handling without API keys. Reports from that path are marked
+`lexical-offline-placeholder` and are not a model-quality signal.
+
+With `EVAL_BASE_URL`, collectors call:
 
 - `POST /api/eval/chatbot`
 - `POST /api/eval/resume`
 
-Both routes require `EVAL_MODE=1`.
+Both routes require `EVAL_MODE=1`. Live/API answers are scored with the actual
+`ragas` library. RAGAS judge prompts are sent to Gemini through
+`scripts/eval/gemini_judge.py`; metrics that need embeddings use a local
+deterministic hashing adapter so the harness does not fall back to OpenAI.
 
 ## Refresh Knowledge Fixtures
 
@@ -53,5 +59,7 @@ requirements that would be costly to catch manually.
 `thresholds.json` defines the minimum aggregate metric scores. The runner exits
 non-zero when a metric falls below its threshold.
 
-`baseline.json` captures the initial committed reference scores. Update it only
-after intentionally accepting new model or prompt behavior.
+`baseline.json` currently captures the committed offline placeholder scores.
+Because offline mode scores `answer = ground_truth`, all metrics are expected to
+be `1.0` and should only be used to validate harness plumbing. Replace it with
+a live RAGAS baseline after intentionally accepting model and prompt behavior.

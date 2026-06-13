@@ -22,7 +22,9 @@ def collect_chatbot_answer(example: dict[str, Any]) -> dict[str, Any]:
         json={
             "question": example["question"],
             "contexts": example.get("contexts", []),
-            "enableFunctionCalling": example.get("metadata", {}).get("enableFunctionCalling", True),
+            "enableFunctionCalling": example.get("metadata", {}).get(
+                "enableFunctionCalling", True
+            ),
         },
         timeout=90,
     )

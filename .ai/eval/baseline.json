@@ -1,4 +1,5 @@
 {
+  "_comment": "Offline lexical placeholder only: this baseline scores answer = ground_truth, so all 1.0 values validate harness plumbing rather than real model quality. Replace with a live RAGAS baseline after an API-backed run.",
   "captured_at": "2026-06-13",
   "model": "offline-lexical-baseline",
   "chatbot": {

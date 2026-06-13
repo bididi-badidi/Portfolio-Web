@@ -1,18 +1,23 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from typing import Any
 
 import google.generativeai as genai
+from langchain_core.language_models.llms import LLM
+from pydantic import ConfigDict, PrivateAttr
 
 
-@dataclass
-class GeminiJudge:
-    """Small Gemini wrapper used by custom eval code and future RAGAS adapters."""
+class GeminiJudge(LLM):
+    """LangChain-compatible Gemini judge for RAGAS metric prompts."""
 
     model_name: str | None = None
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def __post_init__(self) -> None:
+    _model: genai.GenerativeModel = PrivateAttr()
+
+    def __init__(self, **data: Any) -> None:
+        super().__init__(**data)
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             raise RuntimeError("GEMINI_API_KEY is required for Gemini judge calls")
@@ -28,6 +33,24 @@ class GeminiJudge:
         self._model = genai.GenerativeModel(model_name)
         self.model_name = model_name
 
-    def generate(self, prompt: str) -> str:
+    @property
+    def _llm_type(self) -> str:
+        return "gemini-judge"
+
+    @property
+    def _identifying_params(self) -> dict[str, Any]:
+        return {"model_name": self.model_name}
+
+    def _call(
+        self,
+        prompt: str,
+        stop: list[str] | None = None,
+        **_: Any,
+    ) -> str:
         response = self._model.generate_content(prompt)
-        return getattr(response, "text", "") or ""
+        text = getattr(response, "text", "") or ""
+        if stop:
+            for token in stop:
+                if token in text:
+                    text = text.split(token, 1)[0]
+        return text
