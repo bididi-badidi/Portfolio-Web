@@ -4,8 +4,8 @@ import { mockGeminiGenerateContent } from "../../../../../bun-test-setup";
 
 import { fetchExcDecisionStruct } from "../../fetchFunctionApproval";
 
-const APPROVED_RESPONSE = JSON.stringify({ approve: true, reason: "User explicitly requested this." });
-const DENIED_RESPONSE = JSON.stringify({ approve: false, reason: "Action is potentially harmful." });
+const APPROVED_RESPONSE = { approve: true, reason: "User explicitly requested this." };
+const DENIED_RESPONSE = { approve: false, reason: "Action is potentially harmful." };
 
 describe("fetchExcDecisionStruct", () => {
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe("fetchExcDecisionStruct", () => {
 
   it("should return approve: true when Gemini approves the function call", async () => {
     mockGeminiGenerateContent.mockImplementation(() =>
-      Promise.resolve({ text: APPROVED_RESPONSE })
+      Promise.resolve({ object: APPROVED_RESPONSE })
     );
 
     const result = await fetchExcDecisionStruct(
@@ -29,7 +29,7 @@ describe("fetchExcDecisionStruct", () => {
 
   it("should return approve: false when Gemini denies the function call", async () => {
     mockGeminiGenerateContent.mockImplementation(() =>
-      Promise.resolve({ text: DENIED_RESPONSE })
+      Promise.resolve({ object: DENIED_RESPONSE })
     );
 
     const result = await fetchExcDecisionStruct(
@@ -57,39 +57,9 @@ describe("fetchExcDecisionStruct", () => {
     expect(result.reason).toBe("Failed to fetch decision");
   });
 
-  it("should return approve: false fallback when Gemini returns invalid JSON", async () => {
-    mockGeminiGenerateContent.mockImplementation(() =>
-      Promise.resolve({ text: "not-valid-json{{" })
-    );
-
-    const result = await fetchExcDecisionStruct(
-      "conversation",
-      { name: "SendEmail", args: {} },
-      "desc"
-    );
-
-    expect(result.approve).toBe(false);
-    expect(result.reason).toBe("Failed to fetch decision");
-  });
-
-  it("should return approve: false fallback when Gemini returns empty text", async () => {
-    mockGeminiGenerateContent.mockImplementation(() =>
-      Promise.resolve({ text: "" })
-    );
-
-    const result = await fetchExcDecisionStruct(
-      "conversation",
-      { name: "AddNewReminder", args: {} },
-      "desc"
-    );
-
-    expect(result.approve).toBe(false);
-    expect(result.reason).toBe("Failed to fetch decision");
-  });
-
   it("should include the function call name in the prompt sent to Gemini", async () => {
     mockGeminiGenerateContent.mockImplementation(() =>
-      Promise.resolve({ text: APPROVED_RESPONSE })
+      Promise.resolve({ object: APPROVED_RESPONSE })
     );
 
     await fetchExcDecisionStruct(

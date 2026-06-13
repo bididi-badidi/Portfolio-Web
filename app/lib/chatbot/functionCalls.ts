@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { FunctionCallType } from "@/app/enums/functionCall";
-// import { ProjectDemoType } from "@/app/enums/projectDemo";
+import { ProjectDemoType } from "@/app/enums/projectDemo";
 
 export const funcSysMsgDict = new Map<string, string>();
 funcSysMsgDict.set(
@@ -94,9 +94,23 @@ const sendEmailDeclaration = tool({
   }),
 });
 
+const showProjectDemoDeclaration = tool({
+  description: FunctionCallType.ShowProjectDemo.description,
+  inputSchema: z.object({
+    name: z
+      .enum([
+        ProjectDemoType.PersonalAI,
+        ProjectDemoType.ReminderApi,
+        ProjectDemoType.Xcuisite,
+      ])
+      .describe("The project demo to open for the user."),
+  }),
+});
+
 export const functionCallTools = {
   [FunctionCallType.SendEmail.name]: sendEmailDeclaration,
   [FunctionCallType.NavigateProjects.name]: navigateProjectsDeclaration,
   [FunctionCallType.NavigateSection.name]: navigateSectionDeclaration,
   [FunctionCallType.AddNewReminder.name]: addNewReminderDeclaration,
+  [FunctionCallType.ShowProjectDemo.name]: showProjectDemoDeclaration,
 };

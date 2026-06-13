@@ -6,9 +6,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateObject, generateText, type FlexibleSchema, type ToolSet } from "ai";
 import { envServer } from "@/app/env/server";
 import { MAX_RETRY_COUNT } from "@/app/config/api";
-import { GEMINI_API_VERBOSE_MODE } from "./config";
-
-const CHATBOT_AI_TIMEOUT_MS = 15000;
+import { GEMINI_API_VERBOSE_MODE, GEMINI_DEFAULT_TIMEOUT_MS } from "./config";
 
 const google = createGoogleGenerativeAI({
   apiKey: envServer.GEMINI_API_KEY,
@@ -45,7 +43,7 @@ function googleModel(model: GoogleTextModelId) {
 }
 
 function timeoutSignal() {
-  return AbortSignal.timeout(CHATBOT_AI_TIMEOUT_MS);
+  return AbortSignal.timeout(GEMINI_DEFAULT_TIMEOUT_MS);
 }
 
 export async function generateChatbotText<TOOLS extends ToolSet = ToolSet>({

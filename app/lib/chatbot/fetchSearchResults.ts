@@ -37,7 +37,7 @@ export async function fetchStructQueryPrompt(
   fallbackQuery: string,
 ): Promise<QueryStructure> {
   try {
-    const queryModel = process.env.NEXT_PUBLIC_GEMINI_MODEL_QUERY
+    const queryModel = envClient.NEXT_PUBLIC_GEMINI_MODEL_QUERY
       || envClient.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT;
     const result = await generateChatbotObject({
       model: queryModel,
