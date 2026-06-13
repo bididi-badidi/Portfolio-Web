@@ -1,0 +1,67 @@
+{
+  "header": {
+    "name": "Zishen Chan",
+    "contact": "zshen2002@example.com",
+    "links": [
+      {
+        "label": "GitHub",
+        "text": "github.com/bididi-badidi",
+        "url": "https://github.com/bididi-badidi"
+      }
+    ]
+  },
+  "education": [
+    {
+      "institution": "Singapore University of Technology and Design",
+      "degree": "Computer Science and Design",
+      "gpa": "N/A",
+      "date": "Expected 2026"
+    }
+  ],
+  "summary": "AI-focused software engineer building LLM applications, automation workflows, and polished web products.",
+  "Work Experiences & Internships": [
+    {
+      "title": "AI Engineering Internship",
+      "role": "Software Engineer Intern",
+      "date": "2025",
+      "bullets": [
+        "Built LLM-backed workflow tooling with TypeScript and Python.",
+        "Improved reliability through tests, structured prompts, and evaluation checks."
+      ]
+    }
+  ],
+  "Personal Projects": [
+    {
+      "title": "Personal AI Portfolio Chatbot",
+      "role": "Creator",
+      "date": "2026",
+      "bullets": [
+        "Implemented a Gemini RAG chatbot with controlled function calls.",
+        "Used AWS S3 knowledge fixtures and Next.js server actions."
+      ]
+    },
+    {
+      "title": "Automation Manager",
+      "role": "Creator",
+      "date": "2026",
+      "bullets": [
+        "Designed automation workflows for repeatable operational tasks."
+      ]
+    }
+  ],
+  "Leadership Experiences": [
+    {
+      "title": "Project Team Lead",
+      "role": "Lead Developer",
+      "date": "2025",
+      "bullets": [
+        "Coordinated implementation plans and maintained delivery quality."
+      ]
+    }
+  ],
+  "skills": {
+    "Technical": "TypeScript, React, Next.js, Python, Gemini, AWS, Azure, RAG, LLM evaluation",
+    "Soft Skills": "Communication, planning, ownership",
+    "Interests": "AI systems, automation, developer tools"
+  }
+}

@@ -57,6 +57,12 @@ bun --env-file=.env.local run scripts/run-agentic-resume.ts --jd=
 bun --env-file=.env.local run scripts/run-agentic-resume.ts --jd-file=testdata/resume/test-jd.txt
 ```
 
+### Evaluation
+
+RAGAS-style quality checks for the chatbot and resume generation live in
+[`.ai/eval/README.md`](./.ai/eval/README.md). The harness writes JSON, CSV, and
+Markdown reports and is wired into `.github/workflows/ragas-eval.yml`.
+
 ### Unit Tests
 
 Run all tests:

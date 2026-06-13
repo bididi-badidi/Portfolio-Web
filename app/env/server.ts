@@ -12,6 +12,7 @@ export const envServer = createEnv({
     AWS_BUCKET_NAME: z.string(),
     RESUME_SERVER_URL: z.string().url(),
     RESUME_API_KEY: z.string(),
+    EVAL_MODE: z.string().optional(),
   },
   experimental__runtimeEnv: {
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
@@ -22,5 +23,6 @@ export const envServer = createEnv({
     AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
     RESUME_SERVER_URL: process.env.RESUME_SERVER_URL,
     RESUME_API_KEY: process.env.RESUME_API_KEY,
+    EVAL_MODE: process.env.EVAL_MODE,
   },
 });

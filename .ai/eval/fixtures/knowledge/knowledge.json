@@ -1,0 +1,72 @@
+[
+  {
+    "id": "bio",
+    "category": "general",
+    "title": "Zishen Chan profile",
+    "date": "2026-06-13",
+    "tech_stack": ["React", "Next.js", "TypeScript", "Python", "Gemini"],
+    "content": "Zishen Chan builds AI-enabled software products, portfolio tooling, automation systems, and developer workflows. His work emphasizes practical agentic systems, reliable evaluation, and user-facing product polish.",
+    "summary": "AI-focused software engineer building portfolio projects, automation, and LLM systems.",
+    "importance_score": 10
+  },
+  {
+    "id": "personal-ai",
+    "category": "project",
+    "title": "Personal AI",
+    "date": "2026-06-13",
+    "tech_stack": ["Next.js", "Gemini", "AWS S3", "RAG"],
+    "content": "Personal AI is a portfolio chatbot that answers questions about Zishen using a Gemini-powered RAG pipeline. It detects function calls, synthesizes search queries, retrieves portfolio knowledge, validates actions, and generates final answers.",
+    "summary": "Gemini RAG chatbot for portfolio Q&A and controlled function calls.",
+    "importance_score": 10
+  },
+  {
+    "id": "remainder-api",
+    "category": "project",
+    "title": "Remainder API",
+    "date": "2026-06-13",
+    "tech_stack": ["API design", "Scheduling", "Automation"],
+    "content": "Remainder API supports reminder creation and scheduling workflows. It is integrated into the portfolio chatbot so users can ask to create reminders through a controlled function-call flow.",
+    "summary": "Reminder scheduling API integrated with chatbot actions.",
+    "importance_score": 8
+  },
+  {
+    "id": "automation-manager",
+    "category": "project",
+    "title": "Automation Manager",
+    "date": "2026-06-13",
+    "tech_stack": ["Python", "Automation", "Workflow orchestration"],
+    "content": "Automation Manager coordinates repeatable tasks and operational workflows. It focuses on reducing manual effort with structured automation and clear control surfaces.",
+    "summary": "Workflow automation project for repeatable operational tasks.",
+    "importance_score": 7
+  },
+  {
+    "id": "stock-ai",
+    "category": "project",
+    "title": "Stock AI",
+    "date": "2026-06-13",
+    "tech_stack": ["AI", "Data analysis", "Finance"],
+    "content": "Stock AI explores AI-assisted analysis for market-related information. It is positioned as an applied AI and data interpretation project, not as financial advice.",
+    "summary": "AI-assisted stock and market analysis project.",
+    "importance_score": 7
+  },
+  {
+    "id": "shortcuts",
+    "category": "project",
+    "title": "Shortcuts",
+    "date": "2026-06-13",
+    "tech_stack": ["Apple Shortcuts", "iOS automation"],
+    "content": "Shortcuts showcases personal productivity automations built around Apple Shortcuts and lightweight integrations.",
+    "summary": "iOS and personal productivity automation examples.",
+    "importance_score": 6
+  },
+  {
+    "id": "skills",
+    "category": "skills",
+    "title": "Technical skills",
+    "date": "2026-06-13",
+    "tech_stack": ["TypeScript", "React", "Next.js", "Python", "Azure", "AWS", "LLM evaluation"],
+    "content": "Zishen works across frontend product engineering, TypeScript and React applications, Python automation, LLM integrations, RAG systems, cloud services, and evaluation harnesses.",
+    "summary": "Full-stack and AI engineering skills with cloud and evaluation experience.",
+    "importance_score": 9
+  }
+]

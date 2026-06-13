@@ -1,0 +1,140 @@
+name: RAGAS Eval
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  pull_request:
+    paths:
+      - "app/lib/chatbot/**"
+      - "app/api/resume/**"
+      - "app/api/eval/**"
+      - "lib/gemini.ts"
+      - "lib/s3-file-loader.ts"
+      - "scripts/eval/**"
+      - ".ai/eval/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  EVAL_MODE: "1"
+  EVAL_BASE_URL: "http://127.0.0.1:3000"
+  NEXT_PUBLIC_DEV_MODE: "false"
+  NEXT_PUBLIC_EMAILJS_SERVICE_ID: "dummy-service"
+  NEXT_PUBLIC_EMAILJS_TEMPLATE_ID: "dummy-template"
+  NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: "dummy-key"
+  NEXT_PUBLIC_AZURE_REMINDER_API_URL: "https://dummy-url.com"
+  NEXT_PUBLIC_LOCAL_REMINDER_API_URL: "http://localhost:3000"
+  NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT || 'gemini-1.5-flash' }}
+  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL || 'gemini-1.5-flash' }}
+  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER || 'gemini-1.5-flash' }}
+  NEXT_PUBLIC_GEMINI_MODEL_RESUME: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_RESUME || 'gemini-1.5-flash' }}
+  NEXT_PUBLIC_GEMINI_MODEL_JUDGE: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_JUDGE || 'gemini-1.5-flash' }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'dummy-key' }}
+  REMINDER_API_TOKEN: "dummy-token"
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  AWS_ACCESS_KEY_ID: "dummy-key-id"
+  AWS_SECRET_ACCESS_KEY: "dummy-secret"
+  AWS_BUCKET_NAME: "dummy-bucket"
+  RESUME_SERVER_URL: "https://resume.invalid"
+  RESUME_API_KEY: "dummy-resume-key"
+
+jobs:
+  ragas-eval:
+    name: RAGAS quality gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: "scripts/eval/requirements.txt"
+
+      - name: Install Node dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Python eval dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r scripts/eval/requirements.txt
+
+      - name: Build app
+        run: bun run build
+
+      - name: Start app
+        run: |
+          bun run start > /tmp/portfolio-ragas-eval.log 2>&1 &
+          echo $! > /tmp/portfolio-ragas-eval.pid
+          for attempt in {1..60}; do
+            if curl --silent --fail "$EVAL_BASE_URL" >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/portfolio-ragas-eval.log
+          exit 1
+
+      - name: Run RAGAS eval
+        run: python scripts/eval/ragas_eval.py --feature all --out .ai/eval/reports
+
+      - name: Add summary
+        if: always()
+        run: |
+          if [ -f .ai/eval/reports/report.md ]; then
+            cat .ai/eval/reports/report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Comment on PR
+        if: always() && github.event_name == 'pull_request' && hashFiles('.ai/eval/reports/report.md') != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("node:fs");
+            const marker = "<!-- ragas-eval -->";
+            const body = fs.readFileSync(".ai/eval/reports/report.md", "utf8");
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const previous = comments.find((comment) => comment.body?.includes(marker));
+            if (previous) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: previous.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ragas-eval-report
+          path: .ai/eval/reports/*
+          if-no-files-found: warn
+          retention-days: 30

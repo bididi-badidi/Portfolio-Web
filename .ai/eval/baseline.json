@@ -1,0 +1,36 @@
+{
+  "captured_at": "2026-06-13",
+  "model": "offline-lexical-baseline",
+  "chatbot": {
+    "faithfulness": {
+      "score": 1.0,
+      "sample_size": 11
+    },
+    "answer_relevancy": {
+      "score": 1.0,
+      "sample_size": 11
+    },
+    "context_precision": {
+      "score": 1.0,
+      "sample_size": 11
+    },
+    "context_recall": {
+      "score": 1.0,
+      "sample_size": 11
+    }
+  },
+  "resume": {
+    "faithfulness": {
+      "score": 1.0,
+      "sample_size": 5
+    },
+    "answer_relevancy": {
+      "score": 1.0,
+      "sample_size": 5
+    },
+    "answer_correctness": {
+      "score": 1.0,
+      "sample_size": 5
+    }
+  }
+}
