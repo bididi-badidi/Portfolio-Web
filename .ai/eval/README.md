@@ -34,18 +34,85 @@ Both routes require `EVAL_MODE=1`. Live/API answers are scored with the actual
 `scripts/eval/gemini_judge.py`; metrics that need embeddings use a local
 deterministic hashing adapter so the harness does not fall back to OpenAI.
 
+During collection, the runner prints per-example progress for chatbot answers
+and resume drafts before RAGAS scoring starts.
+
+## Metrics
+
+| Feature | Metrics |
+| --- | --- |
+| chatbot | `faithfulness`, `answer_relevancy` |
+| resume | `faithfulness`, `answer_relevancy`, `answer_correctness` |
+
+Context precision and context recall are not evaluated — the full knowledge
+context is passed directly so retrieval ranking is not in scope.
+
+## Knowledge Context
+
+The chatbot eval route always returns the **full knowledge context** as the
+evaluation context, built from two fixture files:
+
+- `fixtures/knowledge/knowledge.json` — chatbot knowledge items (title, summary, content)
+- `fixtures/knowledge/master_resume.json` — structured resume data serialised section-by-section
+
+This means `faithfulness` measures whether the chatbot answer is grounded in the
+complete knowledge base, not just the chunks it happened to retrieve.
+
+## Sync Fixtures From S3
+
+Before evaluating, pull the latest knowledge and resume data from S3:
+
+```bash
+python scripts/eval/sync_fixtures.py
+```
+
+The script reads AWS credentials from `.env.local` (then `.env`) and downloads:
+
+| S3 key | Local fixture |
+| --- | --- |
+| `knowledge.json` | `fixtures/knowledge/knowledge.json` |
+| `master_data.json` | `fixtures/knowledge/master_resume.json` |
+
+If credentials are absent or set to placeholder values, the script skips the
+download and leaves the committed fixtures unchanged — safe for offline runs.
+
+You can override the S3 key for knowledge via `EVAL_KNOWLEDGE_S3_KEY`, and the
+fixture paths via `EVAL_KNOWLEDGE_FIXTURE_PATH` and `EVAL_RESUME_FIXTURE_PATH`.
+
+In CI, the workflow runs `sync_fixtures.py` automatically before the eval step
+using `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_BUCKET_NAME` secrets.
+
+## Local Answer Cache
+
+Live/API answers are cached under `.ai/eval/cache/` by default so repeated local
+runs do not call the app and Gemini for unchanged examples. The cache key
+includes the feature, example id, question, contexts, metadata, eval base URL,
+Gemini model env vars, and cache schema version.
+
+Refresh cached answers:
+
+```bash
+python scripts/eval/ragas_eval.py --feature all --refresh-cache
+```
+
+Disable the answer cache for one run:
+
+```bash
+python scripts/eval/ragas_eval.py --feature all --no-cache
+```
+
 ## Refresh Knowledge Fixtures
 
-The committed files in `.ai/eval/fixtures/knowledge/` are small text snapshots
-of the knowledge used by evaluation cases. To refresh them:
+The committed files in `.ai/eval/fixtures/knowledge/` are snapshots of the S3
+knowledge used for evaluation. To refresh them, run `sync_fixtures.py` (see
+above). After syncing:
 
-1. Export the current S3 knowledge files locally.
-2. Replace `knowledge.json` and `master_resume.json`.
-3. Update JSONL examples if source facts changed.
-4. Run `python scripts/eval/ragas_eval.py --feature all`.
-5. Rebaseline only after reviewing changed examples and scores.
+1. Update JSONL examples if source facts changed.
+2. Run `python scripts/eval/ragas_eval.py --feature all`.
+3. Rebaseline only after reviewing changed examples and scores.
 
-Generated reports under `.ai/eval/reports/` are ignored.
+Generated reports under `.ai/eval/reports/` and cached live answers under
+`.ai/eval/cache/` are ignored.
 
 ## Add A Golden Example
 
