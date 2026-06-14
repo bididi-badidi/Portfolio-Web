@@ -26,3 +26,4 @@ def test_gemini_judge_stores_private_model(monkeypatch) -> None:
 
     assert judge.model_name == "gemini-test"
     assert judge._call("score this") == "judge response"
+    assert judge._call("score this", None, object()) == "judge response"

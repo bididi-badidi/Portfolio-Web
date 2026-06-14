@@ -63,6 +63,17 @@ RAGAS-style quality checks for the chatbot and resume generation live in
 [`.ai/eval/README.md`](./.ai/eval/README.md). The harness writes JSON, CSV, and
 Markdown reports and is wired into `.github/workflows/ragas-eval.yml`.
 
+Run all evaluation cases locally with uv:
+
+```bash
+uv run --with-requirements scripts/eval/requirements.txt \
+  python scripts/eval/ragas_eval.py --feature all --out .ai/eval/reports
+```
+
+For live RAGAS scoring, start the app with `EVAL_MODE=1`, set `EVAL_BASE_URL`
+and `GEMINI_API_KEY`, then run the same command. Live answers are cached under
+`.ai/eval/cache/`; add `--refresh-cache` to collect fresh answers.
+
 ### Unit Tests
 
 Run all tests:

@@ -27,7 +27,7 @@ class GeminiJudge(LLM):
             or os.getenv("NEXT_PUBLIC_GEMINI_MODEL_JUDGE")
             or os.getenv("NEXT_PUBLIC_GEMINI_MODEL_REPLY")
             or os.getenv("NEXT_PUBLIC_GEMINI_MODEL_DEFAULT")
-            or "gemini-1.5-flash"
+            or "gemini-3.5-flash"
         )
         self._model = genai.GenerativeModel(model_name)
         self.model_name = model_name
@@ -44,6 +44,7 @@ class GeminiJudge(LLM):
         self,
         prompt: str,
         stop: list[str] | None = None,
+        run_manager: Any | None = None,
         **_: Any,
     ) -> str:
         response = self._model.generate_content(prompt)

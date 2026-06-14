@@ -47,6 +47,7 @@ next-env.d.ts
 # tests
 testdata/chatbot-golden-live/reports
 .ai/eval/reports/
+.ai/eval/cache/
 
 # local agent assets
 .ai/assets/branches
