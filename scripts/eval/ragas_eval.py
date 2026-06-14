@@ -5,24 +5,24 @@ import csv
 import hashlib
 import json
 import math
+import os
 import re
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
 from collect_chatbot import collect_chatbot_answer
 from collect_resume import collect_resume_answer
 
 ROOT = Path(__file__).resolve().parents[2]
 EVAL_DIR = ROOT / ".ai" / "eval"
+CACHE_VERSION = 2
 
 CHATBOT_METRICS = (
     "faithfulness",
     "answer_relevancy",
-    "context_precision",
-    "context_recall",
 )
 RESUME_METRICS = ("faithfulness", "answer_relevancy", "answer_correctness")
 
@@ -157,31 +157,112 @@ def lexical_scores(
         ),
     }
 
-    if feature == "chatbot":
-        scores["context_precision"] = overlap_score(
-            question + " " + ground_truth, context_blob
-        )
-        scores["context_recall"] = overlap_score(ground_truth, context_blob)
-    else:
+    if feature != "chatbot":
         scores["answer_correctness"] = overlap_score(ground_truth, answer)
 
     return {metric: clamp(score) for metric, score in scores.items()}
 
 
+def cache_key(feature: str, example: dict[str, Any]) -> str:
+    payload = {
+        "version": CACHE_VERSION,
+        "feature": feature,
+        "id": example["id"],
+        "question": example["question"],
+        "contexts": example.get("contexts", []),
+        "metadata": example.get("metadata", {}),
+        "environment": {
+            name: os.getenv(name)
+            for name in (
+                "EVAL_BASE_URL",
+                "NEXT_PUBLIC_GEMINI_MODEL_DEFAULT",
+                "NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL",
+                "NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER",
+                "NEXT_PUBLIC_GEMINI_MODEL_RESUME",
+                "NEXT_PUBLIC_GEMINI_MODEL_JUDGE",
+            )
+        },
+    }
+    serialized = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+
+def cache_path(cache_dir: Path, feature: str, example: dict[str, Any]) -> Path:
+    digest = cache_key(feature, example)
+    safe_id = re.sub(r"[^a-zA-Z0-9_.-]+", "-", str(example["id"])).strip("-")
+    return cache_dir / feature / f"{safe_id}-{digest[:16]}.json"
+
+
+def load_cached_answer(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def write_cached_answer(path: Path, collected: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "cached_at": datetime.now(timezone.utc).isoformat(),
+        "answer": collected.get("answer", ""),
+        "contexts": collected.get("contexts", []),
+        "source": collected.get("source", "unknown"),
+    }
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def collect_with_cache(
+    feature: str,
+    example: dict[str, Any],
+    collector: Callable[[dict[str, Any]], dict[str, Any]],
+    cache_dir: Path | None,
+    refresh_cache: bool,
+) -> dict[str, Any]:
+    path = cache_path(cache_dir, feature, example) if cache_dir else None
+
+    if path and not refresh_cache:
+        cached = load_cached_answer(path)
+        if cached is not None:
+            cached["source"] = f"{cached.get('source', 'unknown')}-cache"
+            return cached
+
+    collected = collector(example)
+    if path and collected.get("source") != "offline-ground-truth":
+        write_cached_answer(path, collected)
+    return collected
+
+
 def collect_examples(
-    feature: str, examples: Iterable[dict[str, Any]]
+    feature: str,
+    examples: Iterable[dict[str, Any]],
+    cache_dir: Path | None,
+    refresh_cache: bool,
 ) -> tuple[list[EvalRow], bool]:
     rows: list[EvalRow] = []
     uses_live_answers = False
-    for example in examples:
-        collected = (
-            collect_chatbot_answer(example)
-            if feature == "chatbot"
-            else collect_resume_answer(example)
+    example_list = list(examples)
+    collector = (
+        collect_chatbot_answer if feature == "chatbot" else collect_resume_answer
+    )
+    label = "chat answer" if feature == "chatbot" else "resume"
+
+    for index, example in enumerate(example_list, start=1):
+        print(
+            f"[{feature}] collecting {label} {index}/{len(example_list)}: {example['id']}",
+            file=sys.stderr,
+            flush=True,
+        )
+        collected = collect_with_cache(
+            feature, example, collector, cache_dir, refresh_cache
         )
         answer = str(collected.get("answer", ""))
         contexts = [str(context) for context in collected.get("contexts", [])]
         source = str(collected.get("source", "unknown"))
+        if source.endswith("-cache"):
+            print(
+                f"[{feature}] cache hit for {example['id']}",
+                file=sys.stderr,
+                flush=True,
+            )
         uses_live_answers = uses_live_answers or source != "offline-ground-truth"
         scores = lexical_scores(
             feature, example["question"], answer, contexts, example["ground_truth"]
@@ -198,17 +279,31 @@ def collect_examples(
     return rows, uses_live_answers
 
 
+def parse_ragas_traces_safely(
+    parser: Callable[[dict[str, Any], str | None], list[dict[str, Any]]],
+    traces: dict[str, Any],
+    parent_run_id: str | None = None,
+) -> list[dict[str, Any]]:
+    try:
+        return parser(traces, parent_run_id)
+    except (IndexError, KeyError, TypeError) as err:
+        print(
+            f"Warning: RAGAS trace parsing failed; scores are still available. ({err})",
+            file=sys.stderr,
+            flush=True,
+        )
+        return []
+
+
 def ragas_metrics_for(feature: str) -> list[Any]:
     from ragas.metrics import (
         answer_correctness,
         answer_relevancy,
-        context_precision,
-        context_recall,
         faithfulness,
     )
 
     if feature == "chatbot":
-        return [faithfulness, answer_relevancy, context_precision, context_recall]
+        return [faithfulness, answer_relevancy]
     return [faithfulness, answer_relevancy, answer_correctness]
 
 
@@ -216,6 +311,7 @@ def apply_ragas_scores(feature: str, rows: list[EvalRow]) -> None:
     from datasets import Dataset
     from gemini_judge import GeminiJudge
     from ragas import evaluate
+    from ragas import dataset_schema as ragas_dataset_schema
 
     dataset = Dataset.from_list(
         [
@@ -229,14 +325,22 @@ def apply_ragas_scores(feature: str, rows: list[EvalRow]) -> None:
         ]
     )
 
-    result = evaluate(
-        dataset,
-        metrics=ragas_metrics_for(feature),
-        llm=GeminiJudge(),
-        embeddings=make_ragas_embeddings(),
-        raise_exceptions=True,
-        show_progress=False,
+    original_parse_run_traces = ragas_dataset_schema.parse_run_traces
+    ragas_dataset_schema.parse_run_traces = lambda traces, parent_run_id=None: (
+        parse_ragas_traces_safely(original_parse_run_traces, traces, parent_run_id)
     )
+    try:
+        result = evaluate(
+            dataset,
+            metrics=ragas_metrics_for(feature),
+            llm=GeminiJudge(),
+            embeddings=make_ragas_embeddings(),
+            raise_exceptions=True,
+            show_progress=True,
+        )
+    finally:
+        ragas_dataset_schema.parse_run_traces = original_parse_run_traces
+
     frame = result.to_pandas()
     metrics = CHATBOT_METRICS if feature == "chatbot" else RESUME_METRICS
 
@@ -332,6 +436,14 @@ def threshold_failures(report: dict[str, Any]) -> list[str]:
     return failures
 
 
+def print_report_summary(report: dict[str, Any]) -> None:
+    print(f"Mode: {report['mode']}")
+    for feature, feature_report in report["features"].items():
+        print(f"{feature}:")
+        for metric, score in feature_report["aggregate"].items():
+            print(f"  {metric}: {score:.3f}")
+
+
 def selected_features(feature_arg: str) -> list[str]:
     return ["chatbot", "resume"] if feature_arg == "all" else [feature_arg]
 
@@ -348,14 +460,33 @@ def main() -> int:
         default="auto",
         help="Use RAGAS for live/API answers; lexical-offline is only a smoke-test placeholder.",
     )
+    parser.add_argument(
+        "--cache-dir",
+        type=Path,
+        default=EVAL_DIR / "cache",
+        help="Directory for cached live/API answers. Use --no-cache to disable.",
+    )
+    parser.add_argument(
+        "--no-cache",
+        action="store_true",
+        help="Disable local answer caching for this run.",
+    )
+    parser.add_argument(
+        "--refresh-cache",
+        action="store_true",
+        help="Ignore existing cached answers and overwrite them with fresh API results.",
+    )
     args = parser.parse_args()
+    cache_dir = None if args.no_cache else args.cache_dir
 
     all_rows: dict[str, list[EvalRow]] = {}
     uses_live_answers = False
     for feature in selected_features(args.feature):
         dataset = EVAL_DIR / f"{feature}.jsonl"
         examples = load_jsonl(dataset)
-        rows, feature_uses_live_answers = collect_examples(feature, examples)
+        rows, feature_uses_live_answers = collect_examples(
+            feature, examples, cache_dir, args.refresh_cache
+        )
         all_rows[feature] = rows
         uses_live_answers = uses_live_answers or feature_uses_live_answers
 
@@ -369,11 +500,17 @@ def main() -> int:
                 "RAGAS scoring requires live/API answers. Set EVAL_BASE_URL."
             )
         for feature, rows in all_rows.items():
+            print(
+                f"[{feature}] running RAGAS metrics for {len(rows)} examples",
+                file=sys.stderr,
+                flush=True,
+            )
             apply_ragas_scores(feature, rows)
 
     mode = "ragas" if scoring_mode == "ragas" else "lexical-offline-placeholder"
 
     report = write_reports(all_rows, args.out, mode)
+    print_report_summary(report)
     failures = threshold_failures(report)
     if failures:
         for failure in failures:

@@ -21,7 +21,6 @@ def collect_chatbot_answer(example: dict[str, Any]) -> dict[str, Any]:
         f"{base_url.rstrip('/')}/api/eval/chatbot",
         json={
             "question": example["question"],
-            "contexts": example.get("contexts", []),
             "enableFunctionCalling": example.get("metadata", {}).get(
                 "enableFunctionCalling", True
             ),
@@ -33,6 +32,6 @@ def collect_chatbot_answer(example: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "answer": payload.get("answer", ""),
-        "contexts": payload.get("contexts") or example.get("contexts", []),
+        "contexts": payload.get("contexts", []),
         "source": "api",
     }

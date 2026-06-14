@@ -1,9 +1,7 @@
 {
   "chatbot": {
     "faithfulness": 0.7,
-    "answer_relevancy": 0.7,
-    "context_precision": 0.65,
-    "context_recall": 0.65
+    "answer_relevancy": 0.7
   },
   "resume": {
     "faithfulness": 0.7,

@@ -1,11 +1,14 @@
 # Session Handover Notes
 
 ## Current Context
-- Contact form card now borrows the chat modal's `FluidGlass` panel recipe: 14px radius, dark slate tint, diagonal glass highlight, strong glass border, inset top highlight, and ambient `AnimatedBlobs`.
-- The surrounding contact section layout was intentionally left as before: GitHub, LinkedIn, and Email remain outside the form card.
-- Local dev/build validation needs environment variables. This session used placeholder values for the required public Gemini/dev-mode variables, plus placeholder server values for `bun run build`.
 
-## Verification Notes
-- `bun lint` passes.
-- `bun run build` passes when required env vars are present.
-- Dev server is running on `http://localhost:3001` because port 3000 was already in use.
+- Branch: `feat/issue-34`
+- Goal: Integrate RAGAS to evaluate chatbot and resume synthesis LLM quality (GitHub issue #34).
+- Implementation plan is fully drafted at `.ai/assets/branches/feat-issue-34/plan.md` — covers 4 phases: golden dataset, RAGAS harness, CI integration, documentation.
+- No code has been written yet on this branch (clean working tree as of session start).
+
+## Next Steps
+
+- Phase 1: create `.ai/eval/chatbot.jsonl` (≥10 examples), `.ai/eval/resume.jsonl` (≥5 examples), snapshot S3 knowledge fixtures.
+- Phase 2: scaffold Python harness in `scripts/eval/` (ragas_eval.py, gemini_judge.py, collect_chatbot.py, collect_resume.py).
+- Resolve open question before starting Phase 2: single pyproject.toml vs scripts/eval/requirements.txt.

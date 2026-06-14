@@ -31,17 +31,17 @@ env:
   NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: "dummy-key"
   NEXT_PUBLIC_AZURE_REMINDER_API_URL: "https://dummy-url.com"
   NEXT_PUBLIC_LOCAL_REMINDER_API_URL: "http://localhost:3000"
-  NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT || 'gemini-1.5-flash' }}
-  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL || 'gemini-1.5-flash' }}
-  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER || 'gemini-1.5-flash' }}
-  NEXT_PUBLIC_GEMINI_MODEL_RESUME: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_RESUME || 'gemini-1.5-flash' }}
-  NEXT_PUBLIC_GEMINI_MODEL_JUDGE: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_JUDGE || 'gemini-1.5-flash' }}
+  NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT || 'gemini-3.5-flash' }}
+  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL || 'gemini-3.5-flash' }}
+  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER || 'gemini-3.5-flash' }}
+  NEXT_PUBLIC_GEMINI_MODEL_RESUME: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_RESUME || 'gemini-3.5-flash' }}
+  NEXT_PUBLIC_GEMINI_MODEL_JUDGE: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_JUDGE || 'gemini-3.5-flash' }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   REMINDER_API_TOKEN: "dummy-token"
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
-  AWS_ACCESS_KEY_ID: "dummy-key-id"
-  AWS_SECRET_ACCESS_KEY: "dummy-secret"
-  AWS_BUCKET_NAME: "dummy-bucket"
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
   RESUME_SERVER_URL: "https://resume.invalid"
   RESUME_API_KEY: "dummy-resume-key"
 
@@ -93,6 +93,9 @@ jobs:
           done
           cat /tmp/portfolio-ragas-eval.log
           exit 1
+
+      - name: Sync knowledge fixture from S3
+        run: python scripts/eval/sync_fixtures.py
 
       - name: Run RAGAS eval
         run: python scripts/eval/ragas_eval.py --feature all --out .ai/eval/reports
