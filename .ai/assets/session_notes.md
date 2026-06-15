@@ -2,13 +2,27 @@
 
 ## Current Context
 
-- Branch: `feat/issue-34`
-- Goal: Integrate RAGAS to evaluate chatbot and resume synthesis LLM quality (GitHub issue #34).
-- Implementation plan is fully drafted at `.ai/assets/branches/feat-issue-34/plan.md` — covers 4 phases: golden dataset, RAGAS harness, CI integration, documentation.
-- No code has been written yet on this branch (clean working tree as of session start).
+- Branch: `feat/issue-34`.
+- User asked to start implementation from `.ai/assets/branches/feat-issue-34/codex-claude-resume-plan.md`.
+- Added experimental Codex + Claude CLI resume workflow under `scripts/codex-claude-resume/`.
+- Added `resume:codex-claude` package script and ignored `.ai/runs/`.
+- Review and fact-check stages are serialized and stdout-driven: Claude returns comments, then the orchestrator writes `stages.review` / `stages.factcheck`. This avoids Claude Code file-write permission prompts in print mode.
+- Codex draft can set top-level `outputFilename`; the DOCX step sanitizes and uses it under `/Users/user/Downloads/` unless `--out` is supplied.
+
+## Verification
+
+- `uv run ruff format .` passed.
+- `uv run ruff check . --fix` passed.
+- `uv run pytest` still fails because `pytest` is not declared in the uv environment.
+- `uv run --with pytest pytest` passed: 3 tests.
+- `bunx tsc --noEmit --pretty false` passed.
+- `bun test` passed: 112 tests.
+- Dry-run passed with local master fixture and wrote state/logs under `/tmp/codex-claude-resume-dry-run`.
+- Dry-run after Claude stdout fix passed under `/tmp/codex-claude-resume-claude-stdout-dry-run`.
+- Filename dry-run passed under `/tmp/codex-claude-resume-filename-dry-run`; example sanitized `../Zishen AI Engineer Resume!.docx` to `/Users/user/Downloads/Zishen-AI-Engineer-Resume.docx`.
 
 ## Next Steps
 
-- Phase 1: create `.ai/eval/chatbot.jsonl` (≥10 examples), `.ai/eval/resume.jsonl` (≥5 examples), snapshot S3 knowledge fixtures.
-- Phase 2: scaffold Python harness in `scripts/eval/` (ragas_eval.py, gemini_judge.py, collect_chatbot.py, collect_resume.py).
-- Resolve open question before starting Phase 2: single pyproject.toml vs scripts/eval/requirements.txt.
+- Run a real stage with authenticated `codex` and `claude` CLIs, for example:
+  `bun run resume:codex-claude -- --jd-file=<path> --master-file=.ai/eval/fixtures/knowledge/master_resume.json --only=draft`
+- If a prior run has `stages.review.status = "running"` from the old Claude prompt, rerun with `--only=review --run-dir=<same-run-dir>` to replace it with stdout-captured comments.

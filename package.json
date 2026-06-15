@@ -15,7 +15,8 @@
     "test:chatbot-golden-live:file": "CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test ./app/lib/chatbot/__tests__/live/goldenLive.live.ts",
     "test:chatbot-golden-live:ci": "CHATBOT_LIVE_EVAL=1 bun test ./app/lib/chatbot/__tests__/live/goldenLive.live.ts",
     "test:ui": "bun test --preload ./bun-ui-test-setup.ts components/ui/__tests__/",
-    "resume:agentic": "bun --env-file=.env.local run scripts/run-agentic-resume.ts"
+    "resume:agentic": "bun --env-file=.env.local run scripts/run-agentic-resume.ts",
+    "resume:codex-claude": "bun --env-file=.env.local run scripts/codex-claude-resume/run.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.981.0",
