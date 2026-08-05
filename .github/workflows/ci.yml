@@ -6,6 +6,8 @@ on:
   push:
     branches: [ dev ]
   workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * 1'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -68,8 +70,7 @@ jobs:
   golden-live:
     name: Live golden chatbot eval
     needs: test
-    if: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') ||
-      github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -98,37 +99,6 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Run live golden eval
         run: bun run test:chatbot-golden-live:ci
-      - name: Add live golden summary
-        if: always()
-        run: |
-          node <<'NODE'
-          const fs = require("node:fs");
-          const path = "testdata/chatbot-golden-live/reports/latest.json";
-          if (!fs.existsSync(path)) process.exit(0);
-
-          const report = JSON.parse(fs.readFileSync(path, "utf8"));
-          const pct = (value) => `${(value * 100).toFixed(1)}%`;
-          const lines = [
-            "## Live golden chatbot eval",
-            "",
-            `Result: ${report.passCount}/${report.total} passed (${pct(report.passRate)})`,
-            `Overall threshold: ${pct(report.thresholds.overallPassRate)}`,
-            "",
-            "| File | Passed | Pass rate | Threshold |",
-            "| --- | ---: | ---: | ---: |",
-            ...report.fileSummaries.map((file) =>
-              `| ${file.file} | ${file.passCount}/${file.total} | ${pct(file.passRate)} | ${
-                file.threshold === null ? "-" : pct(file.threshold)
-              } |`,
-            ),
-          ];
-
-          if (report.thresholdFailures.length > 0) {
-            lines.push("", "### Threshold failures", ...report.thresholdFailures.map((failure) => `- ${failure}`));
-          }
-
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join("\n")}\n`);
-          NODE
       - name: Upload live golden report
         if: always()
         uses: actions/upload-artifact@v4

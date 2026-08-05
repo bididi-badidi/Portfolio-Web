@@ -50,6 +50,8 @@ const sendFormEmail = ({ formDetails }: sendEmailProps) => {
     success: "Email sent!",
     error: "Failed to send email",
   });
+
+  return sendEmailPromise;
 };
 
 const sendEmail = ({ name, email, title, description }: Email) => {

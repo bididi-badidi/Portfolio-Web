@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
       if (!response.ok) {
         const details = await response.text();
-        return NextResponse.json({ error: details || "Resume server request failed" }, { status: response.status });
+        return NextResponse.json({ error: details || "Resume server request failed" }, { status: 502 });
       }
 
       if (!response.body) {
@@ -57,6 +57,6 @@ export async function POST(request: NextRequest) {
       err instanceof DOMException && err.name === "AbortError" ? "Resume generation timed out" : getErrorMessage(err);
 
     console.error(`resume API error: ${message}`);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: err instanceof DOMException && err.name === "AbortError" ? 504 : 500 });
   }
 }
