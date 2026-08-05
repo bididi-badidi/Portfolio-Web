@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "worktree": "bash scripts/worktree-bootstrap.sh",
     "test": "bun test",
     "test:unit": "bun test app/lib/chatbot/__tests__/unit app/utils/__tests__/unit",
@@ -37,11 +37,11 @@
     "lucide-react": "^0.482.0",
     "mini-svg-data-uri": "^1.4.4",
     "motion": "^12.5.0",
-    "next": "15.2.8",
+    "next": "16.3.0",
     "ogl": "^1.0.11",
     "qss": "^3.0.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "react-hot-toast": "^2.5.2",
     "react-player": "^2.16.0",
     "react-responsive": "^10.0.1",
@@ -50,25 +50,28 @@
     "tailwind-merge": "^3.0.2",
     "three": "^0.167.1",
     "uuid": "^11.1.0",
-    "zod": "^3.24.2"
+    "zod": "^3.25.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4.0.14",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/jsdom": "^28.0.1",
     "@types/node": "^20",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
     "@types/three": "0.167.2",
     "autoprefixer": "^10.4.21",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.2",
+    "eslint": "^9.7.0",
+    "eslint-config-next": "16.3.0",
     "jsdom": "^29.1.1",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.0.14",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4"
   }
 }
