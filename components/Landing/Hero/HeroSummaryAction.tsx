@@ -2,7 +2,7 @@
 
 import { themeClasses } from "@/app/styles/themeClasses";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, LayoutGroup, motion, useInView, useReducedMotion } from "motion/react";
+import { AnimatePresence, LayoutGroup, motion, useInView } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { ResumeButton } from "./ResumeButton";
 
@@ -16,10 +16,15 @@ const RESUME_MORPH_TRANSITION = {
   },
 };
 
-export function HeroSummaryAction({ start = true }: { start?: boolean }) {
+export function HeroSummaryAction({
+  start = true,
+  shouldReduceMotion = false,
+}: {
+  start?: boolean;
+  shouldReduceMotion?: boolean;
+}) {
   const scope = useRef<HTMLDivElement>(null);
   const isInView = useInView(scope, { once: true });
-  const shouldReduceMotion = useReducedMotion();
   const [phase, setPhase] = useState<"summary" | "square" | "button">("summary");
   const isResumeReady = phase === "button";
 
