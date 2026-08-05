@@ -3,7 +3,7 @@ import { envServer } from "@/app/env/server";
 import { getErrorMessage } from "@/app/utils/handleReport";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 240;
 
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 

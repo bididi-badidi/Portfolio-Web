@@ -266,7 +266,7 @@ explain cron setup (`crontab -e`).
 
 ## Architecture Overview
 
-**Next.js 15 App Router** portfolio site with an AI-powered chatbot, dynamic resume generation, and project showcase.
+**Next.js 16 App Router** portfolio site with an AI-powered chatbot, dynamic resume generation, and project showcase.
 
 ### Key Technologies
 

@@ -11,16 +11,12 @@ interface SoftAuroraHeroProps {
   className?: string;
 }
 
-export function SoftAuroraHero({
-  id,
-  children,
-  className,
-}: SoftAuroraHeroProps) {
+export function SoftAuroraHero({ id, children, className }: SoftAuroraHeroProps) {
   return (
     <ScrollableSection
       id={id}
       className={cn(
-        "relative grid min-h-screen w-full place-items-center overflow-hidden bg-background mb-0 lg:mb-0",
+        "relative grid min-h-dvh w-dvw place-items-center overflow-hidden bg-background mb-0 lg:mb-0",
         className,
       )}
     >

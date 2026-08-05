@@ -186,12 +186,12 @@ Expected result: the script copies `.env` files into the existing worktree and i
 
 ## Common Mistakes
 
-| Wrong behavior | Correct behavior |
-| --- | --- |
-| Manually run `git worktree add`, copy `.env`, and install dependencies as separate ad hoc steps. | Use `scripts/worktree-bootstrap.sh` so setup is repeatable. |
-| Create a new worktree from a stale local checkout. | Pull changes from `origin` before creating the worktree; let the script's fast-forward-only sync run first. |
-| Print `.env` contents to prove files copied. | List filenames only. Never display secret values. |
-| Pass `--base` when checking out an existing branch. | Omit `--base` for existing branches. |
-| Skip dependency installation by default. | Install dependencies unless the user asks for `--no-install`. |
-| Invent a branch name that ignores the user's requested branch. | Use the user's branch name when provided. |
-| Flatten branch paths into names like `my-repo-feat-new-feat`. | Preserve the project tree: `my-repo/feat/new-feat`. |
+| Wrong behavior                                                                                   | Correct behavior                                                                                            |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Manually run `git worktree add`, copy `.env`, and install dependencies as separate ad hoc steps. | Use `scripts/worktree-bootstrap.sh` so setup is repeatable.                                                 |
+| Create a new worktree from a stale local checkout.                                               | Pull changes from `origin` before creating the worktree; let the script's fast-forward-only sync run first. |
+| Print `.env` contents to prove files copied.                                                     | List filenames only. Never display secret values.                                                           |
+| Pass `--base` when checking out an existing branch.                                              | Omit `--base` for existing branches.                                                                        |
+| Skip dependency installation by default.                                                         | Install dependencies unless the user asks for `--no-install`.                                               |
+| Invent a branch name that ignores the user's requested branch.                                   | Use the user's branch name when provided.                                                                   |
+| Flatten branch paths into names like `my-repo-feat-new-feat`.                                    | Preserve the project tree: `my-repo/feat/new-feat`.                                                         |

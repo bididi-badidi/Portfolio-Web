@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Architecture review — Portfolio-Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "neutral",
+        securityLevel: "loose",
+        flowchart: { curve: "basis", htmlLabels: true },
+      });
+    </script>
+    <style>
+      :root { color-scheme: light; }
+      html { scroll-behavior: smooth; }
+      body {
+        background:
+          radial-gradient(circle at 10% 0%, rgb(16 185 129 / 0.08), transparent 25rem),
+          radial-gradient(circle at 100% 28%, rgb(79 70 229 / 0.07), transparent 24rem),
+          #fafaf9;
+      }
+      .seam-line { border-style: dashed; }
+      .deep {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        box-shadow: 0 18px 50px rgb(15 23 42 / 0.16);
+      }
+      .diagram-grid { min-height: 318px; }
+      .leak-arrow { color: #dc2626; font-weight: 700; }
+      .module-box { box-shadow: 0 1px 0 rgb(15 23 42 / 0.05); }
+      .mermaid { display: flex; align-items: center; justify-content: center; min-height: 250px; }
+      .mermaid svg { max-width: 100%; }
+      @media print {
+        body { background: white; }
+        article { break-inside: avoid; }
+      }
+    </style>
+  </head>
+  <body class="font-sans text-slate-900 antialiased">
+    <main class="mx-auto max-w-6xl space-y-12 px-5 py-12 sm:px-8 lg:py-16">
+      <header class="border-b border-slate-200 pb-8">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">Architecture review</p>
+            <h1 class="mt-2 font-serif text-4xl tracking-tight text-slate-950 sm:text-5xl">Portfolio-Web</h1>
+            <p class="mt-3 text-sm text-slate-500">dev · 5 August 2026 · commit 1869cf6 + current working-tree edits</p>
+          </div>
+          <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-xs text-slate-600 sm:grid-cols-4 lg:max-w-2xl">
+            <div class="flex items-center gap-2"><span class="h-6 w-9 rounded border border-slate-400 bg-white"></span><span>module</span></div>
+            <div class="flex items-center gap-2"><span class="h-0 w-9 border-t-2 border-dashed border-slate-500"></span><span>seam</span></div>
+            <div class="flex items-center gap-2"><span class="text-lg font-bold text-red-600">→</span><span>leakage</span></div>
+            <div class="flex items-center gap-2"><span class="h-6 w-9 rounded bg-slate-900"></span><span>deep module</span></div>
+          </div>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-12">
+        <article id="resume-generation" class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div class="p-6 sm:p-8">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Candidate 01</p>
+                <h2 class="mt-2 font-serif text-3xl tracking-tight">Make resume generation one canonical module</h2>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span>
+                <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800">ports &amp; adapters</span>
+              </div>
+            </div>
+
+            <div class="mt-6 rounded-2xl bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Files</p>
+              <p class="mt-2 font-mono text-xs leading-6 text-slate-700 sm:text-sm">resume-server/{main.py, agents.py, prompts.py, models.py, docx_generator.py}<br />scripts/run-agentic-resume.ts · app/lib/chatbot/agenticResume/* · app/lib/chatbot/fetchCustomizedResume.ts<br />app/api/resume/route.ts · components/Landing/Hero/ResumeButton.tsx · lib/docx.ts</p>
+            </div>
+
+            <div class="mt-7 grid gap-5 lg:grid-cols-2">
+              <section>
+                <p class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-red-700">Before · three truths</p>
+                <div class="diagram-grid rounded-2xl border border-red-100 bg-red-50/40 p-3">
+                  <pre class="mermaid">
+flowchart TB
+  W[Resume button] --> N[Next route]
+  N --> P[Python HTTP module]
+  P --> PA[Python prompts + models]
+  P --> PD[Python DOCX]
+  C[CLI] --> T[TypeScript pipeline]
+  T --> TA[TS prompts + schemas]
+  T --> TD[TS DOCX]
+  L[Legacy chatbot resume files] --> LG[Gemini + S3 flow]
+  PA -. duplicated knowledge .-> TA
+  PD -. duplicated formatting .-> TD
+  classDef leak fill:#fff1f2,stroke:#dc2626,stroke-width:2px,color:#991b1b;
+  class PA,PD,TA,TD,LG leak;
+                  </pre>
+                </div>
+              </section>
+              <section>
+                <p class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">After · one source of behaviour</p>
+                <div class="diagram-grid rounded-2xl border border-emerald-100 bg-emerald-50/40 p-3">
+                  <pre class="mermaid">
+flowchart TB
+  W[Web adapter] --> S
+  C[CLI adapter] --> S
+  subgraph S[Deep resume generation module]
+    direction LR
+    O[orchestration] --- V[validation]
+    V --- F[document generation]
+  end
+  S --> G[Gemini adapter]
+  S --> A[S3 adapter]
+  S --> M[In-memory test adapters]
+  classDef deep fill:#0f172a,stroke:#0f172a,color:#fff,stroke-width:3px;
+  class S deep;
+                  </pre>
+                </div>
+              </section>
+            </div>
+
+            <div class="mt-7 grid gap-6 border-t border-slate-100 pt-6 md:grid-cols-[1fr_1fr_auto]">
+              <div><p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Problem</p><p class="mt-2 text-sm leading-6 text-slate-700">Prompt, schema, model, and document behaviour exists in parallel Python and TypeScript implementations; changes have no locality and the active Python path has no tests.</p></div>
+              <div><p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Solution</p><p class="mt-2 text-sm leading-6 text-slate-700">Keep one deep resume generation module; make web and CLI thin adapters, and remove the shadow implementations once behaviour is locked at the seam.</p></div>
+              <div class="min-w-52"><p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Wins</p><ul class="mt-2 space-y-2 text-sm text-slate-700"><li>• locality: one resume truth</li><li>• leverage: web and CLI</li><li>• tests hit one interface</li><li>• two adapters justify seam</li></ul></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="chatbot-actions" class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div class="p-6 sm:p-8">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Candidate 02</p>
+                <h2 class="mt-2 font-serif text-3xl tracking-tight">Make each chatbot action atomic</h2>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span>
+                <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-800">in-process</span>
+              </div>
+            </div>
+
+            <div class="mt-6 rounded-2xl bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Files</p>
+              <p class="mt-2 font-mono text-xs leading-6 text-slate-700 sm:text-sm">app/enums/functionCall.ts · app/lib/chatbot/functionCalls.ts · app/lib/chatbot/functionHandlers.ts<br />app/lib/chatbot/fetchReply.ts · app/context/AppActionsContext.tsx · app/lib/chatbot/config.ts<br />app/lib/chatbot/__tests__/unit/functionHandlers.unit.test.ts · app/lib/chatbot/__tests__/integration/fetchReply.integration.test.ts</p>
+            </div>
+
+            <div class="mt-7 grid gap-5 lg:grid-cols-2">
+              <section>
+                <p class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-red-700">Before · change leaks across modules</p>
+                <div class="diagram-grid relative overflow-hidden rounded-2xl border border-red-100 bg-red-50/40 p-5">
+                  <div class="mx-auto w-40 rounded-xl border-2 border-red-300 bg-white px-3 py-3 text-center text-xs font-bold text-red-800">Add one chatbot action</div>
+                  <div class="mx-auto h-7 w-px bg-red-300"></div>
+                  <div class="grid grid-cols-2 gap-3 text-center text-xs sm:grid-cols-3">
+                    <div class="module-box rounded-lg border border-slate-300 bg-white p-3">name + description</div>
+                    <div class="module-box rounded-lg border border-slate-300 bg-white p-3">Gemini declaration</div>
+                    <div class="module-box rounded-lg border border-slate-300 bg-white p-3">system message</div>
+                    <div class="module-box rounded-lg border border-slate-300 bg-white p-3">handler registry</div>
+                    <div class="module-box rounded-lg border border-slate-300 bg-white p-3">React action</div>
+                    <div class="module-box rounded-lg border border-slate-300 bg-white p-3">approval lookup</div>
+                  </div>
+                  <div class="mt-5 rounded-xl border border-red-200 bg-red-100 px-4 py-3 text-center text-sm font-semibold text-red-900">ShowProjectDemo exists in five places, but is absent from the declaration list.</div>
+                </div>
+              </section>
+              <section>
+                <p class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">After · definition and execution co-locate</p>
+                <div class="diagram-grid rounded-2xl border border-emerald-100 bg-emerald-50/40 p-5">
+                  <div class="deep mx-auto flex min-h-52 max-w-sm flex-col justify-between rounded-2xl border-4 border-slate-900 p-5 text-white">
+                    <div>
+                      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Deep chatbot action module</p>
+                      <p class="mt-2 text-lg font-semibold">One place owns each action</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-slate-300">
+                      <span class="rounded bg-white/10 p-2">model description</span><span class="rounded bg-white/10 p-2">validation</span><span class="rounded bg-white/10 p-2">approval facts</span><span class="rounded bg-white/10 p-2">execution</span>
+                    </div>
+                  </div>
+                  <div class="mx-auto h-6 w-px border-l-2 border-dashed border-slate-400"></div>
+                  <div class="mx-auto max-w-sm rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-xs font-semibold text-slate-700">Email · reminder · navigation adapters</div>
+                </div>
+              </section>
+            </div>
+
+            <div class="mt-7 grid gap-6 border-t border-slate-100 pt-6 md:grid-cols-[1fr_1fr_auto]">
+              <div><p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Problem</p><p class="mt-2 text-sm leading-6 text-slate-700">The action interface is scattered across six modules, so declaration and execution drift; tests can pass while an action remains unreachable.</p></div>
+              <div><p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Solution</p><p class="mt-2 text-sm leading-6 text-slate-700">Deepen the chatbot action module so model facts, validation, approval facts, and dispatch stay local; keep browser side effects behind adapters.</p></div>
+              <div class="min-w-52"><p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Wins</p><ul class="mt-2 space-y-2 text-sm text-slate-700"><li>• locality: action stays whole</li><li>• leverage: one registration path</li><li>• interface proves reachability</li><li>• drift becomes unrepresentable</li></ul></div>
+            </div>
+          </div>
+        </article>
+
+        <article id="chat-session" class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div class="p-6 sm:p-8">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Candidate 03</p>
+                <h2 class="mt-2 font-serif text-3xl tracking-tight">Move conversation behaviour out of the modal</h2>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Worth exploring</span>
+                <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800">ports &amp; adapters</span>
+              </div>
+            </div>
+
+            <div class="mt-6 rounded-2xl bg-slate-50 p-4">
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Files</p>
+              <p class="mt-2 font-mono text-xs leading-6 text-slate-700 sm:text-sm">components/Modal/{Modal.tsx, ModalContent.tsx, ModalFooter.tsx}<br />app/context/ModalContext.tsx · app/lib/chatbot/fetchReplyClient.ts · app/lib/chatbot/functionHandlers.ts<br />app/hooks/useConversation.tsx · app/interfaces/Chatbot.ts</p>
+            </div>
+
+            <div class="mt-7 grid gap-5 lg:grid-cols-2">
+              <section>
+                <p class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-red-700">Before · render module owns the state machine</p>
+                <div class="diagram-grid rounded-2xl border border-red-100 bg-red-50/40 p-5">
+                  <div class="rounded-xl border-2 border-red-300 bg-white p-3 text-center text-xs font-bold text-red-900">ModalFooter</div>
+                  <div class="mt-3 space-y-2">
+                    <div class="flex items-center gap-3 rounded-lg border-l-4 border-red-400 bg-white px-3 py-2 text-xs"><span class="w-24 font-semibold">history</span><span class="text-slate-500">IDs, append, trim</span></div>
+                    <div class="flex items-center gap-3 rounded-lg border-l-4 border-red-400 bg-white px-3 py-2 text-xs"><span class="w-24 font-semibold">request</span><span class="text-slate-500">fetch + timeout race</span></div>
+                    <div class="flex items-center gap-3 rounded-lg border-l-4 border-red-400 bg-white px-3 py-2 text-xs"><span class="w-24 font-semibold">feedback</span><span class="text-slate-500">placeholder + errors</span></div>
+                    <div class="flex items-center gap-3 rounded-lg border-l-4 border-red-400 bg-white px-3 py-2 text-xs"><span class="w-24 font-semibold">actions</span><span class="text-slate-500">dispatch + delays</span></div>
+                    <div class="flex items-center gap-3 rounded-lg border-l-4 border-red-400 bg-white px-3 py-2 text-xs"><span class="w-24 font-semibold">render</span><span class="text-slate-500">animation + input</span></div>
+                  </div>
+                  <p class="mt-3 text-center text-xs font-medium text-red-800">No tests cross this seam.</p>
+                </div>
+              </section>
+              <section>
+                <p class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">After · modal becomes an adapter</p>
+                <div class="diagram-grid rounded-2xl border border-emerald-100 bg-emerald-50/40 p-5">
+                  <div class="grid grid-cols-[auto_1fr] items-center gap-4">
+                    <div class="rounded-xl border border-slate-300 bg-white px-4 py-5 text-center text-xs font-semibold">Modal<br /><span class="font-normal text-slate-500">adapter</span></div>
+                    <div class="deep rounded-2xl border-4 border-slate-900 p-5 text-white">
+                      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Deep chat session module</p>
+                      <div class="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-300"><span class="rounded bg-white/10 p-2">conversation state</span><span class="rounded bg-white/10 p-2">request lifecycle</span><span class="rounded bg-white/10 p-2">timeout cleanup</span><span class="rounded bg-white/10 p-2">action outcomes</span></div>
+                    </div>
+                  </div>
+                  <div class="mx-auto h-7 w-px border-l-2 border-dashed border-slate-400"></div>
+                  <div class="grid grid-cols-2 gap-3 text-center text-xs"><div class="rounded-xl border border-slate-300 bg-white px-3 py-3">HTTP adapter</div><div class="rounded-xl border border-slate-300 bg-white px-3 py-3">in-memory test adapter</div></div>
+                </div>
+              </section>
+            </div>
+
+            <div class="mt-7 grid gap-6 border-t border-slate-100 pt-6 md:grid-cols-[1fr_1fr_auto]">
+              <div><p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Problem</p><p class="mt-2 text-sm leading-6 text-slate-700">Conversation state, request timing, placeholders, errors, action execution, and rendering live in one UI module; the timeout request survives after the race and no tests cover the behaviour.</p></div>
+              <div><p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Solution</p><p class="mt-2 text-sm leading-6 text-slate-700">Deepen a chat session module around the conversation lifecycle; let the modal render its outcomes and let tests substitute the owned HTTP adapter.</p></div>
+              <div class="min-w-52"><p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Wins</p><ul class="mt-2 space-y-2 text-sm text-slate-700"><li>• locality: lifecycle concentrates</li><li>• interface is test surface</li><li>• modal only renders</li><li>• timeout behaviour survives refactors</li></ul></div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section id="top-recommendation" class="rounded-3xl bg-slate-950 p-7 text-white shadow-2xl sm:p-9">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">Top recommendation</p>
+        <div class="mt-3 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 class="font-serif text-3xl tracking-tight">Make resume generation one canonical module</h2>
+            <p class="mt-3 max-w-3xl text-sm leading-6 text-slate-300">It is the hottest changing area, duplicates the same domain behaviour across two languages, and currently has no test surface on the active pipeline.</p>
+          </div>
+          <a href="#resume-generation" class="inline-flex shrink-0 items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300">View candidate ↑</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

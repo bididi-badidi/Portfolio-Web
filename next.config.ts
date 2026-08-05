@@ -2,7 +2,21 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@google/genai"],
+  turbopack: {
+    rules: {
+      "*.svg": {
+        loaders: [
+          {
+            loader: "@svgr/webpack",
+            options: { icon: true },
+          },
+        ],
+        as: "*.js",
+      },
+    },
+  },
   images: {
+    qualities: [50, 75],
     remotePatterns: [
       {
         protocol: "https",
@@ -17,15 +31,6 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
-  },
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/i,
-      issuer: /\.[jt]sx?$/,
-      use: [{ loader: "@svgr/webpack", options: { icon: true } }],
-    });
-
-    return config;
   },
 };
 

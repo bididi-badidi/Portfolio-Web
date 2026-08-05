@@ -24,11 +24,7 @@ interface SoftAuroraProps {
 function hexToVec3(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
 
-  return [
-    parseInt(h.slice(0, 2), 16) / 255,
-    parseInt(h.slice(2, 4), 16) / 255,
-    parseInt(h.slice(4, 6), 16) / 255,
-  ];
+  return [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255];
 }
 
 const vertexShader = `
@@ -164,6 +160,27 @@ void main() {
 }
 `;
 
+const WEBGL_RETRY_DELAY_MS = 1_000;
+
+function createRenderer(): Renderer | null {
+  const canvas = document.createElement("canvas");
+  const contextAttributes: WebGLContextAttributes = {
+    alpha: true,
+    depth: true,
+    stencil: false,
+    antialias: false,
+    premultipliedAlpha: false,
+    preserveDrawingBuffer: false,
+    powerPreference: "default",
+  };
+  const context =
+    canvas.getContext("webgl2", contextAttributes) ?? canvas.getContext("webgl", contextAttributes);
+
+  if (!context) return null;
+
+  return new Renderer({ canvas, alpha: true, premultipliedAlpha: false });
+}
+
 export default function SoftAurora({
   speed = 0.6,
   scale = 1.5,
@@ -187,107 +204,152 @@ export default function SoftAurora({
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    const renderer = new Renderer({ alpha: true, premultipliedAlpha: false });
-    const gl = renderer.gl;
+    let disposed = false;
+    let initializationAttempts = 0;
+    let retryTimeoutId: number | undefined;
+    let disposeRenderer: (() => void) | undefined;
 
-    gl.clearColor(0, 0, 0, 0);
+    function initializeRenderer() {
+      if (disposed) return;
 
-    let animationFrameId: number;
-    const currentMouse: [number, number] = [0.5, 0.5];
-    let targetMouse: [number, number] = [0.5, 0.5];
+      initializationAttempts += 1;
 
-    function handleMouseMove(event: MouseEvent) {
-      const rect = gl.canvas.getBoundingClientRect();
+      let renderer: Renderer | null = null;
 
-      targetMouse = [
-        (event.clientX - rect.left) / rect.width,
-        1.0 - (event.clientY - rect.top) / rect.height,
-      ];
-    }
-
-    function handleMouseLeave() {
-      targetMouse = [0.5, 0.5];
-    }
-
-    renderer.setSize(container.offsetWidth, container.offsetHeight);
-
-    const geometry = new Triangle(gl);
-    const program = new Program(gl, {
-      vertex: vertexShader,
-      fragment: fragmentShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uResolution: {
-          value: [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height],
-        },
-        uSpeed: { value: speed },
-        uScale: { value: scale },
-        uBrightness: { value: brightness },
-        uColor1: { value: hexToVec3(color1) },
-        uColor2: { value: hexToVec3(color2) },
-        uNoiseFreq: { value: noiseFrequency },
-        uNoiseAmp: { value: noiseAmplitude },
-        uBandHeight: { value: bandHeight },
-        uBandSpread: { value: bandSpread },
-        uOctaveDecay: { value: octaveDecay },
-        uLayerOffset: { value: layerOffset },
-        uColorSpeed: { value: colorSpeed },
-        uMouse: { value: new Float32Array([0.5, 0.5]) },
-        uMouseInfluence: { value: mouseInfluence },
-        uEnableMouse: { value: enableMouseInteraction },
-      },
-    });
-
-    function resize() {
-      renderer.setSize(container.offsetWidth, container.offsetHeight);
-      program.uniforms.uResolution.value = [
-        gl.canvas.width,
-        gl.canvas.height,
-        gl.canvas.width / gl.canvas.height,
-      ];
-    }
-
-    window.addEventListener("resize", resize);
-    resize();
-
-    const mesh = new Mesh(gl, { geometry, program });
-    container.appendChild(gl.canvas);
-
-    if (enableMouseInteraction) {
-      gl.canvas.addEventListener("mousemove", handleMouseMove);
-      gl.canvas.addEventListener("mouseleave", handleMouseLeave);
-    }
-
-    function update(time: number) {
-      animationFrameId = requestAnimationFrame(update);
-      program.uniforms.uTime.value = time * 0.001;
-
-      if (enableMouseInteraction) {
-        currentMouse[0] += 0.05 * (targetMouse[0] - currentMouse[0]);
-        currentMouse[1] += 0.05 * (targetMouse[1] - currentMouse[1]);
-        program.uniforms.uMouse.value[0] = currentMouse[0];
-        program.uniforms.uMouse.value[1] = currentMouse[1];
-      } else {
-        program.uniforms.uMouse.value[0] = 0.5;
-        program.uniforms.uMouse.value[1] = 0.5;
+      try {
+        renderer = createRenderer();
+      } catch (error) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("[SoftAurora] WebGL initialization failed; using the CSS gradient fallback.", error);
+        }
       }
 
-      renderer.render({ scene: mesh });
+      if (!renderer) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn(
+            `[SoftAurora] WebGL is unavailable (attempt ${initializationAttempts} of 2); using the CSS gradient fallback.`,
+          );
+        }
+
+        if (initializationAttempts === 1) {
+          retryTimeoutId = window.setTimeout(initializeRenderer, WEBGL_RETRY_DELAY_MS);
+        }
+
+        return;
+      }
+
+      const activeRenderer = renderer;
+      const gl = activeRenderer.gl;
+
+      gl.clearColor(0, 0, 0, 0);
+
+      let animationFrameId: number;
+      const currentMouse: [number, number] = [0.5, 0.5];
+      let targetMouse: [number, number] = [0.5, 0.5];
+
+      function handleMouseMove(event: MouseEvent) {
+        const rect = gl.canvas.getBoundingClientRect();
+
+        targetMouse = [(event.clientX - rect.left) / rect.width, 1.0 - (event.clientY - rect.top) / rect.height];
+      }
+
+      function handleMouseLeave() {
+        targetMouse = [0.5, 0.5];
+      }
+
+      activeRenderer.setSize(container.offsetWidth, container.offsetHeight);
+
+      const geometry = new Triangle(gl);
+      const program = new Program(gl, {
+        vertex: vertexShader,
+        fragment: fragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+          uResolution: {
+            value: [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height],
+          },
+          uSpeed: { value: speed },
+          uScale: { value: scale },
+          uBrightness: { value: brightness },
+          uColor1: { value: hexToVec3(color1) },
+          uColor2: { value: hexToVec3(color2) },
+          uNoiseFreq: { value: noiseFrequency },
+          uNoiseAmp: { value: noiseAmplitude },
+          uBandHeight: { value: bandHeight },
+          uBandSpread: { value: bandSpread },
+          uOctaveDecay: { value: octaveDecay },
+          uLayerOffset: { value: layerOffset },
+          uColorSpeed: { value: colorSpeed },
+          uMouse: { value: new Float32Array([0.5, 0.5]) },
+          uMouseInfluence: { value: mouseInfluence },
+          uEnableMouse: { value: enableMouseInteraction },
+        },
+      });
+
+      function resize() {
+        activeRenderer.setSize(container.offsetWidth, container.offsetHeight);
+        program.uniforms.uResolution.value = [
+          gl.canvas.width,
+          gl.canvas.height,
+          gl.canvas.width / gl.canvas.height,
+        ];
+      }
+
+      window.addEventListener("resize", resize);
+      resize();
+
+      const mesh = new Mesh(gl, { geometry, program });
+      container.appendChild(gl.canvas);
+
+      if (enableMouseInteraction) {
+        gl.canvas.addEventListener("mousemove", handleMouseMove);
+        gl.canvas.addEventListener("mouseleave", handleMouseLeave);
+      }
+
+      function update(time: number) {
+        animationFrameId = requestAnimationFrame(update);
+        program.uniforms.uTime.value = time * 0.001;
+
+        if (enableMouseInteraction) {
+          currentMouse[0] += 0.05 * (targetMouse[0] - currentMouse[0]);
+          currentMouse[1] += 0.05 * (targetMouse[1] - currentMouse[1]);
+          program.uniforms.uMouse.value[0] = currentMouse[0];
+          program.uniforms.uMouse.value[1] = currentMouse[1];
+        } else {
+          program.uniforms.uMouse.value[0] = 0.5;
+          program.uniforms.uMouse.value[1] = 0.5;
+        }
+
+        activeRenderer.render({ scene: mesh });
+      }
+
+      animationFrameId = requestAnimationFrame(update);
+
+      disposeRenderer = () => {
+        cancelAnimationFrame(animationFrameId);
+        window.removeEventListener("resize", resize);
+
+        if (enableMouseInteraction) {
+          gl.canvas.removeEventListener("mousemove", handleMouseMove);
+          gl.canvas.removeEventListener("mouseleave", handleMouseLeave);
+        }
+
+        geometry.remove();
+        program.remove();
+        gl.canvas.remove();
+      };
     }
 
-    animationFrameId = requestAnimationFrame(update);
+    initializeRenderer();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", resize);
+      disposed = true;
 
-      if (enableMouseInteraction) {
-        gl.canvas.removeEventListener("mousemove", handleMouseMove);
-        gl.canvas.removeEventListener("mouseleave", handleMouseLeave);
+      if (retryTimeoutId !== undefined) {
+        window.clearTimeout(retryTimeoutId);
       }
 
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
-      gl.canvas.remove();
+      disposeRenderer?.();
     };
   }, [
     speed,
