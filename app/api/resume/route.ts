@@ -3,9 +3,10 @@ import { envServer } from "@/app/env/server";
 import { getErrorMessage } from "@/app/utils/handleReport";
 
 export const runtime = "nodejs";
-export const maxDuration = 240;
+export const maxDuration = 60;
 
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+const RESUME_SERVER_TIMEOUT_MS = 60_000;
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 120_000);
+    const timeout = setTimeout(() => controller.abort(), RESUME_SERVER_TIMEOUT_MS);
 
     try {
       const response = await fetch(`${envServer.RESUME_SERVER_URL}/generate`, {
