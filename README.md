@@ -1,78 +1,22 @@
 This website is for personal use only.
 
-## Getting Started
-
-Install dependencies
-
-```bash
-bun i
-```
-
-Local development
-
-```bash
-bun dev
-```
-
 ## Development
 
-### Adding new Function Call
+Install with `bun install`, then run `bun dev`.
 
-- Declare and export new function [here](./app/lib/chatbot/functionCalls.ts)
-- Declare and export app actions [here](./app/context/AppActionsContext.tsx)
-  - AppActionsContextProps
-  - Declare function under AppActionsContextProvider
-- Declare and export function handlers [here](./app/lib/chatbot/functionHandlers.ts)
-- Update system instruction for fetching function [fetchFunctionCalls](./app/lib/chatbot/fetchFunctionCalls.ts)
+The portfolio chatbot reads `OPENAI_API_KEY` on the server. `OPENAI_MODEL` is optional and defaults to `gpt-5.6-luna`. Neither belongs in a `NEXT_PUBLIC_` variable. Other website features retain their existing environment requirements; see `.env.example`.
 
-### Chatbot Live Golden Tests
+## Chatbot
 
-Run all live golden cases:
+Both `/api/chatbot` and `/api/concierge` use one agent in `lib/chatbot/agent.ts`. Local keyword retrieval augments the prompt before generation. No remote search service, vector database, embeddings, or model-based action approver is required.
 
-```bash
-bun run test:chatbot-golden-live
-```
+See [the architecture and migration decision](docs/chatbot-architecture.md) for the component layout, tool execution flow, limits, and knowledge maintenance.
 
-Run only a specific JSON test file group (filename filter):
+## Validation
 
-```bash
-CASE=navigate-projects bun run test:chatbot-golden-live
-CASE=security bun run test:chatbot-golden-live:file
-```
+- `bun run typecheck`
+- `bun test lib/chatbot/__tests__/chatbot.test.ts`
+- `bun test`
+- `bun lint`
 
-Direct command form:
-
-```bash
-CHATBOT_LIVE_EVAL=1 bun --env-file=.env.local test app/lib/chatbot/__tests__/goldenLive.test.ts
-```
-
-Detailed case format and evaluator setup:
-
-- [testdata/chatbot-golden-live/README.md](./testdata/chatbot-golden-live/README.md)
-
-### Running Agentic Resume Generation
-
-```bash
-bun --env-file=.env.local run scripts/run-agentic-resume.ts --jd=
-bun --env-file=.env.local run scripts/run-agentic-resume.ts --jd-file=testdata/resume/test-jd.txt
-```
-
-### Unit Tests
-
-Run all tests:
-
-```bash
-bun test
-```
-
-Run all chatbot unit/integration tests:
-
-```bash
-bun test ./app/lib/chatbot/__tests__
-```
-
-Run a single test file:
-
-```bash
-bun test ./app/lib/chatbot/__tests__/fetchReply.test.ts
-```
+Chatbot tests use mocked network responses and dummy credentials. Legacy Gemini tests, paid live golden evaluations, their CI job, and the obsolete TypeScript multi-agent resume CLI have been removed. There is no live-test flag or model-based evaluator. The separately deployed Python resume service and `/api/resume` retain their existing workflow.

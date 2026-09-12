@@ -4,7 +4,6 @@ import { z } from "zod";
 export const envServer = createEnv({
   emptyStringAsUndefined: true,
   server: {
-    GEMINI_API_KEY: z.string(),
     REMINDER_API_TOKEN: z.string().optional(),
     AWS_REGION: z.string(),
     AWS_ACCESS_KEY_ID: z.string(),
@@ -14,7 +13,6 @@ export const envServer = createEnv({
     RESUME_API_KEY: z.string(),
   },
   experimental__runtimeEnv: {
-    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     REMINDER_API_TOKEN: process.env.REMINDER_API_TOKEN,
     AWS_REGION: process.env.AWS_REGION,
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,

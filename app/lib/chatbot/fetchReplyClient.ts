@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatReply, ChatbotRequest } from "./types";
-import { REPLY_ERROR_FALLBACK_MSG } from "./config";
+import { CHAT_TIMEOUT_MS, REPLY_ERROR_FALLBACK_MSG } from "./config";
 
 export async function fetchChatbotReplyClient(request: ChatbotRequest): Promise<ChatReply> {
   const response = await fetch("/api/chatbot", {
@@ -10,6 +10,7 @@ export async function fetchChatbotReplyClient(request: ChatbotRequest): Promise<
       "Content-Type": "application/json",
     },
     body: JSON.stringify(request),
+    signal: AbortSignal.timeout(CHAT_TIMEOUT_MS),
   });
 
   if (!response.ok) {

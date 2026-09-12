@@ -13,7 +13,6 @@ import { useUIState } from "@/app/context/UIStateContext";
 import { 
   CHATBOT_WAITING_PLACEHOLDER, 
   MAX_CHAT_HISTORY_INSTANCE,
-  CHAT_TIMEOUT_MS,
   REPLY_ERROR_FALLBACK_MSG
 } from "@/app/lib/chatbot/config";
 import { AnimatedToggleButton } from "../Buttons/AnimatedToggleButton";
@@ -104,15 +103,10 @@ export const ModalFooter = () => {
 
     let reply: ChatReply;
     try {
-      reply = (await Promise.race([
-        fetchChatbotReplyClient({
-          chatHistory: updatedChatHistory.slice(-MAX_CHAT_HISTORY_INSTANCE),
-          enableFunctionCalling: enableFuncall,
-        }),
-        new Promise<ChatReply>((_, reject) =>
-          setTimeout(() => reject(new Error("Chatbot response timeout")), CHAT_TIMEOUT_MS)
-        ),
-      ])) as ChatReply;
+      reply = await fetchChatbotReplyClient({
+        chatHistory: updatedChatHistory.slice(-MAX_CHAT_HISTORY_INSTANCE),
+        enableFunctionCalling: enableFuncall,
+      });
     } catch (err) {
       console.error("Chatbot submission error:", err);
       reply = {

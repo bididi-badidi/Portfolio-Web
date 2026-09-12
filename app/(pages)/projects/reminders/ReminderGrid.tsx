@@ -7,8 +7,8 @@ import { Reminder } from "@/app/interfaces/Reminder";
 import { ProjectHeading } from "@/components/Projects/ProjectHeading";
 import toast from "react-hot-toast";
 import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
-import { fetchFunctionCalls } from "@/app/lib/chatbot/fetchFunctionCalls";
-import { FunctionCallResponse } from "@/app/lib/chatbot/types";
+import { fetchChatbotReplyClient } from "@/app/lib/chatbot/fetchReplyClient";
+
 import { PriorityType, ReminderStatus, ReminderType } from "@/app/enums/ReminderEnums";
 import { ProjectText } from "@/components/Projects/ProjectText";
 
@@ -23,14 +23,21 @@ export function ReminderGrid() {
     const createId = toast.loading("Creating Reminders...");
 
     try {
-      const response = (await fetchFunctionCalls(textInput)) as FunctionCallResponse;
+      const response = await fetchChatbotReplyClient({
+        chatHistory: [{ id: "reminder", role: "user", message: textInput }],
+        enableFunctionCalling: true,
+      });
       const funcCall = response.functionCall;
+      if (response.error || funcCall?.name !== "AddNewReminder") {
+        toast.error(response.message, { id: createId });
+        return;
+      }
 
       const newReminder = {
         id: reminders.length + 1,
         title: funcCall?.args?.title || "No title",
         description: funcCall?.args?.description || "",
-        dueDate: funcCall?.args?.dueDate || "2020-10-01",
+        dueDate: funcCall.args.dueDate || "",
         reminderType: funcCall?.args?.reminderType || ReminderType.Work,
         status: ReminderStatus.Pending,
         priority: PriorityType.Low,

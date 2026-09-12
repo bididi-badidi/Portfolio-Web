@@ -1,0 +1,122 @@
+[
+  {
+    "id": "personal-ai",
+    "title": "Updated Personal AI",
+    "keywords": [
+      "OpenAI",
+      "Luna",
+      "Next.js",
+      "TypeScript",
+      "local retrieval"
+    ],
+    "source": "/projects/personal-ai",
+    "content": "The portfolio assistant uses a single OpenAI Luna agent with tools. The server searches a small local knowledge corpus and supplies relevant facts before generating a reply. It can queue portfolio navigation, email, and reminder actions when the visitor enables tools and requests an action. The concierge uses the same agent with local search only. Technologies: OpenAI Responses API, gpt-5.6-luna, Next.js, TypeScript. Evidence: implementation in this repository; public case-study media describes an earlier version. No measured performance claims."
+  },
+  {
+    "id": "automation-manager",
+    "title": "Automation Manager",
+    "keywords": [
+      "Test automation",
+      "Web platforms",
+      "Result analysis"
+    ],
+    "source": "/projects/automation-manager",
+    "content": "Making repetitive device testing easier to run and understand.\nAndroid device testing involves repetitive operations and results that need interpretation.\nAn internship web platform for automating device tests and reviewing results.\nA unified interface for device testing and result analysis. No performance metrics are published.\nTechnologies: Test automation, Web platforms, Result analysis\nEvidence: Disclosure-safe overview of internship work. No proprietary media or measured impact claims."
+  },
+  {
+    "id": "hologram",
+    "title": "Hologram",
+    "keywords": [
+      "Conversational AI",
+      "Interactive interfaces"
+    ],
+    "source": "/preview",
+    "content": "Giving a conversational interface a physical presence.\nVisitors need an approachable way to ask questions at a reception point.\nAn interactive hologram AI receptionist developed during an AV Media internship.\nA receptionist experience that answers visitor questions.\nTechnologies: Conversational AI, Interactive interfaces\nEvidence: Based on the existing portfolio description. Additional public evidence has not been cleared for this preview."
+  },
+  {
+    "id": "fraud-detection",
+    "title": "Credit Card Fraud Detection ML",
+    "keywords": [
+      "Machine learning",
+      "Classification"
+    ],
+    "source": "/preview",
+    "content": "Exploring machine learning for transaction fraud detection.\nIdentifying fraudulent credit card transactions is a classification problem.\nProject selected for this portfolio; implementation details are awaiting an authored case study.\nEvaluation results and measured outcomes are not yet published.\nTechnologies: Machine learning, Classification\nEvidence: Case study in preparation. Dataset, model, evaluation, and results require author verification."
+  },
+  {
+    "id": "dispatcher",
+    "title": "Dispatcher",
+    "keywords": [
+      "Multi-agent systems",
+      "Developer workflows"
+    ],
+    "source": "/preview",
+    "content": "Coordinating agents through a pull-request cycle.\nMulti-agent development needs coordination across the pull-request lifecycle.\nA multi-agent PR-cycle project selected for the featured portfolio.\nArchitecture, implementation evidence, and results are awaiting an authored case study.\nTechnologies: Multi-agent systems, Developer workflows\nEvidence: Case study in preparation. No unsupported claims about autonomy or delivery speed."
+  },
+  {
+    "id": "stock-ai",
+    "title": "Stock AI",
+    "keywords": [
+      "Telegram",
+      "Gemini",
+      "AWS",
+      "Redis",
+      "company research",
+      "earnings",
+      "events"
+    ],
+    "source": "/projects/stock-ai",
+    "content": "Stock AI provides command-driven company research, a help command, an upcoming earnings calendar, and a monitor for future company events such as product releases and conferences. Its authored case study lists Telegram, Gemini, AWS, and Redis. Evidence: app/(pages)/projects/stock-ai/Features.tsx and TechStack.tsx; no investment returns, predictive accuracy, or measured performance are documented."
+  },
+  {
+    "id": "remainder-api",
+    "title": "Reminder API",
+    "keywords": [
+      "Redis",
+      "reminder",
+      "reminders",
+      "authentication",
+      "RemAInder"
+    ],
+    "source": "/projects/remainder-api",
+    "content": "RemAInder API is a reminder API with Redis, authentication, and AI interaction. The portfolio includes a reminder playground at /projects/reminders and a demo at https://reminder-demo-app.vercel.app/. Evidence: components/Landing/Project/RemainderApi.tsx. No measured latency or throughput is documented."
+  },
+  {
+    "id": "shortcuts",
+    "title": "Shortcuts Calendar",
+    "keywords": [
+      "Apple Shortcuts",
+      "Gemini",
+      "Calendar",
+      "AI Event Capture",
+      "events"
+    ],
+    "source": "/projects/shortcuts",
+    "content": "AI Event Capture uses one command to register multiple calendar events. The authored technology list includes Apple Shortcuts, Gemini, and Calendar. Evidence: components/Landing/Project/ShortcutsCalendar.tsx and app/(pages)/projects/shortcuts/TechStack.tsx. No measured time savings are documented."
+  },
+  {
+    "id": "xcuisite",
+    "title": "XCuisite",
+    "keywords": [
+      "ecommerce",
+      "doughnuts",
+      "cart",
+      "authentication",
+      "payment"
+    ],
+    "source": "/#projects",
+    "content": "XCuisite is a doughnut e-commerce website with an animated cart system, authentication, and payment gateway integration. The portfolio links to https://xcuisite.store. Evidence: components/Landing/Project/Xcuisite.tsx, including cart and payment demonstration videos. No revenue or conversion results are documented."
+  },
+  {
+    "id": "sccc",
+    "title": "SCCC",
+    "keywords": [
+      "audio",
+      "accent",
+      "database",
+      "articulatory"
+    ],
+    "source": "/#experience",
+    "content": "SCCC Articulatory Accent Database is a collection of recorded audio, demonstrated in the portfolio video. Evidence: components/Landing/Project/Sccc.tsx. The page does not specify its technology stack, dataset size, or measured results."
+  }
+]

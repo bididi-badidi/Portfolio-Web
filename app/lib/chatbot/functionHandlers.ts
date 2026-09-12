@@ -61,7 +61,7 @@ const handleAddReminder = async (
 ) => {
   const newReminder = {
     title: args?.title || "No title",
-    dueDate: args?.dueDate || "2020-10-01",
+    dueDate: args?.dueDate || "",
     dueTime: args?.time,
     description: args?.description || "",
     status: ReminderStatus.Pending,

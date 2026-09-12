@@ -54,4 +54,3 @@ export const RESUME_OPTIONS: ResumeOption[] = [
 ];
 
 export const MASTER_RESUME_FILENAME = "master_data.json";
-export const LLM_KNOWLEDGE_FILENAME = "knowledge.json";
