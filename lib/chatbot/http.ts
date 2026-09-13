@@ -53,7 +53,7 @@ export async function handleChatRequest(request: Request, format: "chatbot" | "c
       const quota = await checkChatbotQuota(request);
       if (!quota.allowed) {
         return json(
-          { message: quota.reason === "ip" ? "You’ve sent too many questions. Please try again shortly." : "The portfolio assistant has reached today’s request limit. Please try again tomorrow.", error: true },
+          { message: quota.reason === "ip" ? "Rate limit reached. You can send another question when the timer resets." : "Daily request limit reached. The portfolio assistant will be available again after the reset.", error: true },
           429,
           { "Retry-After": String(quota.retryAfterSeconds) },
         );

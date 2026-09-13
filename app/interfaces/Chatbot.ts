@@ -3,4 +3,5 @@ export interface ChatInstance {
   message: string;
   role: string;
   isError?: boolean;
+  rateLimitResetAt?: number;
 }

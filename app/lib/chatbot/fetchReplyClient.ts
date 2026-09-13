@@ -13,6 +13,22 @@ export async function fetchChatbotReplyClient(request: ChatbotRequest): Promise<
     signal: AbortSignal.timeout(CHAT_TIMEOUT_MS),
   });
 
+  if (response.status === 429) {
+    const body: unknown = await response.json().catch(() => null);
+    const retryAfter = Number(response.headers.get("Retry-After"));
+    const message = body && typeof body === "object" && "message" in body && typeof body.message === "string"
+      ? body.message
+      : "Rate limit reached. Please wait before sending another question.";
+    const retryAfterSeconds = Number.isSafeInteger(retryAfter) && retryAfter > 0 ? retryAfter : undefined;
+    return {
+      message,
+      error: true,
+      ...(retryAfterSeconds
+        ? { retryAfterSeconds, rateLimitResetAt: Date.now() + retryAfterSeconds * 1000 }
+        : {}),
+    };
+  }
+
   if (!response.ok) {
     return {
       message: REPLY_ERROR_FALLBACK_MSG,

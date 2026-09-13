@@ -8,6 +8,8 @@ export interface FunctionCall {
 export interface ChatReply {
   message: string;
   error: boolean;
+  retryAfterSeconds?: number;
+  rateLimitResetAt?: number;
   functionCall?: FunctionCall;
   funcSysMsg?: string;
 }

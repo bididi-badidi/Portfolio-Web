@@ -64,7 +64,7 @@ describe("chatbot request limits", () => {
     expect(blocked.status).toBe(429);
     expect(blocked.headers.get("Retry-After")).toBe("59");
     expect(await blocked.json()).toEqual({
-      message: "You’ve sent too many questions. Please try again shortly.",
+      message: "Rate limit reached. You can send another question when the timer resets.",
       error: true,
     });
     expect(fetchMock.mock.calls.filter(([url]) => String(url) === OPENAI_URL)).toHaveLength(1);
@@ -95,7 +95,7 @@ describe("chatbot request limits", () => {
     expect(blocked.status).toBe(429);
     expect(blocked.headers.get("Retry-After")).toBe("43210");
     expect(await blocked.json()).toEqual({
-      message: "The portfolio assistant has reached today’s request limit. Please try again tomorrow.",
+      message: "Daily request limit reached. The portfolio assistant will be available again after the reset.",
       error: true,
     });
     expect(fetchMock.mock.calls.filter(([url]) => String(url) === OPENAI_URL)).toHaveLength(1);

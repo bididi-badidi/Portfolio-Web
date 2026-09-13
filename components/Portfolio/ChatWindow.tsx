@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
-import { ArrowUp, ArrowUpRight, BriefcaseBusiness, Code2, Sparkles, X } from "lucide-react";
+import { ArrowUp, ArrowUpRight, BriefcaseBusiness, Clock3, Code2, Sparkles, X } from "lucide-react";
 import { useModal } from "@/app/context/ModalContext";
 import { useUIState } from "@/app/context/UIStateContext";
 import { useAppActions } from "@/app/context/AppActionsContext";
@@ -24,6 +24,31 @@ const suggestions = [
   { icon: Sparkles, label: "Find out what drives me", prompt: "What interests Zi Shen about AI and software?" },
 ];
 
+function formatCountdown(totalSeconds: number) {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const clock = `${minutes}:${String(seconds).padStart(2, "0")}`;
+  return hours ? `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}` : clock;
+}
+
+function RateLimitCountdown({ resetAt, clock }: { resetAt: number; clock: number }) {
+  const secondsRemaining = Math.max(0, Math.ceil((resetAt - clock) / 1000));
+  return (
+    <div
+      className={styles.rateLimitCountdown}
+      role="timer"
+      aria-label={secondsRemaining ? `Rate limit resets in ${formatCountdown(secondsRemaining)}` : "Rate limit reset. You can send a new question now."}
+    >
+      <Clock3 size={16} strokeWidth={1.75} aria-hidden="true" />
+      <span>{secondsRemaining ? "Available again in" : "Available again"}</span>
+      <time dateTime={`PT${secondsRemaining}S`}>
+        {secondsRemaining ? formatCountdown(secondsRemaining) : "Ready now"}
+      </time>
+    </div>
+  );
+}
+
 /** Shared chat presentation; shares the site's existing conversation and tools. */
 export function ChatWindow() {
   const { chatHistory, setChatHistory } = useModal();
@@ -34,6 +59,8 @@ export function ChatWindow() {
   const [draft, setDraft] = useState("");
   const [thinking, setThinking] = useState(false);
   const [allowActions, setAllowActions] = useState(true);
+  const [rateLimitResetAt, setRateLimitResetAt] = useState<number | null>(null);
+  const [clock, setClock] = useState(() => Date.now());
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const transcript = useRef<HTMLDivElement>(null);
@@ -41,6 +68,10 @@ export function ChatWindow() {
   const pending = useRef(false);
   const mounted = useRef(false);
   const messages: ChatInstance[] = chatHistory.filter((message) => message.role !== "system");
+  const rateLimitSeconds = rateLimitResetAt
+    ? Math.max(0, Math.ceil((rateLimitResetAt - clock) / 1000))
+    : 0;
+  const isRateLimited = rateLimitSeconds > 0;
 
   useEffect(() => {
     mounted.current = true;
@@ -74,10 +105,22 @@ export function ChatWindow() {
     element.style.height = `${Math.min(element.scrollHeight, 120)}px`;
   }, [draft, isChatOpen]);
 
+  useEffect(() => {
+    if (!rateLimitResetAt) return;
+    const updateClock = () => {
+      const now = Date.now();
+      setClock(now);
+      if (now >= rateLimitResetAt) setRateLimitResetAt(null);
+    };
+    updateClock();
+    const timer = window.setInterval(updateClock, 1000);
+    return () => window.clearInterval(timer);
+  }, [rateLimitResetAt]);
+
   async function sendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const text = draft.trim();
-    if (!text || pending.current) return;
+    if (!text || pending.current || isRateLimited) return;
     pending.current = true;
     followLatest.current = true;
     setDraft("");
@@ -93,6 +136,11 @@ export function ChatWindow() {
     } catch {
       reply = { message: REPLY_ERROR_FALLBACK_MSG, error: true };
     }
+    const replyResetAt = reply.rateLimitResetAt;
+    if (replyResetAt) {
+      setClock(replyResetAt - (reply.retryAfterSeconds ?? 0) * 1000);
+      setRateLimitResetAt(replyResetAt);
+    }
     setChatHistory((previous) => [
       ...previous,
       {
@@ -100,6 +148,7 @@ export function ChatWindow() {
         role: "bot",
         message: reply.message,
         isError: reply.error,
+        rateLimitResetAt: replyResetAt,
       },
     ]);
     pending.current = false;
@@ -216,18 +265,27 @@ export function ChatWindow() {
             aria-relevant="additions"
             className={styles.messages}
           >
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                className={`${styles.message} ${message.role === "user" ? styles.userMessage : styles.assistantMessage} ${message.isError ? styles.error : ""}`}
-                initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={transition}
-              >
-                <span className={styles.messageAuthor}>{message.role === "user" ? "You" : "Zi Shen’s AI"}</span>
-                <p>{message.message}</p>
-              </motion.div>
-            ))}
+            {messages.map((message) => {
+              const isExpiredRateLimit = Boolean(
+                message.rateLimitResetAt && message.rateLimitResetAt <= clock,
+              );
+              if (isExpiredRateLimit) return null;
+              return (
+                <motion.div
+                  key={message.id}
+                  className={`${styles.message} ${message.role === "user" ? styles.userMessage : styles.assistantMessage} ${message.isError ? styles.error : ""}`}
+                  initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={transition}
+                >
+                  <span className={styles.messageAuthor}>{message.role === "user" ? "You" : "Zi Shen’s AI"}</span>
+                  <p>{message.message}</p>
+                  {message.rateLimitResetAt ? (
+                    <RateLimitCountdown resetAt={message.rateLimitResetAt} clock={clock} />
+                  ) : null}
+                </motion.div>
+              );
+            })}
           </div>
           {thinking && (
             <div className={styles.thinking} role="status">
@@ -256,13 +314,14 @@ export function ChatWindow() {
               {allowActions ? "Navigation, demos & site tools enabled" : "Just a conversation"}
             </span>
           </div>
-          <form className={styles.composer} onSubmit={sendMessage}>
+          <form className={`${styles.composer} ${isRateLimited ? styles.composerDisabled : ""}`} onSubmit={sendMessage}>
             <textarea
               ref={input}
               aria-label="Message Zi Shen’s AI"
-              placeholder="Ask me anything about my work…"
+              placeholder={isRateLimited ? `Available in ${formatCountdown(rateLimitSeconds)}` : "Ask me anything about my work…"}
               rows={1}
               maxLength={4000}
+              disabled={isRateLimited}
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
@@ -276,7 +335,7 @@ export function ChatWindow() {
               type="submit"
               className={styles.send}
               aria-label="Send message"
-              disabled={!draft.trim() || thinking}
+              disabled={!draft.trim() || thinking || isRateLimited}
               whileTap={reduceMotion ? undefined : { scale: 0.92 }}
               transition={transition}
             >
