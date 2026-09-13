@@ -1,12 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import "@/components/GlassSurface.css";
 
 import { Providers } from "./providers";
 import { Modal } from "@/components/Modal/Modal";
 import { CustomToaster } from "./utils/Toaster";
-import { Footer } from "@/components/Footer/Footer";
 
 import { Analytics } from "@vercel/analytics/next";
 
@@ -29,9 +27,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
-  width: 1,
-};
+export const viewport: Viewport = { width: "device-width", initialScale: 1 };
 
 export default function RootLayout({
   children,
@@ -46,7 +42,6 @@ export default function RootLayout({
             <CustomToaster />
             {children}
             <Modal />
-            <Footer />
             <Analytics />
           </main>
         </Providers>

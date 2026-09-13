@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@google/genai"],
+  async redirects() {
+    return [
+      { source: "/preview/dark", destination: "/", permanent: true },
+      { source: "/preview/dark/projects/:slug", destination: "/projects/:slug", permanent: true },
+    ];
+  },
   turbopack: {
     rules: {
       "*.svg": {

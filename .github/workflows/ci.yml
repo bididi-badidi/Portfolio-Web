@@ -17,7 +17,6 @@ permissions:
 env:
   # Required by app/env/server.ts and app/env/client.ts
   # These are dummy values to pass validation in CI for lint/test jobs.
-  # Live jobs (like golden-live) will override these with real secrets/vars.
   NEXT_PUBLIC_DEV_MODE: "false"
   REMINDER_API_TOKEN: "dummy-token"
   NEXT_PUBLIC_EMAILJS_SERVICE_ID: "dummy-service"
@@ -25,11 +24,6 @@ env:
   NEXT_PUBLIC_EMAILJS_PUBLIC_KEY: "dummy-key"
   NEXT_PUBLIC_AZURE_REMINDER_API_URL: "https://dummy-url.com"
   NEXT_PUBLIC_LOCAL_REMINDER_API_URL: "http://localhost:3000"
-  NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: "gemini-1.5-flash"
-  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: "gemini-1.5-flash"
-  NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: "gemini-1.5-flash"
-  NEXT_PUBLIC_GEMINI_MODEL_RESUME: "gemini-1.5-flash"
-  EVALUATOR_MODEL: "gemini-1.5-flash"
   AWS_REGION: "us-east-1"
   AWS_ACCESS_KEY_ID: "dummy-key-id"
   AWS_SECRET_ACCESS_KEY: "dummy-secret"
@@ -64,76 +58,3 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Run tests
         run: bun test
-
-  golden-live:
-    name: Live golden chatbot eval
-    needs: test
-    if: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') ||
-      github.event_name == 'workflow_dispatch' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    env:
-      CHATBOT_LIVE_EVAL: "1"
-      GOLDEN_LIVE_PASS_RATE_THRESHOLD: "0.8"
-      GOLDEN_LIVE_FILE_THRESHOLDS: "{\"security.json\":1}"
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'dummy-key' }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID || 'dummy-key-id' }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY || 'dummy-secret' }}
-      # Use real models/vars if available, otherwise workflow-level dummies apply
-      NEXT_PUBLIC_GEMINI_MODEL_DEFAULT: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_DEFAULT || 'gemini-2.5-flash' }}
-      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL || 'gemini-2.5-flash' }}
-      NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER: ${{
-        vars.NEXT_PUBLIC_GEMINI_MODEL_FUNC_CALL_APPROVER || 'gemini-2.5-flash'
-        }}
-      NEXT_PUBLIC_GEMINI_MODEL_RESUME: ${{ vars.NEXT_PUBLIC_GEMINI_MODEL_RESUME || 'gemini-2.5-flash' }}
-      EVALUATOR_MODEL: ${{ vars.EVALUATOR_MODEL || 'gemini-2.5-flash' }}
-      AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
-      AWS_BUCKET_NAME: ${{ vars.AWS_BUCKET_NAME || 'dummy-bucket' }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      - name: Run live golden eval
-        run: bun run test:chatbot-golden-live:ci
-      - name: Add live golden summary
-        if: always()
-        run: |
-          node <<'NODE'
-          const fs = require("node:fs");
-          const path = "testdata/chatbot-golden-live/reports/latest.json";
-          if (!fs.existsSync(path)) process.exit(0);
-
-          const report = JSON.parse(fs.readFileSync(path, "utf8"));
-          const pct = (value) => `${(value * 100).toFixed(1)}%`;
-          const lines = [
-            "## Live golden chatbot eval",
-            "",
-            `Result: ${report.passCount}/${report.total} passed (${pct(report.passRate)})`,
-            `Overall threshold: ${pct(report.thresholds.overallPassRate)}`,
-            "",
-            "| File | Passed | Pass rate | Threshold |",
-            "| --- | ---: | ---: | ---: |",
-            ...report.fileSummaries.map((file) =>
-              `| ${file.file} | ${file.passCount}/${file.total} | ${pct(file.passRate)} | ${
-                file.threshold === null ? "-" : pct(file.threshold)
-              } |`,
-            ),
-          ];
-
-          if (report.thresholdFailures.length > 0) {
-            lines.push("", "### Threshold failures", ...report.thresholdFailures.map((failure) => `- ${failure}`));
-          }
-
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join("\n")}\n`);
-          NODE
-      - name: Upload live golden report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: chatbot-golden-live-report
-          path: testdata/chatbot-golden-live/reports/*.json
-          if-no-files-found: warn
-          retention-days: 30

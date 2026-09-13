@@ -8,6 +8,8 @@ export interface FunctionCall {
 export interface ChatReply {
   message: string;
   error: boolean;
+  retryAfterSeconds?: number;
+  rateLimitResetAt?: number;
   functionCall?: FunctionCall;
   funcSysMsg?: string;
 }
@@ -15,21 +17,4 @@ export interface ChatReply {
 export interface ChatbotRequest {
   chatHistory: ChatInstance[];
   enableFunctionCalling: boolean;
-}
-
-export interface FunctionCallResponse {
-  functionCall: FunctionCall | undefined;
-  functionMessage: string;
-  error: boolean;
-}
-
-export interface FunctionExcDecision {
-  approve: boolean;
-  reason: string;
-}
-
-export interface QueryStructure {
-  synthesisQuery: string;
-  needSearch: boolean;
-  searchQueryLimit: number;
 }

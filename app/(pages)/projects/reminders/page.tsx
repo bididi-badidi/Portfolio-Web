@@ -9,10 +9,16 @@ import { ProjectText } from "@/components/Projects/ProjectText";
 
 import { ReminderProvider } from "@/app/context/ReminderContext";
 import { ReminderGrid } from "./ReminderGrid";
+import { ProjectShell } from "@/components/Portfolio/Projects/ProjectShell";
+
+const links = [{ label: "Playground", id: "about" }];
+const targets = ["about"];
 
 export default function RemindersPage() {
   return (
+    <ProjectShell links={links} extraLinks={[]} targets={targets}>
     <ReminderProvider>
+      <section id="about" className="pt-24">
       <DottedBackground>
         <DottedInnerWrapper className="py-[5dvh]">
           <SectionHeading className="md:text-5xl " animation={false}>
@@ -25,8 +31,9 @@ export default function RemindersPage() {
           </ProjectText>
           <ReminderGrid />
         </DottedInnerWrapper>
-        ++
       </DottedBackground>
+      </section>
     </ReminderProvider>
+    </ProjectShell>
   );
 }

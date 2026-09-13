@@ -1,40 +1,13 @@
 "use client";
-import React, { useRef, useEffect } from "react";
-import { Bot } from "lucide-react";
+
 import { ModalProvider } from "@/app/context/ModalContext";
-import { ModalTrigger } from "./ModalTrigger";
-import { ModalBody } from "./ModalBody";
-import { ModalContent } from "./ModalContent";
-import { ModalFooter } from "./ModalFooter";
+import { ChatWindow } from "@/components/Portfolio/ChatWindow";
 
 export function Modal() {
-  const listEndRef = useRef<null | HTMLDivElement>(null);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, []);
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      if (listEndRef.current) {
-        listEndRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
-  };
-
   return (
-    <div className="w-screen flex items-center justify-center">
+    <div data-site-chat>
       <ModalProvider>
-        <ModalTrigger
-          onOpen={scrollToBottom}
-          className="fixed bottom-[42px] right-4 z-5 cursor-pointer sm:hidden"
-        >
-          <Bot aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
-        </ModalTrigger>
-        <ModalBody>
-          <ModalContent />
-          <ModalFooter />
-        </ModalBody>
+        <ChatWindow />
       </ModalProvider>
     </div>
   );
