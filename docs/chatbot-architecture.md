@@ -17,7 +17,8 @@ This implements the requested Gemini migration, small server-side RAG, single-ag
 | `app/lib/chatbot/functionHandlers.ts` | Execute validated browser actions through existing app contexts |
 | `app/api/chatbot/route.ts` | Legacy chat HTTP entry point |
 | `app/api/concierge/route.ts` | Preview concierge HTTP entry point |
-| `lib/chatbot/http.ts` | Body limits, validation, role normalization, deadline, safe errors |
+| `lib/chatbot/http.ts` | Body limits, validation, role normalization, quota enforcement, deadline, safe errors |
+| `lib/chatbot/rateLimit.ts` | Atomic shared per-IP and global daily request limits for the public chatbot |
 | `lib/chatbot/agent.ts` | Instructions, ground-truth augmentation, bounded single-agent loop |
 | `lib/chatbot/openai.ts` | Server credential, Responses transport and response validation |
 | `lib/chatbot/tools.ts` | Allowed tool schemas, descriptions, argument validation |
@@ -58,6 +59,10 @@ Token matching is case-insensitive and ignores common stop words. Title/keyword 
 ## Cost and failure behavior
 
 - Maximum 20 messages, 2,000 characters each, 48 KB request body.
+- `/api/chatbot` uses one atomic Upstash Redis operation before contacting OpenAI. It applies a fixed-window allowance per hashed client IP and a shared allowance that resets at midnight UTC. Requests already rejected by the per-IP limit do not consume the global allowance.
+- The defaults are 10 accepted requests per IP per 60 seconds and 500 accepted requests per UTC day. `CHATBOT_RATE_LIMIT_PER_IP_MAX`, `CHATBOT_RATE_LIMIT_WINDOW_SECONDS`, and `CHATBOT_DAILY_REQUEST_MAX` configure them; `.env.example` lists the storage, timeout, trusted-header, and key-prefix settings.
+- Production fails closed with 503 when the quota store is missing, invalid, unavailable, or times out. An exceeded quota returns 429 with `Retry-After`. Local development and tests may run without the quota store when both Redis credentials are absent.
+- The preview `/api/concierge` route is deliberately outside this quota until it is production-ready.
 - Maximum three Responses requests per visitor turn; typically one for a direct answer.
 - At most one tool call per response and one queued browser action per turn. The third response disables tools.
 - Maximum 800 output tokens per model call, reasoning effort `none`, no automatic retries.
@@ -65,7 +70,7 @@ Token matching is case-insensitive and ignores common stop words. Title/keyword 
 - `store: false`, no response caching, and no logging of transcripts, credentials, or provider bodies.
 - Invalid input returns 400/413. Provider errors, incomplete/empty replies, or exhausted tool budgets return a generic 503, with no queued action exposed.
 
-These are per-request limits. Public-endpoint deployment still needs platform-level rate/spend controls for aggregate traffic; there is no distributed rate limiter in this change.
+The distributed quota limits aggregate traffic before paid provider calls. A provider-account billing ceiling remains a recommended final safeguard because application controls cannot protect against every infrastructure or credential failure.
 
 ## Validation and removal
 

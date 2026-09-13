@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { messagesSchema, runPortfolioAgent } from "./agent";
+import { checkChatbotQuota } from "./rateLimit";
 import { REPLY_ERROR_FALLBACK_MSG } from "@/app/lib/chatbot/config";
 
 const legacySchema = z.object({
@@ -31,7 +32,7 @@ async function readBody(request: Request): Promise<unknown> {
 }
 
 export async function handleChatRequest(request: Request, format: "chatbot" | "concierge") {
-  const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
+  const json = (body: unknown, status = 200, headers?: HeadersInit) => Response.json(body, { status, headers: { "Cache-Control": "no-store", ...Object.fromEntries(new Headers(headers)) } });
   let messages;
   let enableActions = false;
   try {
@@ -46,6 +47,20 @@ export async function handleChatRequest(request: Request, format: "chatbot" | "c
     }
   } catch (error) {
     return json(format === "chatbot" ? { message: "Please send a question of up to 2,000 characters.", error: true } : { error: "Please send a valid question of up to 2,000 characters." }, error instanceof RangeError ? 413 : 400);
+  }
+  if (format === "chatbot") {
+    try {
+      const quota = await checkChatbotQuota(request);
+      if (!quota.allowed) {
+        return json(
+          { message: quota.reason === "ip" ? "You’ve sent too many questions. Please try again shortly." : "The portfolio assistant has reached today’s request limit. Please try again tomorrow.", error: true },
+          429,
+          { "Retry-After": String(quota.retryAfterSeconds) },
+        );
+      }
+    } catch {
+      return json({ message: REPLY_ERROR_FALLBACK_MSG, error: true }, 503);
+    }
   }
   try {
     const signal = AbortSignal.any([request.signal, AbortSignal.timeout(25_000)]);
