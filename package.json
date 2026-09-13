@@ -10,7 +10,6 @@
     "worktree": "bash scripts/worktree-bootstrap.sh",
     "test": "bun test",
     "test:unit": "bun test lib/chatbot/__tests__ app/utils/__tests__/unit",
-    "test:ui": "bun test --preload ./bun-ui-test-setup.ts components/ui/__tests__/",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

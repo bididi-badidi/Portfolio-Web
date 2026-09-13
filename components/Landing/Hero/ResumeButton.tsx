@@ -15,6 +15,7 @@ import { motion } from "motion/react";
 
 export function ResumeButton({
   className,
+  label = "Resume",
   labelDelay = 0,
   labelInitialOpacity = 1,
   layoutId,
@@ -22,6 +23,7 @@ export function ResumeButton({
   reserveLabelSpace = false,
 }: {
   className?: string;
+  label?: string;
   labelDelay?: number;
   labelInitialOpacity?: number;
   layoutId?: string;
@@ -150,7 +152,7 @@ export function ResumeButton({
           transition={{ delay: labelDelay, duration: 0.24, ease: "easeOut" }}
           style={{ minWidth: reserveLabelSpace ? "4.6rem" : undefined }}
         >
-          Resume
+          {label}
         </motion.span>
       </GlassButton>
 

@@ -1,0 +1,962 @@
+.page {
+  background: #000;
+}
+.page .hero {
+  padding-top: 11rem;
+  padding-bottom: 5rem;
+  text-align: center;
+}
+.hero h1 {
+  margin: 0;
+  font-size: clamp(3.5rem, 7.2vw, 6.5rem);
+  font-weight: 600;
+  letter-spacing: -0.06em;
+  line-height: 1.02;
+}
+.hero h1 > span {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background: linear-gradient(180deg, #f2f2f4 6%, #a3a3a8 60%, #646469 100%);
+  color: #aaaab0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero .heroDescription {
+  margin-top: 2rem;
+  color: #aaaab0;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  letter-spacing: -0.015em;
+}
+.heroVisual {
+  display: grid;
+  grid-template-columns: 0.9fr 1.35fr;
+  align-items: center;
+  gap: 4.5rem;
+  max-width: 62rem;
+  margin: 5rem auto 0;
+  text-align: left;
+}
+.contextRail {
+  display: grid;
+  gap: 1.65rem;
+}
+.visualLabel {
+  color: #929298;
+  font-size: 0.6rem;
+  letter-spacing: 0.09em;
+}
+.contextRail > div {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  color: #bdbdc4;
+  font-size: 0.95rem;
+}
+.contextRail svg {
+  color: #9999a2;
+}
+.conversation {
+  border: 1px solid #414145;
+  border-radius: 1.5rem;
+  background: linear-gradient(130deg, #171719, #09090a 60%);
+  overflow: hidden;
+  box-shadow: 0 24px 64px #000;
+}
+.conversationHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 1.35rem;
+  border-bottom: 1px solid #29292c;
+  font-size: 0.8rem;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border: 1px solid #75757b;
+  border-radius: 50%;
+  font-size: 0.9rem;
+}
+.exampleLabel {
+  margin-left: auto;
+  font-size: 0.65rem;
+  color: #929298;
+}
+.conversationBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.6rem;
+}
+.conversationBody .exampleQuestion {
+  align-self: flex-end;
+  max-width: 95%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #38383e;
+  border-radius: 1.1rem 1.1rem 0.3rem 1.1rem;
+  background: #232326;
+  font-size: 0.85rem;
+}
+.exampleAnswer {
+  max-width: 24rem;
+}
+.exampleAnswer > span {
+  color: #9999a2;
+  letter-spacing: 0.05em;
+  font-size: 0.6rem;
+}
+.exampleAnswer > p {
+  margin-top: 0.5rem;
+  color: #d1d1d7;
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+.conversationAction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.9rem 1.6rem;
+  border: 0;
+  border-top: 1px solid #29292c;
+  background: #141416;
+  color: #bfbfc7;
+  font-size: 0.8rem !important;
+  text-align: left;
+  transition: background 180ms;
+}
+.conversationAction:hover {
+  background: #242428;
+  color: #fff;
+}
+.conversationAction:active {
+  background: #303034;
+}
+.projectMeta {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 3rem;
+  color: #929298;
+  font-size: 0.7rem;
+}
+.projectMeta span + span::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  margin: 0 2rem 0 0;
+  border-radius: 50%;
+  background: #66666d;
+  vertical-align: middle;
+}
+.overview,
+.build {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: 2rem;
+  border-top: 1px solid #29292c;
+  padding: 6rem 0;
+}
+.secondary {
+  color: #a4a4ac;
+}
+.bodyCopy {
+  margin-top: 1.8rem !important;
+  color: #aaaab0;
+  font-size: 1.15rem;
+  line-height: 1.75;
+  max-width: 48rem;
+}
+.section {
+  padding: 4rem 0 6rem;
+}
+.section h2,
+.architecture h2 {
+  margin-top: 1.5rem;
+}
+.sectionDescription {
+  margin-top: 1.4rem !important;
+  margin-bottom: 1.4rem !important;
+  color: #aaaab0;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 35rem;
+}
+.demoTabs {
+  margin-top: 2.5rem;
+}
+.demoStage {
+  position: relative;
+  border: 1px solid #414145;
+  border-radius: 1.5rem;
+  background: linear-gradient(125deg, #202023 -30%, #0c0c0d 45%, #080809);
+  overflow: clip;
+}
+.demoPanel {
+  display: grid;
+  grid-template-columns: 0.85fr 1.5fr;
+  align-items: center;
+  gap: 3rem;
+  width: 100%;
+  padding: 3rem;
+}
+.demoCopy > svg {
+  color: #aaaab0;
+  margin-bottom: 1.4rem;
+}
+.demoCopy h3 {
+  font-size: clamp(1.9rem, 2.9vw, 2.6rem);
+  font-weight: 550;
+  line-height: 1.15;
+  letter-spacing: -0.045em;
+  white-space: pre-line;
+}
+.demoCopy > p {
+  margin-top: 1.5rem;
+  color: #aaaab0;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+.demoCopy blockquote {
+  border-left: 1px solid #55555b;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: #c3c3ca;
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+.playButton {
+  min-height: 2.75rem;
+  padding: 0.6rem 1.1rem;
+  font-size: 0.8rem;
+}
+.demoCopy > a {
+  display: flex;
+  width: fit-content;
+  font-size: 0.75rem;
+}
+.demoMedia {
+  min-width: 0;
+  border: 1px solid #414145;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #030303;
+}
+.recordingHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #29292c;
+  background: #161618;
+  font-size: 0.7rem;
+  color: #c4c4cc;
+}
+.recordingHeader > span:first-child {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a3a3aa;
+}
+.recordingHeader > span:last-child {
+  margin-left: auto;
+  color: #929298;
+  font-size: 0.6rem;
+}
+.demoMedia video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  background: #000;
+}
+.recordingNote {
+  margin-top: 1rem !important;
+  text-align: right;
+  font-size: 0.7rem;
+  line-height: 1.7;
+  color: #929298;
+}
+.mediaError {
+  padding: 1rem;
+  color: #efd1cb;
+  font-size: 0.8rem;
+}
+.mediaError a {
+  color: #fff;
+  text-decoration: underline;
+}
+.architecture {
+  display: grid;
+  grid-template-columns: 0.95fr 1.3fr;
+  gap: 5rem;
+  padding: 6rem 0 7rem;
+  border-top: 1px solid #29292c;
+}
+.architectureIntro {
+  align-self: start;
+  position: sticky;
+  top: 9rem;
+}
+.architectureIntro h2 {
+  font-size: clamp(2.2rem, 3.7vw, 3.25rem);
+}
+.architectureIntro .sectionDescription {
+  font-size: 1rem;
+}
+.steps {
+  border-top: 1px solid #29292c;
+}
+.step {
+  border-bottom: 1px solid #29292c;
+}
+.stepToggle {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  padding: 1.5rem 0;
+  border: 0;
+  background: transparent;
+  color: #f5f5f7;
+  text-align: left;
+}
+.stepNumber {
+  color: #929298;
+  font-size: 0.75rem;
+  align-self: flex-start;
+  padding-top: 0.3rem;
+}
+.stepHeading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.stepHeading > span {
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.stepHeading small {
+  font-size: 0.75rem;
+  color: #929298;
+}
+.stepDisclosure {
+  overflow: hidden;
+}
+.stepBody {
+  padding: 0 0 1.8rem 2.3rem;
+}
+.stepBody > p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #aaaab0;
+}
+.stepFormula {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 1rem;
+  margin-top: 1.25rem;
+  border: 1px solid #333338;
+  border-radius: 0.75rem;
+  background: #111113;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.64rem;
+  line-height: 1.7;
+  color: #c6c6ce;
+}
+.stepFormula svg {
+  margin-top: 0.2rem;
+}
+.stack {
+  margin: 3rem 0 0;
+}
+.stack > div {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0.3rem 1rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid #29292c;
+}
+.stack dt {
+  color: #929298;
+  font-size: 0.75rem;
+}
+.stack dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.stack p {
+  margin-top: 0.4rem;
+  color: #aaaab0;
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: normal;
+}
+.evolution {
+  margin-top: 2rem;
+  border-top: 1px solid #29292c;
+  border-bottom: 1px solid #29292c;
+}
+.evolutionToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 1.2rem 0;
+  font-size: 0.85rem !important;
+  color: #c3c3cb;
+  text-align: left;
+}
+.evolutionBody {
+  padding-bottom: 1.5rem;
+}
+.evolution p {
+  color: #aaaab0;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  margin-top: 1rem;
+}
+.evolution a {
+  font-size: 0.8rem;
+}
+.trySection {
+  padding: 6rem 0 7rem;
+  text-align: center;
+}
+.trySection h2 {
+  margin-top: 1.6rem;
+}
+.trySection .sectionDescription {
+  margin-inline: auto;
+}
+.trySection > button {
+  margin-top: 2rem;
+}
+.footer > a {
+  font-size: 0.8rem;
+}
+.footer {
+  padding-bottom: 6rem;
+}
+.caseStudyHeroVisual {
+  align-items: stretch;
+}
+.projectHeroWindow {
+  min-width: 0;
+  border: 1px solid #414145;
+  border-radius: 1.5rem;
+  background: linear-gradient(130deg, #171719, #09090a 60%);
+  overflow: hidden;
+  box-shadow: 0 24px 64px #000;
+}
+.projectWindowBar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3.45rem;
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid #29292c;
+  color: #c7c7ce;
+  font-size: 0.75rem;
+}
+.projectWindowBar > span:last-child {
+  margin-left: auto;
+  color: #929298;
+  font-size: 0.65rem;
+}
+.heroTerminalBody {
+  min-height: 17rem;
+  padding: 2rem;
+  font-family: var(--font-geist-mono), monospace;
+}
+.heroTerminalBody > p {
+  color: #f0f0f3;
+  font-size: 0.9rem;
+}
+.heroTerminalBody > p span {
+  margin-right: 0.65rem;
+  color: #c7dfc0;
+}
+.heroTerminalBody > small {
+  display: block;
+  margin-top: 0.8rem;
+  color: #929298;
+  font-size: 0.65rem;
+}
+.heroTerminalBody dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin: 3rem 0 0;
+}
+.heroTerminalBody dl > div {
+  padding-top: 0.85rem;
+  border-top: 1px solid #343438;
+}
+.heroTerminalBody dt {
+  color: #7e7e85;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.heroTerminalBody dd {
+  margin: 0.45rem 0 0;
+  color: #d4d4da;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+.shortcutList {
+  display: grid;
+  gap: 0.7rem;
+  min-height: 17rem;
+  padding: 1.35rem;
+}
+.shortcutList > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #333338;
+  border-radius: 0.85rem;
+  background: #111113;
+}
+.shortcutIcon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid #4a4a50;
+  border-radius: 0.7rem;
+  color: #d7d7dd;
+}
+.shortcutList p {
+  display: grid;
+  gap: 0.2rem;
+}
+.shortcutList strong {
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.shortcutList small {
+  color: #929298;
+  font-size: 0.65rem;
+}
+.shortcutList > div > svg {
+  color: #aaaab0;
+}
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c7dfc0;
+}
+.apiBody {
+  display: grid;
+  align-content: center;
+  min-height: 17rem;
+  padding: 1.5rem 2rem 2rem;
+  font-family: var(--font-geist-mono), monospace;
+}
+.apiBody > p {
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.72rem;
+}
+.apiBody > p strong {
+  color: #c7dfc0;
+}
+.apiBody > p span {
+  color: #c7c7ce;
+}
+.apiBody pre {
+  margin: 1.1rem 0;
+  padding: 1rem;
+  border: 1px solid #333338;
+  border-radius: 0.75rem;
+  background: #070708;
+  color: #bdbdc5;
+  font-size: 0.68rem;
+  line-height: 1.75;
+  overflow: auto;
+}
+.apiBody > div {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #c7dfc0;
+  font-size: 0.65rem;
+}
+.automationFlow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 17rem;
+  padding: 1.5rem;
+}
+.automationFlow > div {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 1rem 0.8rem;
+  border: 1px solid #3b3b40;
+  border-radius: 0.8rem;
+  background: #101012;
+}
+.automationFlow > div > span {
+  color: #7f7f86;
+  font-size: 0.55rem;
+  letter-spacing: 0.06em;
+}
+.automationFlow strong {
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.automationFlow small {
+  color: #929298;
+  font-size: 0.58rem;
+  line-height: 1.5;
+}
+.automationFlow > svg {
+  color: #73737a;
+}
+.disclosureNote {
+  max-width: 22rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid #29292c;
+  color: #85858c;
+  font-size: 0.7rem;
+  line-height: 1.65;
+}
+.demoCopy .featureDetail {
+  margin-top: 0.75rem;
+  color: #85858d;
+  font-size: 0.82rem;
+}
+.featureFormula {
+  padding: 0.9rem 1rem;
+  margin-top: 1.4rem;
+  border: 1px solid #333338;
+  border-radius: 0.75rem;
+  background: #111113;
+  color: #c6c6ce;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.63rem;
+  line-height: 1.7;
+}
+.inlinePlayButton {
+  min-height: 2.65rem;
+  margin-top: 1rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.75rem;
+}
+.abstractFeature {
+  display: grid;
+  align-content: center;
+  min-height: 22rem;
+  padding: 2rem;
+  border: 1px solid #414145;
+  border-radius: 1rem;
+  background: #030303;
+}
+.abstractFeature > p {
+  margin-bottom: 1.5rem;
+  color: #77777e;
+  font-size: 0.58rem;
+  letter-spacing: 0.09em;
+}
+.abstractFlow {
+  display: grid;
+  gap: 0.75rem;
+}
+.abstractFlow > div {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.5rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #333338;
+  border-radius: 0.75rem;
+  background: #111113;
+}
+.abstractFlow span {
+  color: #74747b;
+  font-size: 0.6rem;
+}
+.abstractFlow strong {
+  min-width: 0;
+  color: #c8c8cf;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.abstractFlow svg {
+  color: #74747b;
+  transform: rotate(90deg);
+}
+@media (max-width: 1100px) {
+  .heroVisual {
+    gap: 2rem;
+  }
+  .contextRail > div {
+    font-size: 0.8rem;
+  }
+  .overview,
+  .build {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+  .architecture {
+    gap: 3rem;
+  }
+  .demoPanel {
+    padding: 2rem;
+    gap: 2rem;
+  }
+  .automationFlow {
+    grid-template-columns: 1fr;
+  }
+  .automationFlow > svg {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+}
+@media (max-width: 700px) {
+  .page .hero {
+    padding-top: 8.5rem;
+    padding-bottom: 3.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.65rem, 10.5vw, 4.5rem);
+    letter-spacing: -0.065em;
+    line-height: 1.08;
+  }
+  .hero .heroDescription {
+    font-size: 1rem;
+    margin-top: 1.65rem;
+    line-height: 1.7;
+  }
+  .heroVisual {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+  .caseStudyHeroVisual {
+    flex-direction: column-reverse;
+  }
+  .projectHeroWindow {
+    width: 100%;
+    border-radius: 1.2rem;
+  }
+  .heroTerminalBody,
+  .shortcutList,
+  .apiBody,
+  .automationFlow {
+    min-height: 15rem;
+  }
+  .heroTerminalBody {
+    padding: 1.5rem 1.2rem;
+  }
+  .heroTerminalBody dl {
+    gap: 0.4rem;
+    margin-top: 2.25rem;
+  }
+  .shortcutList {
+    padding: 1rem;
+  }
+  .shortcutList > div {
+    padding: 0.75rem;
+  }
+  .apiBody {
+    padding: 1.2rem;
+  }
+  .automationFlow {
+    padding: 1rem;
+  }
+  .conversation {
+    width: 100%;
+    border-radius: 1.2rem;
+  }
+  .conversationHeader {
+    padding: 0.8rem 1rem;
+    font-size: 0.75rem;
+  }
+  .conversationBody {
+    padding: 1.2rem;
+    gap: 1.2rem;
+  }
+  .conversationBody .exampleQuestion {
+    font-size: 0.75rem;
+  }
+  .exampleAnswer > p {
+    font-size: 0.82rem;
+  }
+  .conversationAction {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.75rem !important;
+  }
+  .contextRail {
+    width: 100%;
+    gap: 0.9rem;
+    text-align: left;
+    padding-inline: 0.4rem;
+  }
+  .contextRail > div {
+    font-size: 0.8rem;
+  }
+  .visualLabel {
+    font-size: 0.55rem;
+  }
+  .projectMeta {
+    gap: 0.75rem;
+    margin-top: 2rem;
+    font-size: 0.57rem;
+    flex-wrap: wrap;
+  }
+  .projectMeta span + span::before {
+    margin-right: 0.75rem;
+  }
+  .overview,
+  .build {
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+    padding: 3.5rem 0;
+  }
+  .bodyCopy {
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-top: 1.4rem !important;
+  }
+  .section {
+    padding: 2.5rem 0 4rem;
+  }
+  .sectionDescription {
+    font-size: 1rem;
+  }
+  .demoTabs {
+    width: 100%;
+  }
+  .demoTabs button {
+    padding: 0.7rem 0.45rem;
+    font-size: 0.7rem;
+  }
+  .demoStage {
+    border-radius: 1.2rem;
+  }
+  .demoPanel {
+    grid-template-columns: 1fr;
+    padding: 1.75rem 1.25rem;
+    gap: 2rem;
+  }
+  .demoCopy h3 {
+    font-size: 2rem;
+  }
+  .demoCopy > p {
+    font-size: 0.9rem;
+  }
+  .demoCopy blockquote {
+    font-size: 0.75rem;
+  }
+  .demoMedia {
+    border-radius: 0.75rem;
+  }
+  .abstractFeature {
+    min-height: 18rem;
+    padding: 1.2rem;
+    border-radius: 0.75rem;
+  }
+  .recordingHeader {
+    padding: 0.7rem;
+    font-size: 0.65rem;
+  }
+  .recordingHeader > span:last-child {
+    font-size: 0.5rem;
+  }
+  .recordingNote {
+    text-align: left;
+    font-size: 0.65rem;
+  }
+  .architecture {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 3.5rem 0 4rem;
+  }
+  .architectureIntro {
+    position: static;
+  }
+  .stepToggle {
+    gap: 0.7rem;
+  }
+  .stepHeading > span {
+    font-size: 1rem;
+  }
+  .stepHeading small {
+    font-size: 0.68rem;
+  }
+  .stepBody {
+    padding-left: 1.85rem;
+  }
+  .stepBody > p {
+    font-size: 0.9rem;
+  }
+  .stepFormula {
+    font-size: 0.58rem;
+  }
+  .stack {
+    margin-top: 2rem;
+  }
+  .stack > div {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+  .stack p {
+    grid-column: 1;
+  }
+  .stack dd {
+    font-size: 1rem;
+  }
+  .trySection {
+    padding: 3.5rem 0 4.5rem;
+  }
+  .trySection h2 {
+    font-size: clamp(2rem, 7.5vw, 3rem);
+  }
+  .footer {
+    padding-bottom: 6rem;
+  }
+}
+@media (prefers-contrast: more) {
+  .hero h1 > span {
+    background: none;
+    -webkit-text-fill-color: #ddd;
+  }
+  .secondary,
+  .bodyCopy,
+  .sectionDescription,
+  .demoCopy > p,
+  .stepBody > p {
+    color: #d3d3d8;
+  }
+  .conversation,
+  .demoStage,
+  .demoMedia {
+    border-color: #aaa;
+  }
+}

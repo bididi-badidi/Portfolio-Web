@@ -1,4 +1,3 @@
-import { CHAT_HISTORY } from "@/components/chatbot/demoChatHistory";
 import { ChatInstance } from "@/app/interfaces/Chatbot";
 import React, { ReactNode, createContext, useContext, useState } from "react";
 
@@ -10,7 +9,7 @@ interface ModalContextType {
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
-  const [chatHistory, setChatHistory] = useState<ChatInstance[]>(CHAT_HISTORY);
+  const [chatHistory, setChatHistory] = useState<ChatInstance[]>([]);
 
   return (
     <ModalContext.Provider

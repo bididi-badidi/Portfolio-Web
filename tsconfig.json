@@ -40,7 +40,6 @@
     "**/__tests__/**",
     "**/*.test.ts",
     "**/*.test.tsx",
-    "bun-test-setup.ts",
-    "bun-ui-test-setup.ts"
+    "bun-test-setup.ts"
   ]
 }

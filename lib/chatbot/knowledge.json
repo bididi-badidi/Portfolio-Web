@@ -83,16 +83,16 @@
   },
   {
     "id": "shortcuts",
-    "title": "Shortcuts Calendar",
+    "title": "Productivity Shortcuts",
     "keywords": [
       "Apple Shortcuts",
       "Gemini",
       "Calendar",
-      "AI Event Capture",
+      "Productivity Shortcuts",
       "events"
     ],
     "source": "/projects/shortcuts",
-    "content": "AI Event Capture uses one command to register multiple calendar events. The authored technology list includes Apple Shortcuts, Gemini, and Calendar. Evidence: components/Landing/Project/ShortcutsCalendar.tsx and app/(pages)/projects/shortcuts/TechStack.tsx. No measured time savings are documented."
+    "content": "Productivity Shortcuts is a collection of three Apple Shortcuts: screen-to-calendar capture, conversation-to-calendar capture, and batch scheduling for multiple events. The authored technology list includes Apple Shortcuts, Gemini, and Calendar. Evidence: app/(pages)/projects/shortcuts/Features.tsx and TechStack.tsx. No measured time savings are documented."
   },
   {
     "id": "xcuisite",
