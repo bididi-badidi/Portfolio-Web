@@ -38,7 +38,7 @@ Use rendered, active components as examples. The older `.demoButton` and `.close
 
 The project reference is **`/projects/personal-ai`**, reached from the Personal AI tab on the homepage. The shared case-study template also powers `/projects/stock-ai`, `/projects/shortcuts`, `/projects/remainder-api` and `/projects/automation-manager`. Each page links back to all projects. `/projects/reminders` remains the functional playground.
 
-The approved dark design now lives in `components/Portfolio`. Former `/preview/dark` URLs permanently redirect to their production counterparts. The replaced landing, case-study and chat presentation code has been removed; the experimental `components/PortfolioPreview` and `components/ModelIntroduction` folders and their preview routes are retained. The shared chat uses one presentation on every route, and live pages inherit indexable metadata with a device-width viewport.
+The approved dark design now lives in `components/Portfolio`. Former `/preview/dark` URLs permanently redirect to their production counterparts. The replaced landing, case-study, chat presentation, and experimental preview code has been removed. The shared chat uses one presentation on every route, and live pages inherit indexable metadata with a device-width viewport.
 
 Use `ProjectShell` for consistent navigation, footer and the existing separate `ChatWindow`. Project navigation names the page's own sections. The hero uses the same silver display gradient and pill actions as the landing page; a compact example conversation demonstrates the product and leads into the live assistant. Label example content clearly.
 
